@@ -17,7 +17,8 @@
     "icons": "node scripts/make-icons.mjs",
     "package:win": "node scripts/package-win.mjs",
     "count-lines": "node scripts/count-lines.mjs",
-    "huishots": "node scripts/capture.mjs"
+    "huishots": "node scripts/capture.mjs",
+    "gen:api": "node scripts/gen-api-catalog.mjs"
   },
   "dependencies": {
     "dompurify": "^3.2.6",
@@ -30,7 +31,8 @@
   "devDependencies": {
     "@electron/packager": "^18.3.6",
     "electron": "^37.2.0",
-    "esbuild": "^0.25.5"
+    "esbuild": "^0.25.5",
+    "js-yaml": "^4.3.2"
   },
   "optionalDependencies": {
     "electron-winstaller": "^5.4.0",
