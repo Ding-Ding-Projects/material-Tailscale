@@ -71,7 +71,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p out/screenshots
-          MT_CAPTURE_DIR="$PWD/out/screenshots" npx electron . --disable-gpu || true
+          MT_CAPTURE_DIR="$PWD/out/screenshots" node scripts/capture.mjs || true
           ls out/screenshots | head -100
 
       - name: Package Squirrel.Windows installer
