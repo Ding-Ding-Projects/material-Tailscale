@@ -41,6 +41,10 @@ export const DESTS = [
 
 const pages = new Map();
 export function registerPage(id, render) { pages.set(id, render); }
+export const getPage = (id) => pages.get(id);
+// The website supplies its own router; the desktop app uses tabs.
+let external = null;
+export function setRouter(r) { external = r; }
 
 let tabs = store.get('tabs') || [{ id: 'ws', kind: 'workspace', dest: 'home' }];
 let active = tabs[0].id;
@@ -107,10 +111,12 @@ function renderTabs() {
 }
 
 export function newTabCatalog(anchor) {
+  if (external) return;
   menu(anchor || strip, DESTS.map((d) => ({ label: t(d.id), icon: d.icon, run: () => openInNewTab(d.id) })), { title: t('newTab') });
 }
 
 export function openInNewTab(dest, arg) {
+  if (external) return external.open(dest, arg);
   const id = 't' + Date.now();
   tabs.push({ id, kind: 'utility', dest, arg });
   active = id; saveTabs(); renderTabs(); renderRail(); render();
@@ -132,6 +138,7 @@ export function closeTab(id) {
 
 /** Ordinary navigation reuses the workspace tab; it never adds tabs. */
 export function openDest(dest, arg) {
+  if (external) return external.open(dest, arg);
   const ws = tabs.find((x) => x.kind === 'workspace');
   const cur = tabs.find((x) => x.id === active);
   if (cur && cur.kind !== 'workspace' && cur.dest === dest) { cur.arg = arg; render(); return; }
@@ -139,9 +146,10 @@ export function openDest(dest, arg) {
   saveTabs(); renderTabs(); renderRail(); render();
 }
 
-export function currentDest() { return tabs.find((x) => x.id === active)?.dest; }
+export function currentDest() { if (external) return external.current(); return tabs.find((x) => x.id === active)?.dest; }
 
 export function render() {
+  if (external) return external.render();
   const tb = tabs.find((x) => x.id === active) || tabs[0];
   const fn = pages.get(tb.dest) || pages.get('home');
   transition(() => {

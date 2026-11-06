@@ -13,11 +13,11 @@
     "build:info": "node scripts/build-info.mjs",
     "build": "npm run build:info && npm run build:renderer",
     "start": "npm run build && electron .",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.mjs",
     "icons": "node scripts/make-icons.mjs",
     "package:win": "node scripts/package-win.mjs",
     "count-lines": "node scripts/count-lines.mjs",
-    "huishots": "node scripts/capture.mjs",
+    "screenshots": "node scripts/capture.mjs",
     "gen:api": "node scripts/gen-api-catalog.mjs"
   },
   "dependencies": {
@@ -32,11 +32,9 @@
     "@electron/packager": "^18.3.6",
     "electron": "^37.2.0",
     "esbuild": "^0.25.5",
-    "js-yaml": "^4.3.2"
-  },
-  "optionalDependencies": {
-    "electron-winstaller": "^5.4.0",
+    "js-yaml": "^4.3.2",
+    "sharp": "^0.34.5",
     "png-to-ico": "^2.1.8",
-    "sharp": "^0.34.2"
+    "electron-winstaller": "^5.4.0"
   }
 }

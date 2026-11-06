@@ -1,0 +1,28 @@
+/* Website layout on top of the app's own Material 3 tokens (app.css). */
+body { overflow: auto; }
+.site-header { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 10px; padding: 10px 20px; background: color-mix(in oklab, var(--surface) 85%, transparent); border-bottom: 1px solid var(--outline-soft); backdrop-filter: blur(16px); flex-wrap: wrap; }
+.site-header .brand { display: flex; align-items: center; gap: 10px; color: var(--on); text-decoration: none; font-family: var(--font-display); font-size: 17px; white-space: nowrap; }
+.site-nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.site-link { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: 14px; color: var(--on-2); text-decoration: none; font-weight: 600; font-size: 13px; transition: background var(--dur-m) var(--ease-emph); }
+.site-link:hover { background: var(--surface-3); }
+.site-link[aria-current="page"] { background: var(--primary-cont); color: var(--on); }
+.site-link .msr { font-size: 18px; }
+.site-menu { display: none; }
+.site-prov { max-width: 1480px; margin: 10px auto 0; padding: 0 24px; position: relative; z-index: 1; }
+#outlet { position: relative; z-index: 1; padding: 24px; }
+.site-hero { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; padding: 40px 0 20px; }
+.site-h1 { font-size: clamp(36px, 6vw, 68px); line-height: 1.02; letter-spacing: -1px; }
+.lede { font-size: 18px; color: var(--on-2); max-width: 640px; margin: 0; }
+.site-shot { flex: 1 1 440px; margin: 0; border-radius: var(--r-xl); overflow: hidden; border: 1px solid var(--outline); box-shadow: var(--shadow); animation: float 14s ease-in-out infinite; }
+.site-shot img { width: 100%; display: block; }
+.site-footer { position: relative; z-index: 1; display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; padding: 24px; color: var(--on-3); font-size: 12px; border-top: 1px solid var(--outline-soft); }
+a.btn, a.cmd-tile { text-decoration: none; color: inherit; }
+.eyebrow { font: 600 12px var(--font-body); color: var(--secondary); text-transform: uppercase; letter-spacing: 1px; }
+@media (max-width: 860px) {
+  .site-menu { display: inline-grid; }
+  .site-nav { display: none; width: 100%; flex-direction: column; }
+  body.nav-open .site-nav { display: flex; }
+  .site-link { height: 48px; }
+  .palette-trigger kbd { display: none; }
+  #outlet { padding: 16px; }
+}

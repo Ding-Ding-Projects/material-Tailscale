@@ -73,7 +73,7 @@ function schoolSection() {
     const name = text(rec.name || '', { label: pair('Rename this mode', '改名'), placeholder: 'School mode' });
     name.onChange(async (v) => { rec = await window.mt.shared.set({ name: v || null }); });
     const pw = h('input.input', { type: 'password', placeholder: pair('Set a new shared unlock password', '設定新共用密碼'), 'aria-label': pair('Shared unlock password', '共用解鎖密碼') });
-    box.append(h('div.flag-card', { dataset: { el: 'set-school' } }, h('div.switch-row', h('div.txt', h('b', schoolName()), h('span.small.muted', pair('One switch shared by every Ding-Ding app on this computer. Forces English and hides playful extras everywhere, live.', '本機所有 Ding-Ding 程式共用一個開關。強制英文，即時隱藏所有玩味功能。'))), sw.el),
+    box.append(h('div.flag-card', { dataset: { el: 'set-school' } }, h('div.switch-row', h('div.txt', h('b', schoolName()), h('span.small.muted', pair('One switch shared by every Ding-Ding-Projects app on this computer. Forces English and hides playful extras everywhere, live.', '本機所有 Ding-Ding-Projects 程式共用一個開關。強制英文，即時隱藏所有玩味功能。'))), sw.el),
       h('b', pair('Name', '名稱')), name.el, h('b', pair('Unlock password', '解鎖密碼')), h('div.row.nowrap', pw, h('button.btn.small', { on: { click: async () => { if (pw.value.length < 4) { toast(pair('Use at least 4 characters.', '最少 4 個字元。'), { kind: 'warn' }); return; } rec = await window.mt.shared.set({ credential: await sha(pw.value) }); pw.value = ''; toast(pair('Shared password saved.', '已儲存共用密碼。'), { kind: 'ok' }); } } }, t('apply')), h('button.btn.small.outline', { on: { click: async () => { if (await superConfirm({ action: pair('Reset the shared unlock password', '重設共用密碼'), affects: pair('Every app that uses this mode.', '所有用呢個模式嘅程式。') })) { rec = await window.mt.shared.set({ credential: null }); toast(pair('Shared password cleared.', '已清除共用密碼。'), { kind: 'ok' }); } } } }, t('reset')))));
   });
   return box;
@@ -171,12 +171,12 @@ function logoSection() {
 }
 
 registerPage('settings', (ctx) => {
-  let sec = SECTIONS.find((s) => s[0] === ctx.arg)?.[0] || 'tailscale';
+  let sec = SECTIONS.find((s) => s[0] === ctx.arg)?.[0] || (window.mt.site ? 'language' : 'tailscale');
   const content = h('div.stack');
   const search = regexField({ id: 'settings', placeholder: pair('Search settings', '搜尋設定'), onChange: () => draw() });
   const nav = h('div.row');
   const draw = () => {
-    clear(nav).append(...SECTIONS.filter(([id]) => !(schoolOn() && ['vocabulary'].includes(id))).map(([id, en, yue, ic]) => h('button.chip.choice', { 'aria-pressed': String(id === sec), on: { click: () => { sec = id; search.set(''); draw(); } } }, h('span.msr', { style: { fontSize: '16px' } }, ic), pair(en, yue))));
+    clear(nav).append(...SECTIONS.filter(([id]) => !(schoolOn() && ['vocabulary'].includes(id)) && !(window.mt.site && ['tailscale', 'data', 'about'].includes(id))).map(([id, en, yue, ic]) => h('button.chip.choice', { 'aria-pressed': String(id === sec), on: { click: () => { sec = id; search.set(''); draw(); } } }, h('span.msr', { style: { fontSize: '16px' } }, ic), pair(en, yue))));
     clear(content);
     const { q, re } = search.value();
     if (q) {

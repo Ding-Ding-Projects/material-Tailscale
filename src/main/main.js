@@ -183,7 +183,7 @@ app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(
 
 async function captureAll(dir) {
   // Drives the real built renderer through every destination in both themes
-  // and writes PNGs. Used by `npm run huishots` and the release workflow.
+  // and writes PNGs. Used by `npm run screenshots` and the release workflow.
   fs.mkdirSync(dir, { recursive: true });
   const wc = win.webContents;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
