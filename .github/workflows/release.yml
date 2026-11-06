@@ -74,50 +74,25 @@ jobs:
           MT_CAPTURE_DIR="$PWD/out/screenshots" node scripts/capture.mjs || true
           ls out/screenshots | head -100
 
+      - name: Prepare output folder
+        shell: bash
+        run: mkdir -p out
+
       - name: Package Squirrel.Windows installer
-        run: npm run package:win
+        shell: bash
+        run: |
+          set +e
+          npm run package:win > out/package.log 2>&1
+          code=$?
+          cat out/package.log
+          if [ "$code" -ne 0 ]; then echo "::error title=package::$(tail -c 2500 out/package.log | tr '\n' ' ')"; exit 1; fi
 
       - name: Count lines
         shell: bash
-        run: node scripts/count-lines.mjs > out/line-counts.md
+        run: mkdir -p out && node scripts/count-lines.mjs > out/line-counts.md
 
-      - name: Write release notes
-        shell: bash
-        run: |
-          {
-            echo "## Material Tailscale v$MT_VERSION"
-            [ -n "$MT_CODENAME" ] && echo "" && echo "**Code name:** $MT_CODENAME" && echo "" && echo "![$MT_CODENAME]($MT_PHOTO_URL)"
-            echo ""
-            echo "Commit: ${{ github.sha }}"
-            echo ""
-            echo "### Install"
-            echo "Download **MaterialTailscaleSetup.exe** below and run it. The installer is **unsigned**, so Windows SmartScreen may warn about an unknown publisher. Installed copies update themselves from this release feed and ask before restarting."
-            echo ""
-            echo "### Checks"
-            echo "This release workflow runs no automated test or lint gate. Local checks for this commit are recorded in HANDOFF.md."
-            echo ""
-            echo "### Changes"
-            git log -1 --format='- %s'
-            echo ""
-            echo "### Line counts"
-            cat out/line-counts.md
-          } > out/notes.md
-
-      - name: Publish release
-        shell: bash
-        run: |
-          gh release create "v$MT_VERSION" out/installer/MaterialTailscaleSetup.exe out/installer/RELEASES out/installer/*.nupkg \
-            --title "v$MT_VERSION${MT_CODENAME:+ · $MT_CODENAME}" --notes-file out/notes.md --target "${{ github.sha }}"
-          if ls out/screenshots/*.png >/dev/null 2>&1; then (cd out/screenshots && zip -q ../screenshots.zip *.png) && gh release upload "v$MT_VERSION" out/screenshots.zip; fi
-
-      - name: Append verified workflow timing
-        shell: bash
-        run: |
-          done=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          secs=$(( $(date -u -d "$done" +%s) - $(date -u -d "$MT_STARTED" +%s) ))
-          dur=$(printf '%02d:%02d:%02d' $((secs/3600)) $((secs%3600/60)) $((secs%60)))
-          printf '\n### Workflow timing\n- Workflow started: %s\n- Workflow completed: %s\n- Workflow duration: %s\n' "$MT_STARTED" "$done" "$dur" >> out/notes.md
-          gh release edit "v$MT_VERSION" --notes-file out/notes.md
+      - name: Publish release with notes and timing
+        run: node scripts/publish-release.mjs
 
       - name: Upload safe outputs
         if: ${{ always() }}
