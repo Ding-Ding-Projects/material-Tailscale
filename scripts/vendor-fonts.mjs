@@ -26,8 +26,11 @@ for (const url of REQUESTS) {
   let text = await res.text();
   const urls = [...text.matchAll(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g)].map((m) => m[1]);
   if (!urls.length) throw new Error(`No font files in ${url}`);
+  const family = (url.match(/family=([^:&]+)/)?.[1] || 'font').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  let n = 0;
   for (const fileUrl of urls) {
-    const name = fileUrl.split('/').slice(-3).join('-').replace(/[^A-Za-z0-9._-]/g, '_');
+    // Short names: Windows checkouts fail on very long paths.
+    const name = `${family}-${++n}.woff2`;
     const r = await fetch(fileUrl, { headers: { 'User-Agent': UA } });
     if (!r.ok) throw new Error(`Font file failed: ${fileUrl} -> HTTP ${r.status}`);
     const buf = Buffer.from(await r.arrayBuffer());
