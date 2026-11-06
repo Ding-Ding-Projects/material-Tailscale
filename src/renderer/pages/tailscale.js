@@ -19,7 +19,7 @@ const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.title
 const cmdBlock = (id, opts) => { const c = findCommand(id); return collapsible(`cmd-${id}`, h('span', pair(c.title, YUE_TITLES[id]), h('code.small.muted', { style: { marginLeft: '8px' } }, 'tailscale ' + c.path.join(' '))), h('div.card', commandForm(c, { compact: true, ...opts })), { startCollapsed: opts?.collapsed }); };
 
 function missingCard() {
-  return h('div.card.span-12', { style: { borderColor: 'var(--error)' } }, h('div.row', icon('error', '.fill'), h('h2', t('notInstalled'))), h('p', t('tsMissing')),
+  return h('div.card', { style: { borderColor: 'var(--error)', gridColumn: '1 / -1' } }, h('div.row', icon('error', '.fill'), h('h2', t('notInstalled'))), h('p', t('tsMissing')),
     h('div.row', h('button.btn', { on: { click: () => window.mt.shell.external('https://tailscale.com/download') } }, icon('download'), pair('Get Tailscale', '下載 Tailscale')), h('button.btn.outline', { on: { click: () => openDest('settings', 'tailscale') } }, icon('folder_open'), pair('Choose its location', '揀佢嘅位置'))),
     ts.data.located?.length ? h('details', h('summary', pair('Places searched', '搵過嘅位置')), h('div.out', ts.data.located.join('\n'))) : null);
 }

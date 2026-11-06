@@ -45,7 +45,7 @@
 - [ ] Minecraft server creator, plugin installer and world generator
 
 ## Phase 5: Release and website
-- [x] Squirrel.Windows packaging, unsigned verification, update banner
+- [x] Squirrel.Windows packaging, unsigned verification, update banner (first release v1.0.4 published)
 - [x] Release on every push with version tag, dim sum code name, line counts and measured timing
 - [x] screenshot capture mode in the built app and in the release workflow
 - [x] Website that reuses the app's modules: landing, features, docs, download, changelog, status, tools, settings
