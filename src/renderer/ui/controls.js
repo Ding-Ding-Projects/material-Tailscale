@@ -300,7 +300,7 @@ export function forSpec(spec, { triState, value } = {}) {
     case 'path': return pathPick(v, { mode: 'file', label });
     case 'savepath': return pathPick(v, { mode: 'save', label });
     case 'dir': return pathPick(v, { mode: 'dir', label });
-    case 'files': return pathPick([], { mode: 'files', label });
+    case 'files': return pathPick(Array.isArray(v) ? v : [], { mode: 'files', label });
     case 'secret': return secret(v, { label });
     case 'servetarget': return serveTarget('', { label });
     case 'certhost': return certHost(v, { label });
