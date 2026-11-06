@@ -8,7 +8,7 @@ import { sound } from '../core/feedback.js';
 
 const emitter = () => { const fns = new Set(); return { on: (f) => fns.add(f), fire: (v) => fns.forEach((f) => f(v)) }; };
 
-export function switchCtl(value = false, { label, triState } = {}) {
+export function switchCtl(value, { label, triState } = {}) {
   const ev = emitter();
   let v = value;
   if (triState) {
@@ -16,6 +16,7 @@ export function switchCtl(value = false, { label, triState } = {}) {
     seg.onChange(ev.fire);
     return { el: seg.el, get: seg.get, set: seg.set, onChange: ev.on };
   }
+  v = !!v;
   const el = h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(!!v), 'aria-label': label || 'Toggle', on: { click: () => { v = !v; el.setAttribute('aria-checked', String(v)); sound('click'); ev.fire(v); } } });
   return { el, get: () => v, set: (x) => { v = !!x; el.setAttribute('aria-checked', String(v)); }, onChange: ev.on };
 }

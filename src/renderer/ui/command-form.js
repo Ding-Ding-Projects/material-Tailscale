@@ -46,12 +46,12 @@ export function commandForm(cmd, { compact, onResult, preset } = {}) {
   const values = () => {
     const flags = {};
     for (const [name, c] of controls) {
+      // Only flags the person actually touched (or that came from a preset) are sent.
+      if (!c.touched) continue;
       const v = c.get();
       const spec = cmd.flags.find((f) => f.name === name);
-      if (v === undefined || v === '' && spec.type !== 'port' || (Array.isArray(v) && !v.length && spec.type !== 'cidrs')) continue;
-      if (Array.isArray(v) && !v.length && spec.type === 'cidrs' && !c.touched) continue;
-      if (!triState && spec.type === 'bool' && v === (spec.default ?? false) && !c.touched) continue;
-      if (spec.type !== 'bool' && !c.touched && v === spec.default) continue;
+      if (v === undefined) continue;
+      if (v === '' && spec.type !== 'port' && spec.type !== 'exitnode' && spec.type !== 'cidrs') continue;
       flags[name] = v;
     }
     return { flags, positionals: pos.map((c) => c.get()) };
@@ -88,6 +88,9 @@ export function commandForm(cmd, { compact, onResult, preset } = {}) {
   });
   for (const spec of cmd.flags || []) {
     const c = forSpec(spec, { triState, value: preset?.flags?.[spec.name] });
+    if (preset?.flags && spec.name in preset.flags) c.touched = true;
+    // App defaults that are always sent: machine-readable output and no interactive prompts.
+    if (['json', 'yes', 'bg', 'confirm'].includes(spec.name) || (spec.name === 'format' && spec.default === 'json')) c.touched = true;
     const card = h('div.flag-card', { dataset: { el: `cmd-${cmd.id}-flag-${spec.name}` } });
     c.onChange(() => { c.touched = true; card.classList.add('changed'); refresh(); });
     controls.set(spec.name, c);

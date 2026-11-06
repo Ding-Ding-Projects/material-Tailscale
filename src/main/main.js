@@ -44,7 +44,7 @@ function createWindow() {
     width: 1440, height: 940, minWidth: 380, minHeight: 560,
     frame: false, titleBarStyle: 'hidden', backgroundColor: '#0b0f1a', show: false,
     icon: path.join(ROOT, 'assets', 'icon.png'),
-    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: true }
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: true, backgroundThrottling: false }
   });
   win.loadFile(path.join(DIST, 'index.html'));
   win.once('ready-to-show', () => { if (!process.env.MT_HEADLESS) win.show(); });
@@ -181,8 +181,36 @@ const single = app.requestSingleInstanceLock();
 if (!single) app.quit();
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
 
+async function captureAll(dir) {
+  // Drives the real built renderer through every destination in both themes
+  // and writes PNGs. Used by `npm run huishots` and the release workflow.
+  fs.mkdirSync(dir, { recursive: true });
+  const wc = win.webContents;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let i = 0; i < 100 && !(await wc.executeJavaScript('!!window.__mtReady').catch(() => false)); i++) await wait(100);
+  await wc.executeJavaScript("document.querySelector('.scrim')?.remove(); document.querySelector('.dimsum')?.remove(); true");
+  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,converter,regex,draw,ollama,minecraft,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
+  for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
+    await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
+    for (const d of dests) {
+      const [dest, arg] = d.split(':');
+      await wc.executeJavaScript(`window.__mtOpen(${JSON.stringify(dest)}, ${JSON.stringify(arg || undefined)}); true`);
+      await wait(900);
+      const img = await wc.capturePage();
+      fs.writeFileSync(path.join(dir, `${theme}-${d.replace(':', '-')}.png`), img.toPNG());
+    }
+  }
+  if (process.env.MT_CAPTURE_PALETTE !== '0') {
+    await wc.executeJavaScript("window.dispatchEvent(new CustomEvent('mt:palette')); true");
+    await wait(600);
+    fs.writeFileSync(path.join(dir, 'light-palette.png'), (await wc.capturePage()).toPNG());
+  }
+  app.quit();
+}
+
 app.whenReady().then(() => {
   createWindow();
+  if (process.env.MT_CAPTURE_DIR) { win.setSize(Number(process.env.MT_CAPTURE_W || 1440), Number(process.env.MT_CAPTURE_H || 940)); win.webContents.once('did-finish-load', () => captureAll(process.env.MT_CAPTURE_DIR)); return; }
   createTray();
   watchShared();
   setupUpdates();

@@ -57,7 +57,7 @@ export function mountShell(info) {
   window.mt.win.onState(({ maximized }) => { maxBtn.firstChild.textContent = maximized ? 'filter_none' : 'crop_square'; });
   titleEl = h('span', appName());
   const b = info.build;
-  provEl = h('span.prov', { dataset: { el: 'provenance' } }, b ? `v${b.version} · ${b.codeName || ''} · ${t('updated')} ${fmtDateTime(b.commitTime)}` : pair(`v${info.version} · build provenance unavailable`, `v${info.version} · 冇建置來源資料`));
+  provEl = h('span.prov', { dataset: { el: 'provenance' } }, b ? [`v${b.version}`, b.codeName, `${t('updated')} ${b.commitTime ? fmtDateTime(b.commitTime) : pair('time unavailable', '冇時間資料')}`].filter(Boolean).join(' · ') : pair(`v${info.version} · build provenance unavailable`, `v${info.version} · 冇建置來源資料`));
   const titlebar = h('header.titlebar', { dataset: { el: 'titlebar' } },
     h('div.brand', logoSvg(22), titleEl), provEl, h('div.grow'),
     h('button.palette-trigger', { dataset: { el: 'palette-trigger' }, on: { click: () => window.dispatchEvent(new CustomEvent('mt:palette')) } }, icon('search'), h('span', pair('Search everything', '搜尋全部')), h('kbd', 'Ctrl+Shift+F')),

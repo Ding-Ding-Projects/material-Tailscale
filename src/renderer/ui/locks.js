@@ -44,7 +44,7 @@ export function lockWizard(id, anchor) {
       try { await window.mt.secret.set('lock:' + id, rec); } catch (e) { toast(e.message, { kind: 'err' }); return; }
       store.set('locks', { ...store.get('locks'), [id]: { mix, attempts: 0, until: 0, at: Date.now() } }, { label: `lock ${id}` });
       sound('success'); toast(pair('Locked.', '已鎖。'), { kind: 'ok' }); panel.close(); applyLocks();
-    } } }, icon('lock'), pair('Lock it', '鎖住'))))), { anchor, width: 480, height: 640 });
+    } } }, icon('lock'), pair('Lock it', '鎖住')))), { anchor, width: 480, height: 640 });
 }
 
 export function applyLocks(root = document) {

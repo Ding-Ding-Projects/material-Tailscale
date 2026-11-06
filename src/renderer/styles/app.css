@@ -51,6 +51,7 @@
 :root.low-stim .ambient { display: none; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; }
 body {
   background: var(--bg); color: var(--on); font: 400 calc(14px * var(--text-scale)) / 1.5 var(--font-body);
@@ -70,6 +71,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .msr.fill { font-variation-settings: 'FILL' 1; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-corner { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--outline); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
 
 /* ===== Ambient background ===== */
@@ -93,7 +95,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .palette-trigger kbd { font: 600 11px var(--font-mono); color: var(--primary); }
 
 .body { display: flex; min-height: 0; }
-.rail { flex: 0 0 92px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; overflow-y: auto; background: color-mix(in oklab, var(--surface) 60%, transparent); border-right: 1px solid var(--outline-soft); }
+.rail { flex: 0 0 92px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; overflow-y: auto; overflow-x: hidden; background: color-mix(in oklab, var(--surface) 60%, transparent); border-right: 1px solid var(--outline-soft); }
 .rail-item { width: 80px; border: 0; background: transparent; color: var(--on-3); display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 0 6px; cursor: pointer; font: 600 11px var(--font-body); text-align: center; line-height: 1.15; }
 .rail-item .pill { width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; transition: background var(--dur-m) var(--ease-emph), transform var(--dur-m) var(--ease-spring); }
 .rail-item:hover .pill { background: var(--surface-3); }
