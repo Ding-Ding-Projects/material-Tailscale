@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,0,0,1) both}
+@media (prefers-reduced-motion: reduce){.rise{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 960px; background: radial-gradient(900px 500px at 90% 0%, #3b2a12 0%, rgba(11,15,26,0) 55%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap"><h1 style="margin: 0; font: 800 40px Outfit; flex: 1">Settings</h1><label style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 22px; background: #161b2e; border: 1px solid #2a3150; min-width: 300px"><span aria-hidden="true">⌕</span><input aria-label="Search settings" placeholder="Search settings" style="flex: 1; border: 0; background: transparent; color: #e6e8f2; font: 14px 'Roboto Flex'; outline: none"><span style="font: 600 11px 'JetBrains Mono'; color: #a9b8ff">.*</span></label></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><sc-for list="{{chips}}" as="c" hint-placeholder-count="6"><button type="button" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button></sc-for></div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px">
+<section class="rise" style="grid-column: span 6; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font: 700 18px Outfit">Language &amp; voice</h2>
+<div role="radiogroup" aria-label="Language mode" style="display: flex; border-radius: 22px; background: #0f1322; padding: 4px"><sc-for list="{{langs}}" as="l" hint-placeholder-count="3"><button type="button" role="radio" aria-checked="{{l.on}}" onClick="{{l.pick}}" style="{{l.style}}">{{l.label}}</button></sc-for></div>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">English funny level</span><span style="font: 600 13px 'JetBrains Mono'; color: #ffc46b">5</span></span><input type="range" min="1" max="5" value="5" style="accent-color: #ffc46b"></label>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="display: flex; justify-content: space-between"><span style="font-weight: 600">Cantonese funny level 廣東話搞笑程度</span><span style="font: 600 13px 'JetBrains Mono'; color: #ffc46b">5</span></span><input type="range" min="1" max="5" value="5" style="accent-color: #ffc46b"></label>
+<div style="padding: 16px; border-radius: 18px; border: 1px dashed #3a4380; display: flex; align-items: center; gap: 12px"><span style="flex: 1"><span style="display: block; font-weight: 600">Personal vocabulary JSON</span><span style="display: block; font-size: 12px; color: #9aa3c4">No file loaded · drop a file anywhere on the window</span></span><button type="button" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 0; background: #a9b8ff; color: #0b0f1a; font: 700 13px 'Roboto Flex'">Choose file</button></div>
+</section>
+<section class="rise" style="grid-column: span 6; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0 0 8px; font: 700 18px Outfit">Comfort &amp; focus</h2>
+<sc-for list="{{toggles}}" as="t" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #1d2238"><span style="flex: 1"><span style="display: block; font-weight: 600">{{t.label}}</span><span style="display: block; font-size: 12px; color: #9aa3c4">{{t.hint}}</span></span><button type="button" role="switch" aria-checked="{{t.on}}" aria-label="{{t.label}}" onClick="{{t.flip}}" style="{{t.sw}}"><span style="{{t.knob}}"></span></button></div>
+</sc-for>
+</section>
+<section class="rise" style="grid-column: span 12; border-radius: 28px; padding: 22px; background: linear-gradient(120deg, #2b2112, #131829 60%); border: 1px solid #3a2e18; display: flex; gap: 20px; align-items: center; flex-wrap: wrap">
+<div style="flex: 1; min-width: 260px"><h2 style="margin: 0; font: 700 18px Outfit">Dim sum surprise</h2><p style="margin: 6px 0 0; color: #c9b896">{{dimMsg}}</p></div>
+<button type="button" role="switch" aria-checked="true" aria-label="Dim sum surprise" onClick="{{troll}}" style="width: 52px; height: 32px; border-radius: 16px; border: 2px solid #ffc46b; background: #ffc46b; position: relative"><span style="position: absolute; top: 4px; left: 24px; width: 20px; height: 20px; border-radius: 10px; background: #0b0f1a"></span></button>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={chip:'Interface',lang:'Bilingual',t:{0:false,1:false,2:true,3:false,4:true,5:true},trolled:0};}
+  renderVals(){
+    const chips=['Tailscale','Interface','Language','Accessibility','Locks','Schedules','Sounds','About'].map(label=>({label,pick:()=>this.setState({chip:label}),style:'height:36px;padding:0 16px;border-radius:12px;border:1px solid '+(this.state.chip===label?'#a9b8ff':'#2a3150')+';background:'+(this.state.chip===label?'#33407f':'transparent')+';color:#e6e8f2;font:600 13px Roboto Flex'}));
+    const langs=['English','廣東話','Bilingual'].map(label=>{const on=this.state.lang===label;return{label,on:on?'true':'false',pick:()=>this.setState({lang:label}),style:'flex:1;height:40px;border-radius:18px;border:0;background:'+(on?'#a9b8ff':'transparent')+';color:'+(on?'#0b0f1a':'#c9cfea')+';font:700 13px Roboto Flex;transition:background .25s'};});
+    const defs=[['School mode','Forces English and hides playful extras everywhere'],['Focus mode','Hides everything but the current task'],['Narrator','Speaks events in English, Cantonese or both'],['Low stimulation','Mutes colour and motion'],['Action sounds','Short cues for real outcomes'],['Show emojis in dialogs','One decorative emoji per message box']];
+    const toggles=defs.map(([label,hint],i)=>{const on=!!this.state.t[i];return{label,hint,on:on?'true':'false',flip:()=>this.setState({t:{...this.state.t,[i]:!on}}),sw:'width:52px;height:32px;border-radius:16px;border:2px solid '+(on?'#6ce6b6':'#4a5278')+';background:'+(on?'#6ce6b6':'transparent')+';position:relative;transition:all .25s',knob:'position:absolute;top:4px;left:'+(on?'24px':'4px')+';width:20px;height:20px;border-radius:10px;background:'+(on?'#0b0f1a':'#9aa3c4')+';transition:left .25s cubic-bezier(.2,0,0,1)'};});
+    const msgs=['A 1-in-10 chance of a dish at launch. Always on.','Nice try. This switch cannot be turned off.','Still on. The har gow insists.','It has never been off. It will never be off.'];
+    return{chips,langs,toggles,dimMsg:msgs[Math.min(this.state.trolled,3)],troll:()=>this.setState({trolled:this.state.trolled+1})};
+  }
+}
+</script>
+</body>
+</html>

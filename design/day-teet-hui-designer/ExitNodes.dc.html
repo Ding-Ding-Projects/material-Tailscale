@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exit nodes and routes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,0,0,1) both}
+@media (prefers-reduced-motion: reduce){.rise{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 960px; background: radial-gradient(900px 500px at 10% 0%, #183a33 0%, rgba(11,15,26,0) 60%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+<div style="flex: 1; min-width: 280px"><div style="font: 600 12px 'Roboto Flex'; color: #6ce6b6; letter-spacing: .8px; text-transform: uppercase">Routing</div><h1 style="margin: 6px 0 0; font: 800 40px Outfit; letter-spacing: -.4px">Exit nodes &amp; subnet routes</h1></div>
+<button type="button" style="height: 48px; padding: 0 22px; border-radius: 24px; border: 0; background: #6ce6b6; color: #0b0f1a; font: 700 14px Outfit">Suggest best exit node</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px">
+<section class="rise" style="grid-column: span 7; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0 0 6px; font: 700 18px Outfit">Available exit nodes</h2>
+<sc-for list="{{nodes}}" as="n" hint-placeholder-count="5">
+<button type="button" onClick="{{n.pick}}" style="{{n.row}}">
+<span style="width: 38px; height: 38px; border-radius: 12px; background: #1e2550; display: grid; place-items: center; font-size: 17px">{{n.flag}}</span>
+<span style="flex: 1; text-align: left"><span style="display: block; font: 700 15px Outfit">{{n.name}}</span><span style="display: block; font: 12px 'JetBrains Mono'; color: #9aa3c4">{{n.meta}}</span></span>
+<span style="font: 600 13px 'JetBrains Mono'; color: #c9cfea">{{n.lat}}</span>
+<span style="{{n.radio}}"></span>
+</button>
+</sc-for>
+<label style="display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 14px 16px; border-radius: 18px; background: #161b2e"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span style="flex: 1"><span style="display: block; font-weight: 600">Allow local network access</span><span style="display: block; font-size: 12px; color: #9aa3c4">--exit-node-allow-lan-access · printers and NAS stay reachable</span></span></label>
+</section>
+<section class="rise" style="grid-column: span 5; display: flex; flex-direction: column; gap: 18px">
+<div style="border-radius: 28px; padding: 22px; background: linear-gradient(150deg, #173a33, #131829); border: 1px solid #22413a">
+<h2 style="margin: 0 0 8px; font: 700 18px Outfit">This device</h2>
+<label style="display: flex; align-items: center; gap: 12px; padding: 10px 0"><span style="flex: 1"><span style="display: block; font-weight: 600">Advertise as exit node</span><span style="display: block; font-size: 12px; color: #9aa3c4">Needs approval in the admin console</span></span><button type="button" role="switch" aria-checked="{{adv}}" aria-label="Advertise as exit node" onClick="{{flip}}" style="{{sw}}"><span style="{{knob}}"></span></button></label>
+<div style="font: 600 13px 'Roboto Flex'; margin: 8px 0">Advertised subnet routes</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><span style="padding: 6px 12px; border-radius: 12px; background: #1b2140; font: 12px 'JetBrains Mono'">10.0.0.0/24 ✕</span><span style="padding: 6px 12px; border-radius: 12px; background: #1b2140; font: 12px 'JetBrains Mono'">192.168.1.0/24 ✕</span><button type="button" style="padding: 6px 12px; border-radius: 12px; border: 1px dashed #3a4380; background: transparent; color: #a9b8ff; font: 600 12px 'Roboto Flex'">＋ Add CIDR</button></div>
+<label style="display: flex; align-items: center; gap: 12px; margin-top: 14px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span>Accept routes from other peers</span></label>
+<label style="display: flex; align-items: center; gap: 12px; margin-top: 10px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span>SNAT subnet routes</span></label>
+</div>
+<div style="border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f">
+<h2 style="margin: 0 0 6px; font: 700 18px Outfit">Pending command</h2>
+<code style="display: block; padding: 14px; border-radius: 14px; background: #0b0f1a; color: #6ce6b6; font: 12px/1.6 'JetBrains Mono'; white-space: pre-wrap">tailscale set --exit-node={{sel}} --exit-node-allow-lan-access=true --advertise-routes=10.0.0.0/24,192.168.1.0/24</code>
+<div style="display: flex; gap: 10px; margin-top: 12px"><button type="button" style="flex: 1; height: 44px; border-radius: 22px; border: 0; background: #a9b8ff; color: #0b0f1a; font: 700 14px Outfit">Apply</button><button type="button" style="height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #3a4380; background: transparent; color: #dfe4ff">Copy</button></div>
+</div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={sel:'vps-tor',adv:false};}
+  renderVals(){
+    const list=[['vps-tor','☁','100.80.2.3 · Toronto · direct','12 ms'],['nas-01','▤','100.88.12.4 · home LAN · direct','3 ms'],['mullvad-se-sto','◈','Mullvad · Stockholm','104 ms'],['mullvad-jp-tyo','◈','Mullvad · Tokyo','161 ms'],['None','○','Route traffic normally','']];
+    const nodes=list.map(([name,flag,meta,lat])=>{const a=this.state.sel===name;return{name,flag,meta,lat,pick:()=>this.setState({sel:name}),row:'display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;border:1px solid '+(a?'#6ce6b6':'#22283f')+';background:'+(a?'#14302a':'#161b2e')+';color:inherit;font-family:inherit;transition:all .25s',radio:'width:18px;height:18px;border-radius:9px;border:2px solid '+(a?'#6ce6b6':'#4a5278')+';background:'+(a?'radial-gradient(#6ce6b6 45%,transparent 50%)':'transparent')};});
+    const adv=this.state.adv;
+    return{nodes,sel:this.state.sel==='None'?'':this.state.sel,adv:adv?'true':'false',flip:()=>this.setState({adv:!adv}),sw:'width:52px;height:32px;border-radius:16px;border:2px solid '+(adv?'#6ce6b6':'#4a5278')+';background:'+(adv?'#6ce6b6':'transparent')+';position:relative;transition:all .25s',knob:'position:absolute;top:4px;left:'+(adv?'24px':'4px')+';width:20px;height:20px;border-radius:10px;background:'+(adv?'#0b0f1a':'#9aa3c4')+';transition:left .25s cubic-bezier(.2,0,0,1)'};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Material Tailscale home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(108,230,182,.55)}70%{box-shadow:0 0 0 14px rgba(108,230,182,0)}100%{box-shadow:0 0 0 0 rgba(108,230,182,0)}}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.rise{animation:rise .6s cubic-bezier(.2,0,0,1) both}
+.pulse{animation:pulse 2s infinite}
+.orbit{animation:orbit 26s linear infinite;transform-origin:50% 50%}
+@media (prefers-reduced-motion: reduce){.rise,.pulse,.orbit{animation:none}}
+</style>
+</helmet>
+<div style="min-height: 960px; background: radial-gradient(1200px 600px at 85% -10%, #2a2f6b 0%, rgba(11,15,26,0) 60%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif; display: flex; flex-direction: column">
+<header style="height: 44px; display: flex; align-items: center; gap: 12px; padding: 0 12px 0 16px; background: rgba(18,22,38,.85); border-bottom: 1px solid #22283f">
+<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="5" r="2.6" fill="#a9b8ff"></circle><circle cx="12" cy="5" r="2.6" fill="#a9b8ff" opacity=".45"></circle><circle cx="19" cy="5" r="2.6" fill="#a9b8ff" opacity=".45"></circle><circle cx="5" cy="12" r="2.6" fill="#6ce6b6"></circle><circle cx="12" cy="12" r="2.6" fill="#6ce6b6"></circle><circle cx="19" cy="12" r="2.6" fill="#6ce6b6"></circle><circle cx="5" cy="19" r="2.6" fill="#a9b8ff" opacity=".45"></circle><circle cx="12" cy="19" r="2.6" fill="#ffc46b"></circle><circle cx="19" cy="19" r="2.6" fill="#a9b8ff" opacity=".45"></circle></svg>
+<span style="font-family: Outfit, sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .2px">Material Tailscale</span>
+<span style="font-size: 12px; color: #9aa3c4">v1.0.0 · Classic Har Gow 蝦餃 · updated 2026-11-06 17:42:09 EST</span>
+<div style="flex: 1"></div>
+<button type="button" style="height: 30px; padding: 0 14px; border-radius: 15px; border: 1px solid #2d3455; background: #161b2e; color: #c9cfea; font: 500 12px 'Roboto Flex', sans-serif">Ctrl+Shift+F  Search everything</button>
+<button type="button" aria-label="Minimize" style="width: 40px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: #c9cfea">–</button>
+<button type="button" aria-label="Maximize" style="width: 40px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: #c9cfea">▢</button>
+<button type="button" aria-label="Close" style="width: 40px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: #c9cfea">✕</button>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1; min-height: 0">
+<nav aria-label="Destinations" style="flex: 0 0 96px; padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(15,19,33,.7); border-right: 1px solid #1d2238">
+<sc-for list="{{rail}}" as="r" hint-placeholder-count="9">
+<button type="button" onClick="{{r.pick}}" style="{{r.style}}"><span style="{{r.pill}}">{{r.icon}}</span><span style="font-size: 11px; font-weight: 600">{{r.label}}</span></button>
+</sc-for>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+<div role="tablist" style="display: flex; gap: 2px; padding: 8px 16px 0; border-bottom: 1px solid #1d2238">
+<div role="tab" aria-selected="true" style="padding: 9px 16px; border-radius: 12px 12px 0 0; background: #161b2e; color: #e6e8f2; font: 600 13px 'Roboto Flex'; border: 1px solid #262c48; border-bottom: 0">◉ Tailnet · swiftie.github</div>
+<div role="tab" aria-selected="false" style="padding: 9px 16px; color: #9aa3c4; font: 500 13px 'Roboto Flex'">Regex builder</div>
+<div role="tab" aria-selected="false" style="padding: 9px 16px; color: #9aa3c4; font: 500 13px 'Roboto Flex'">Authenticator</div>
+<div style="padding: 9px 12px; color: #9aa3c4">＋</div>
+</div>
+<div style="padding: 24px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px">
+<section class="rise" style="grid-column: span 7; border-radius: 28px; padding: 26px; background: linear-gradient(140deg, #1e2550 0%, #151a33 60%); border: 1px solid #2c3463; position: relative; overflow: hidden; min-height: 230px">
+<svg class="orbit" width="420" height="420" viewBox="0 0 420 420" aria-hidden="true" style="position: absolute; right: -120px; top: -110px; opacity: .55"><circle cx="210" cy="210" r="170" fill="none" stroke="#3a4380" stroke-dasharray="4 10"></circle><circle cx="210" cy="210" r="110" fill="none" stroke="#3a4380"></circle><circle cx="380" cy="210" r="7" fill="#6ce6b6"></circle><circle cx="100" cy="210" r="6" fill="#a9b8ff"></circle><circle cx="210" cy="40" r="5" fill="#ffc46b"></circle><line x1="210" y1="210" x2="380" y2="210" stroke="#6ce6b6" opacity=".4"></line><line x1="210" y1="210" x2="100" y2="210" stroke="#a9b8ff" opacity=".4"></line></svg>
+<div style="display: flex; align-items: center; gap: 12px"><span class="pulse" style="width: 12px; height: 12px; border-radius: 6px; background: {{dot}}"></span><span style="font: 600 13px 'Roboto Flex'; color: #9aa3c4; letter-spacing: .6px; text-transform: uppercase">{{stateLabel}}</span></div>
+<h1 style="margin: 12px 0 6px; font: 800 44px/1.05 Outfit, sans-serif; letter-spacing: -.5px; max-width: 520px">{{headline}}</h1>
+<p style="margin: 0 0 20px; color: #b7bedb; max-width: 520px">desk-pc · 100.101.42.7 · fd7a:115c:a1e0::2a01:2a07 · DERP Toronto (tor) 18 ms</p>
+<div style="display: flex; gap: 12px; flex-wrap: wrap; position: relative">
+<button type="button" onClick="{{toggle}}" style="height: 52px; padding: 0 26px; border-radius: 26px; border: 0; background: {{btnBg}}; color: #0b0f1a; font: 700 15px Outfit, sans-serif; transition: background .3s">{{btnLabel}}</button>
+<button type="button" style="height: 52px; padding: 0 22px; border-radius: 26px; border: 1px solid #3a4380; background: transparent; color: #dfe4ff; font: 600 14px 'Roboto Flex'">Exit node: none ▾</button>
+<button type="button" style="height: 52px; padding: 0 22px; border-radius: 26px; border: 1px solid #3a4380; background: transparent; color: #dfe4ff; font: 600 14px 'Roboto Flex'">Switch account ▾</button>
+</div>
+</section>
+<section class="rise" style="grid-column: span 5; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><h2 style="margin: 0; font: 700 18px Outfit">Live traffic</h2><span style="font: 600 22px 'JetBrains Mono'; color: #6ce6b6">4.82 MB/s ↓</span></div>
+<svg viewBox="0 0 400 150" role="img" aria-label="Live traffic chart, last 60 seconds" style="width: 100%; height: 150px"><defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#6ce6b6" stop-opacity=".45"></stop><stop offset="1" stop-color="#6ce6b6" stop-opacity="0"></stop></linearGradient></defs><g stroke="#1f2540"><line x1="0" y1="37" x2="400" y2="37"></line><line x1="0" y1="75" x2="400" y2="75"></line><line x1="0" y1="112" x2="400" y2="112"></line></g><path d="M0 120 C40 110 60 80 100 90 S160 40 200 60 S270 100 300 50 S360 30 392 42 L392 150 L0 150Z" fill="url(#g)"></path><path d="M0 120 C40 110 60 80 100 90 S160 40 200 60 S270 100 300 50 S360 30 392 42" fill="none" stroke="#6ce6b6" stroke-width="2.5"></path><path d="M0 135 C50 130 90 120 130 125 S210 100 250 110 S330 95 392 98" fill="none" stroke="#a9b8ff" stroke-width="2" stroke-dasharray="3 4"></path><circle class="pulse" cx="392" cy="42" r="5" fill="#6ce6b6"></circle></svg>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #9aa3c4"><span>● Download 4.82 MB/s</span><span>┄ Upload 610 KB/s</span><span>Direct 9 · Relayed 2</span></div>
+</section>
+<div style="grid-column: span 12; display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+<h2 style="margin: 0; font: 700 22px Outfit">Peers</h2>
+<span style="padding: 4px 10px; border-radius: 10px; background: #1b2140; font-size: 12px; color: #c9cfea">11 online · 3 offline</span>
+<div style="flex: 1"></div>
+<label style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 20px; background: #161b2e; border: 1px solid #2a3150; min-width: 280px"><span aria-hidden="true">⌕</span><input aria-label="Filter peers" placeholder="Filter peers, tags, IPs…" style="flex: 1; border: 0; background: transparent; color: #e6e8f2; font: 14px 'Roboto Flex'; outline: none"><span style="font: 600 11px 'JetBrains Mono'; color: #a9b8ff">.*</span></label>
+<button type="button" style="height: 40px; padding: 0 16px; border-radius: 20px; border: 0; background: #a9b8ff; color: #0b0f1a; font: 700 13px 'Roboto Flex'">Send file</button>
+</div>
+<sc-for list="{{peers}}" as="p" hint-placeholder-count="6">
+<article class="rise" style="grid-column: span 4; border-radius: 22px; padding: 18px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 40px; height: 40px; border-radius: 14px; background: #1e2550; display: grid; place-items: center; font-size: 18px">{{p.icon}}</span><div style="flex: 1; min-width: 0"><div style="font: 700 15px Outfit">{{p.name}}</div><div style="font: 12px 'JetBrains Mono'; color: #9aa3c4">{{p.ip}}</div></div><span style="{{p.badge}}">{{p.state}}</span></div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{p.tags}}" as="t" hint-placeholder-count="2"><span style="padding: 3px 9px; border-radius: 8px; background: #1b2140; font-size: 11px; color: #c9cfea">{{t}}</span></sc-for></div>
+<div style="display: flex; gap: 8px"><button type="button" style="flex: 1; height: 36px; border-radius: 18px; border: 1px solid #2d3455; background: transparent; color: #dfe4ff; font: 600 12px 'Roboto Flex'">Ping</button><button type="button" style="flex: 1; height: 36px; border-radius: 18px; border: 1px solid #2d3455; background: transparent; color: #dfe4ff; font: 600 12px 'Roboto Flex'">SSH</button><button type="button" style="flex: 1; height: 36px; border-radius: 18px; border: 1px solid #2d3455; background: transparent; color: #dfe4ff; font: 600 12px 'Roboto Flex'">Use as exit</button></div>
+</article>
+</sc-for>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={on:true,dest:'Home'};}
+  renderVals(){
+    const on=this.state.on;
+    const items=[['Home','⌂'],['Peers','◎'],['Exit','⇱'],['Serve','⇄'],['Taildrop','⇣'],['DNS','◇'],['Lock','⚿'],['Admin','☰'],['Settings','⚙']];
+    const rail=items.map(([label,icon])=>{const a=this.state.dest===label;return{label,icon,pick:()=>this.setState({dest:label}),style:'width:72px;border:0;background:transparent;color:'+(a?'#e6e8f2':'#9aa3c4')+';display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 0;font-family:inherit',pill:'width:56px;height:32px;border-radius:16px;display:grid;place-items:center;font-size:16px;transition:background .25s;background:'+(a?'#33407f':'transparent')};});
+    const mk=(name,ip,icon,st,tags)=>({name,ip,icon,state:st,tags,badge:'padding:4px 10px;border-radius:10px;font:600 11px Roboto Flex;'+(st==='direct'?'background:#123b2f;color:#6ce6b6':st==='relay'?'background:#3b2e12;color:#ffc46b':'background:#2a2030;color:#c79ab8')});
+    return{
+      rail,
+      dot:on?'#6ce6b6':'#c79ab8',
+      stateLabel:on?'Connected':'Disconnected',
+      headline:on?'Your tailnet is humming.':'Tailscale is down.',
+      btnLabel:on?'Disconnect':'Connect',
+      btnBg:on?'#6ce6b6':'#a9b8ff',
+      toggle:()=>this.setState({on:!on}),
+      peers:[mk('nas-01','100.88.12.4','▤','direct',['tag:server','exit node']),mk('pixel-9','100.71.3.19','▯','relay',['owner']),mk('build-box','100.90.4.2','⚙','direct',['tag:ci','subnet 10.0.0.0/24']),mk('mbp-work','100.64.8.11','▭','direct',['ssh']),mk('pi-garage','100.99.1.7','◉','offline',['tag:iot']),mk('vps-tor','100.80.2.3','☁','direct',['tag:server','funnel'])]
+    };
+  }
+}
+</script>
+</body>
+</html>
