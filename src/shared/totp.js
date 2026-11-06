@@ -73,6 +73,14 @@ function verify(secret, code, opts = {}) {
   return false;
 }
 
+async function verifyAsync(secret, code, opts = {}) {
+  const period = opts.period || 30;
+  for (const drift of [-1, 0, 1]) {
+    if ((await totp(secret, { ...opts, time: Date.now() + drift * period * 1000 })) === String(code).trim()) return true;
+  }
+  return false;
+}
+
 function parseUri(uri) {
   const u = new URL(uri);
   if (u.protocol !== 'otpauth:') throw new Error('Not an otpauth:// link.');
@@ -106,4 +114,4 @@ function randomSecret(bytes = 20) {
   return base32Encode(b);
 }
 
-module.exports = { base32Decode, base32Encode, hotp, hotpSync, totp, totpSync, verify, parseUri, buildUri, randomSecret };
+module.exports = { base32Decode, base32Encode, hotp, hotpSync, totp, totpSync, verify, verifyAsync, parseUri, buildUri, randomSecret };

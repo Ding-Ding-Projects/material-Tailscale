@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('mt', {
   api: call('api:request'),
   secret: { set: call('secret:set'), presence: call('secret:presence'), clear: call('secret:clear'), available: call('secret:available') },
   lockVerify: call('lock:verify'),
+  authLoad: call('auth:load'),
   history: { record: call('history:record'), list: call('history:list'), files: call('history:files'), restore: call('history:restore') },
   shared: { get: call('shared:get'), set: call('shared:set'), onChange: on('shared:changed') },
   dialog: { open: call('dialog:open'), save: call('dialog:save') },

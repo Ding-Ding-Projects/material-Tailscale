@@ -111,6 +111,7 @@ handle('secret:set', (name, obj) => { if (!/^[a-z0-9:_-]{1,64}$/i.test(name)) th
 handle('secret:presence', (name) => secrets.presence(name));
 handle('secret:clear', (name) => { secrets.clear(name); return true; });
 handle('secret:available', () => secrets.available());
+handle('auth:load', () => { const r = secrets.get('authenticator:secrets'); return r?.value ? JSON.parse(r.value) : {}; });
 handle('lock:verify', (name, attempt) => {
   if (!/^lock:[a-z0-9:_.-]{1,80}$/i.test(name)) throw new Error('Bad lock name');
   const rec = secrets.get(name);
