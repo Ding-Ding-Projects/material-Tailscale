@@ -320,7 +320,7 @@ async function captureAll(dir) {
   let bundleSha = null; try { bundleSha = require('node:crypto').createHash('sha256').update(fs.readFileSync(bundle)).digest('hex'); } catch { /* packaged app: bundle lives in the asar */ }
   fs.writeFileSync(path.join(dir, 'capture-manifest.json'), JSON.stringify({
     app: { version: app.getVersion(), build: (() => { try { return require('../../dist/build-info.json'); } catch { return null; } })(), rendererBundleSha256: bundleSha },
-    method: 'Electron capturePage of the built renderer in capture mode (cloud Linux, Xvfb); sample-free: screens show this machine\'s real state',
+    method: 'Electron capturePage of the built renderer in capture mode (cloud Linux, Xvfb); screens show this machine\'s real state, except the Base64 state, which converts sample files the capture run creates in a temporary folder',
     privacy: 'No account is signed in on the capture machine; no tailnet, token or personal data appears in these captures.',
     captures: provenance
   }, null, 2) + '\n');
