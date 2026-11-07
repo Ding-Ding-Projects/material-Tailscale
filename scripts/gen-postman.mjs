@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { docAddresses } from './doc-addresses.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const spec = yaml.load(fs.readFileSync(path.join(root, 'vendor/tailscale-openapi/openapi.yaml'), 'utf8'));
@@ -54,5 +55,5 @@ const collection = {
 };
 const out = path.join(root, 'docs/api/tailscale.postman_collection.json');
 fs.mkdirSync(path.dirname(out), { recursive: true });
-fs.writeFileSync(out, JSON.stringify(collection, null, 2) + '\n');
+fs.writeFileSync(out, docAddresses(JSON.stringify(collection, null, 2)) + '\n');
 console.log(`${collection.item.reduce((n, f) => n + f.item.length, 0)} requests in ${collection.item.length} folders -> ${path.relative(root, out)}`);

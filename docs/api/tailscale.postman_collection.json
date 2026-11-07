@@ -728,7 +728,7 @@
             "description": "Set a device's enabled subnet routes by replacing the existing list of subnet routes with the supplied parameters.\n[Advertised routes](/docs/features/subnet-routers#advertise-subnet-routes) cannot be set through the API, since they must be set directly on the device.\n\nRoutes must be both advertised and enabled for a device to act as a subnet router or exit node.\nIf a device has advertised routes, they are not exposed to traffic until they are enabled.\nConversely, if routes are enabled before they are advertised, they are not available for routing until the device in question has advertised them.\n\nLearn more about [subnet routers](/docs/features/subnet-routers) and [exit nodes](/docs/features/exit-nodes).\n\nOAuth Scope: `devices:routes`.\n\n\nOperation: setDeviceRoutes",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"routes\": [\n    \"10.0.0.0/16\",\n    \"192.168.1.0/24\"\n  ]\n}",
+              "raw": "{\n  \"routes\": [\n    \"198.51.100.0/24\",\n    \"192.0.2.0/24\"\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1437,7 +1437,7 @@
             "description": "Replaces the DNS configuration for the given tailnet.\n\n- `nameservers` defines the global resolvers to use when `preferences.overrideLocalDNS` is true.\n- `splitDNS` maps DNS name suffixes (domains) to lists of resolvers for Split DNS.\n- `searchPaths` sets custom DNS search domain paths.\n- `preferences.overrideLocalDNS` controls whether resolvers in `nameservers` override the local OS configuration (true) or are used or local resolvers are used (false). Defaults to false.\n- `preferences.magicDNS` enables MagicDNS. Defaults to false.\n\n\nOperation: setDnsConfiguration",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nameservers\": [\n    {\n      \"address\": \"8.8.8.8\",\n      \"useWithExitNode\": true\n    },\n    {\n      \"address\": \"1.1.1.1\",\n      \"useWithExitNode\": false\n    }\n  ],\n  \"splitDNS\": {\n    \"corp.example.com\": [\n      {\n        \"address\": \"10.0.0.53\",\n        \"useWithExitNode\": true\n      },\n      {\n        \"address\": \"10.0.1.53\",\n        \"useWithExitNode\": true\n      }\n    ],\n    \"other.internal\": [\n      {\n        \"address\": \"10.0.2.53\",\n        \"useWithExitNode\": false\n      }\n    ]\n  },\n  \"searchPaths\": [\n    \"user1.example.com\",\n    \"user2.example.com\"\n  ],\n  \"preferences\": {\n    \"overrideLocalDNS\": true,\n    \"magicDNS\": true\n  }\n}",
+              "raw": "{\n  \"nameservers\": [\n    {\n      \"address\": \"8.8.8.8\",\n      \"useWithExitNode\": true\n    },\n    {\n      \"address\": \"1.1.1.1\",\n      \"useWithExitNode\": false\n    }\n  ],\n  \"splitDNS\": {\n    \"corp.example.com\": [\n      {\n        \"address\": \"198.51.100.53\",\n        \"useWithExitNode\": true\n      },\n      {\n        \"address\": \"198.51.100.53\",\n        \"useWithExitNode\": true\n      }\n    ],\n    \"other.internal\": [\n      {\n        \"address\": \"198.51.100.53\",\n        \"useWithExitNode\": false\n      }\n    ]\n  },\n  \"searchPaths\": [\n    \"user1.example.com\",\n    \"user2.example.com\"\n  ],\n  \"preferences\": {\n    \"overrideLocalDNS\": true,\n    \"magicDNS\": true\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2393,7 +2393,7 @@
                 {
                   "key": "previewFor",
                   "value": "",
-                  "description": "- If `type` is `user`, provide the email of a valid user with registered machines.\n- If `type` is `ipport`, provide an IP address + port: `10.0.0.1:80`.\n\nThe supplied policy file is queried with this parameter to determine which rules match.\n",
+                  "description": "- If `type` is `user`, provide the email of a valid user with registered machines.\n- If `type` is `ipport`, provide an IP address + port: `198.51.100.1:80`.\n\nThe supplied policy file is queried with this parameter to determine which rules match.\n",
                   "disabled": false
                 }
               ],

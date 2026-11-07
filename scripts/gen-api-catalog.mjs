@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
+import { docAddresses } from './doc-addresses.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const specPath = path.join(root, 'vendor/tailscale-openapi/openapi.yaml');
@@ -73,5 +74,5 @@ const out = {
   count: ops.length,
   operations: ops
 };
-fs.writeFileSync(path.join(root, 'src/shared/api-catalog.json'), JSON.stringify(out));
+fs.writeFileSync(path.join(root, 'src/shared/api-catalog.json'), docAddresses(JSON.stringify(out)));
 console.log(`api-catalog.json: ${ops.length} operations`);
