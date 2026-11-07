@@ -2,7 +2,7 @@
 
 ## Behaviour
 
-A 1-in-10 chance at launch to show one dish from the public Ding-Ding-Projects/dim-sum-photos catalogue, with its English and Cantonese names and published photo. It never appears on first run, over dialogs or in School mode, dismisses itself, and cannot be turned off: the switch politely refuses.
+A 1-in-10 chance at launch to show one dish from the public Ding-Ding-Projects/dim-sum-photos catalogue, with its English and Cantonese names and published photo. It never appears on first run, over dialogs or in School mode, dismisses itself after a few seconds (it waits while it has keyboard focus or the pointer, and Escape or its close button dismisses it at once, handing focus back), and cannot be turned off: the switch politely refuses.
 
 ## Configuration
 

@@ -18,7 +18,7 @@ export const APP_ROUTES = [
   'extensions', 'extensions>overlay@ext-consent',
   'docs', 'status', 'history', 'changelog', 'notifications', 'about',
   ...SETTINGS.map((s) => `settings:${s}`),
-  'home>overlay@palette', 'home>overlay@onboarding', 'home>overlay@confirm', 'home>overlay@ladder', 'home>overlay@toasts',
+  'home>overlay@palette', 'home>overlay@onboarding', 'home>overlay@confirm', 'home>overlay@ladder', 'home>overlay@toasts', 'home>overlay@dimsum',
   'home>click@tab-new', 'settings:appearance>menu@set-theme',
   'settings:appearance>appearance@set-theme#style', 'settings:appearance>appearance@set-theme#motion'
 ];

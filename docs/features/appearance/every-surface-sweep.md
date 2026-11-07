@@ -4,7 +4,7 @@
 
 Before a release, an automated sweep opens every surface of the app and of the website and reports what eyes skip:
 
-- **App:** every page, every Settings section, the command palette, the setup wizard, the super confirmation, the unlock ladder, toasts, the New tab catalogue, a context menu with live values, both tabs of the appearance editor, the Minecraft dialogs, and the extensions manager with its permission review (58 surfaces).
+- **App:** every page, every Settings section, the command palette, the setup wizard, the super confirmation, the unlock ladder, toasts, the dim sum surprise card, the New tab catalogue, a context menu with live values, both tabs of the appearance editor, the Minecraft dialogs, and the extensions manager with its permission review (59 surfaces).
 - **Website:** every page, every Settings section the website offers, and every bundled article (84 pages).
 - **Each in:** dark and light themes; English, Cantonese and bilingual modes; and four window sizes: desktop (1440 by 940), a 1080p screen at 200 percent (960 by 540), tablet (820 by 1180) and phone (390 by 844).
 
@@ -15,7 +15,7 @@ For each surface and combination it records:
 - text that is clipped by a box that hides overflow, text pushed outside the window, and text covered by something that is not an open menu, dialog or toast;
 - a keyboard walk with Tab that flags focus on a hidden control, a control without a name, an icon name read aloud, focus with no visible change, and focus that leaves an open modal dialog.
 
-Truncation with an ellipsis counts as clipping unless the full text is disclosed (a tooltip or an accessible name). Every finding is fixed at its root token or component rather than per screen, and the sweep runs again.
+Truncation with an ellipsis counts as clipping unless the full text is disclosed (a tooltip or an accessible name). The random dim sum surprise is held back during page checks, because one load in ten would fetch the public catalogue; its card is checked as a surface of its own. Every finding is fixed at its root token or component rather than per screen, and the sweep runs again.
 
 Problem patterns this sweep caught once and now checks everywhere:
 
@@ -38,6 +38,10 @@ Problem patterns this sweep caught once and now checks everywhere:
 
 ```
 npm run build && node scripts/build-site.mjs
+# where the GitHub API is not reachable from Node, give the website build a saved release
+# so the download page is checked with real release assets:
+gh api repos/Ding-Ding-Projects/material-Tailscale/releases/latest > release.json
+MT_RELEASE_JSON=release.json node scripts/build-site.mjs
 xvfb-run -a -s "-screen 0 1600x1300x24" node scripts/sweep.mjs            # app and website, full matrix
 xvfb-run -a -s "-screen 0 1600x1300x24" node scripts/sweep.mjs --quick    # one size, theme and language
 ```

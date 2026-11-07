@@ -27,15 +27,20 @@ fs.cpSync(shotsDir, path.join(out, 'screenshots'), { recursive: true });
 const git = (...a) => { try { return execFileSync('git', a, { cwd: root, encoding: 'utf8' }).trim(); } catch { return null; } };
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
 let release = null;
-try {
-  const headers = { 'User-Agent': 'material-tailscale-site', ...(process.env.GH_TOKEN ? { Authorization: `Bearer ${process.env.GH_TOKEN}` } : {}) };
-  const r = await fetch('https://api.github.com/repos/Ding-Ding-Projects/material-Tailscale/releases/latest', { headers });
-  if (r.ok) {
-    const j = await r.json();
-    const exe = j.assets?.find((a) => /Setup\.exe$/i.test(a.name));
-    if (!j.draft && exe) release = { tag: j.tag_name, publishedAt: j.published_at, codeName: (j.name || '').split(' · ').slice(1).join(' · ') || null, assets: j.assets.map((a) => ({ name: a.name, url: a.browser_download_url, size: a.size })) };
-  }
-} catch { /* offline: the download button stays absent */ }
+const fromApi = (j) => {
+  const exe = j.assets?.find((a) => /Setup\.exe$/i.test(a.name));
+  return !j.draft && exe ? { tag: j.tag_name, publishedAt: j.published_at, codeName: (j.name || '').split(' · ').slice(1).join(' · ') || null, assets: j.assets.map((a) => ({ name: a.name, url: a.browser_download_url, size: a.size })) } : null;
+};
+if (process.env.MT_RELEASE_JSON) {
+  // A release JSON saved from the GitHub API, for builds where the API is not reachable directly.
+  release = fromApi(JSON.parse(fs.readFileSync(process.env.MT_RELEASE_JSON, 'utf8')));
+} else {
+  try {
+    const headers = { 'User-Agent': 'material-tailscale-site', ...(process.env.GH_TOKEN ? { Authorization: `Bearer ${process.env.GH_TOKEN}` } : {}) };
+    const r = await fetch('https://api.github.com/repos/Ding-Ding-Projects/material-Tailscale/releases/latest', { headers });
+    if (r.ok) release = fromApi(await r.json());
+  } catch { /* offline: the download button stays absent */ }
+}
 const site = { version: release?.tag || `v${pkg.version}`, commit: process.env.GITHUB_SHA || git('rev-parse', 'HEAD'), commitTime: git('log', '-1', '--format=%cI'), screenshots: shots };
 fs.writeFileSync(path.join(out, 'site-data.js'), `window.__SITE__=${JSON.stringify(site)};window.__RELEASE__=${JSON.stringify(release)};\n`);
 fs.writeFileSync(path.join(out, '.nojekyll'), '');

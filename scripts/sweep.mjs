@@ -106,7 +106,10 @@ if (!args.has('--app-only')) {
       const todo = routes.filter((r) => !siteDone.has(`${r}|${size}|${theme}|${lang}`));
       if (!todo.length) continue;
       const ctx = await browser.newContext({ viewport: { width: w, height: hgt }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
-      await ctx.addInitScript(([th, lg]) => { try { localStorage.setItem('mt.settings.v1', JSON.stringify({ theme: th, lang: lg, motion: 'reduced', dimsum: false })); } catch { /* storage blocked */ } }, [theme, lang]);
+      // The random dim sum surprise would fetch the public catalogue on one load in ten; an empty
+      // cached catalogue holds it back during page checks. The card itself is checked in the app
+      // as its own surface (home>overlay@dimsum).
+      await ctx.addInitScript(([th, lg]) => { try { localStorage.setItem('mt.settings.v1', JSON.stringify({ theme: th, lang: lg, motion: 'reduced' })); localStorage.setItem('mt.dimsum.cache.v1', JSON.stringify({ at: Date.now(), source: 'sweep', dishes: [] })); } catch { /* storage blocked */ } }, [theme, lang]);
       const page = await ctx.newPage();
       let consoleLog = [];
       page.on('console', (m) => { if (m.type() === 'error' || /refused to|blocked|content security policy/i.test(m.text())) consoleLog.push({ level: m.type(), message: m.text().slice(0, 300) }); });

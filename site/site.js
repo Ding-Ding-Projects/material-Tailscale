@@ -57,7 +57,9 @@ function drawNav() {
 const download = () => {
   const exe = REL?.assets?.find((a) => /Setup\.exe$/i.test(a.name));
   if (!exe) return h('div.card.tonal', h('b', pair('No verified installer is published yet.', '未有已驗證嘅安裝程式。')), h('p.small.muted', pair('This button appears once the release workflow publishes and verifies a build.', '發佈並驗證後先會出現下載掣。')));
-  return h('div.stack', h('a.btn.big.green', { href: exe.url, dataset: { el: 'download-button' }, 'aria-label': pair(`Download Material Tailscale ${REL.tag} for Windows (x64)`, `下載 Material Tailscale ${REL.tag}（Windows x64）`) }, icon('download'), pair(`Download for Windows · ${REL.tag}`, `下載 Windows 版 · ${REL.tag}`)),
+  // The accessible name starts with the visible label, then names the file.
+  const label = pair(`Download for Windows · ${REL.tag}`, `下載 Windows 版 · ${REL.tag}`);
+  return h('div.stack', h('a.btn.big.green', { href: exe.url, dataset: { el: 'download-button' }, 'aria-label': `${label}: ${pair('Material Tailscale installer, Windows x64', 'Material Tailscale 安裝程式，Windows x64')}` }, icon('download'), label),
     h('div.small.muted', pair(`Windows 10 and 11, x64 · ${(exe.size / 1048576).toFixed(1)} MB · published ${fmtDateTime(REL.publishedAt)} · unsigned (Windows may warn about an unknown publisher)`, `Windows 10/11 x64 · ${(exe.size / 1048576).toFixed(1)} MB · 冇簽名`)));
 };
 

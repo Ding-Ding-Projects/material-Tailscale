@@ -38,12 +38,33 @@ export async function maybeSurprise({ firstRun, busy }) {
   if (Math.random() >= 0.1) return;
   const dishes = (await dimsumCatalog()).filter((d) => d.photo);
   if (!dishes.length || busy?.()) return;
-  const d = dishes[Math.floor(Math.random() * dishes.length)];
-  const img = h('img', { src: d.photo, alt: d.alt?.en || d.name.en, loading: 'lazy' });
-  const card = h('aside.dimsum', { role: 'status', 'aria-label': pair('Dim sum surprise', '點心驚喜') }, img,
+  showSurprise(dishes[Math.floor(Math.random() * dishes.length)]);
+}
+
+/** Shows one dish. The card waits while it has focus or the pointer, and hands focus back when it leaves. */
+export function showSurprise(d) {
+  document.querySelector('.dimsum')?.remove();
+  const missing = () => h('div.empty.small', icon('image_not_supported'), pair('Photo unavailable right now.', '暫時睇唔到相。'));
+  const img = d.photo ? h('img', { src: d.photo, alt: d.alt?.en || d.name.en, loading: 'lazy' }) : missing();
+  if (d.photo) img.addEventListener('error', () => img.replaceWith(missing()));
+  let cameFrom = null, timer = 0, left = reducedMotion() ? 6000 : 8000, since = 0;
+  const card = h('div.dimsum', { role: 'status', 'aria-label': pair('Dim sum surprise', '點心驚喜') }, img,
     h('div', { style: { padding: '14px' } }, h('div.small.muted', pair('Dim sum surprise', '點心驚喜')), h('b', { style: { fontSize: '18px', display: 'block' } }, d.name.en), h('div', d.name.zhHant)),
-    h('button.icon-btn.sm', { style: { position: 'absolute', top: '8px', right: '8px', background: 'var(--surface)' }, 'aria-label': pair('Dismiss', '關閉'), on: { click: () => card.remove() } }, icon('close')));
-  img.addEventListener('error', () => img.replaceWith(h('div.empty.small', icon('image_not_supported'), pair('Photo unavailable right now.', '暫時睇唔到相。'))));
+    h('button.icon-btn.sm', { style: { position: 'absolute', top: '8px', right: '8px', background: 'var(--surface)' }, 'aria-label': pair('Dismiss', '關閉'), on: { click: () => leave() } }, icon('close')));
+  const leave = () => {
+    clearTimeout(timer);
+    if (card.contains(document.activeElement)) (cameFrom?.isConnected ? cameFrom : document.getElementById('outlet'))?.focus({ preventScroll: true });
+    card.remove();
+  };
+  const held = () => card.matches(':hover') || card.contains(document.activeElement);
+  const run = () => { if (timer || !card.isConnected || held()) return; since = Date.now(); timer = setTimeout(leave, Math.max(left, 2000)); };
+  const hold = () => { if (!timer) return; clearTimeout(timer); timer = 0; left -= Date.now() - since; };
+  card.addEventListener('focusin', (e) => { if (e.relatedTarget && !card.contains(e.relatedTarget)) cameFrom = e.relatedTarget; hold(); });
+  card.addEventListener('pointerenter', hold);
+  card.addEventListener('focusout', (e) => { if (!card.contains(e.relatedTarget)) setTimeout(run, 0); });
+  card.addEventListener('pointerleave', () => setTimeout(run, 0));
+  card.addEventListener('keydown', (e) => { if (e.key === 'Escape') leave(); });
   document.body.append(card);
-  setTimeout(() => card.remove(), reducedMotion() ? 6000 : 8000);
+  run();
+  return card;
 }
