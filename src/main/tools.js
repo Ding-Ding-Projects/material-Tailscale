@@ -10,7 +10,14 @@ const { app, BrowserWindow } = require('electron');
 
 const unpacked = (p) => p.replace(`app.asar${path.sep}`, `app.asar.unpacked${path.sep}`);
 function ffmpegPath() { try { return unpacked(require('ffmpeg-static')); } catch { return null; } }
-function sevenZipPath() { try { return unpacked(require('7zip-bin').path7za); } catch { return null; } }
+function sevenZipPath() {
+  try {
+    const p = unpacked(require('7zip-bin').path7za);
+    // The npm package ships this helper without the executable bit on some systems.
+    if (process.platform !== 'win32') { try { fs.accessSync(p, fs.constants.X_OK); } catch { try { fs.chmodSync(p, 0o755); } catch { /* reported when run */ } } }
+    return p;
+  } catch { return null; }
+}
 
 const dataDir = (...p) => path.join(app.getPath('userData'), ...p);
 
@@ -133,6 +140,15 @@ async function archiveList(file) {
   return out.split(/\r?\n\r?\n/).map((b) => Object.fromEntries(b.split(/\r?\n/).map((l) => l.split(' = ')).filter((x) => x.length === 2))).filter((e) => e.Path && e.Size !== undefined);
 }
 
+async function archiveData({ name, text, dest, format = 'zip', password, encryptHeaders }) {
+  const dir = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'mt-export-'));
+  try {
+    const f = path.join(dir, name.replace(/[^\w.-]+/g, '_'));
+    fs.writeFileSync(f, text);
+    return await archiveCreate({ files: [f], dest, format, password, encryptHeaders });
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+}
+
 // ---------------- ffmpeg ----------------
 function ffmpeg(args, onProgress, signal) {
   const bin = ffmpegPath();
@@ -223,4 +239,4 @@ async function grep({ folder, pattern, flags = 'i', include = '', maxFiles = 500
   return { hits, scanned, skipped, ms: Date.now() - started, truncated: hits.length >= maxHits || scanned >= maxFiles };
 }
 
-module.exports = { download, installTailscale, installOllama, ensureJava, sevenZip, archiveCreate, archiveExtract, archiveList, convertMedia, convertDocument, htmlToPdf, grep, ffmpegPath, sevenZipPath, dataDir };
+module.exports = { archiveData, download, installTailscale, installOllama, ensureJava, sevenZip, archiveCreate, archiveExtract, archiveList, convertMedia, convertDocument, htmlToPdf, grep, ffmpegPath, sevenZipPath, dataDir };

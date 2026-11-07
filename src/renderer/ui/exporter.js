@@ -2,7 +2,8 @@
 // loss before the export runs. Also hands any export to an external editor.
 import { h, icon } from '../core/dom.js';
 import { pair, t } from '../core/i18n.js';
-import { menu, toast } from './overlay.js';
+import { menu, toast, dialog } from './overlay.js';
+import { segmented, switchCtl, secret } from './controls.js';
 
 function toYaml(v, ind = '') {
   if (v === null || v === undefined) return 'null';
@@ -69,6 +70,24 @@ export function exportMenu(getter) {
   return h('button.icon-btn.sm', { type: 'button', 'aria-label': t('export'), title: t('export'), on: { click: (e) => menu(e.currentTarget, [
     ...FORMATS.map((f) => ({ label: `${t('export')} ${f.label}`, icon: 'download', run: () => exportTo(f, getter) })),
     '-',
+    { label: pair('Export as ZIP or 7z archive…', '匯出做 ZIP 或 7z 壓縮檔…'), icon: 'folder_zip', run: () => archiveDialog(getter) },
     { label: pair('Copy as JSON', '複製 JSON'), icon: 'content_copy', run: () => { navigator.clipboard.writeText(JSON.stringify(getter().data, null, 2)); toast(t('copied'), { kind: 'ok' }); } }
   ]) } }, icon('ios_share'));
+}
+
+/** ZIP or 7z with the full password option set, including encrypted 7z headers. */
+export function archiveDialog(getter) {
+  if (!window.mt.tools?.archiveData) { toast(pair('Archives are available in the desktop app.', '壓縮檔只限桌面程式。'), { kind: 'info' }); return; }
+  const fmt = segmented([{ value: 'zip', label: 'ZIP' }, { value: '7z', label: '7z' }], 'zip', { label: 'Format' });
+  const inner = segmented(FORMATS.map((f) => ({ value: f.id, label: f.label })), 'json', { label: 'Content format' });
+  const pw = secret('', { label: 'Password', allowFile: false });
+  const hdr = switchCtl(true, { label: 'Encrypt file names (7z)' });
+  dialog({ title: pair('Export as archive', '匯出壓縮檔'), emojiChar: '🗜️', body: h('div.stack', h('b', pair('Archive', '壓縮格式')), fmt.el, h('b', pair('File inside', '入面嘅檔案')), inner.el, h('b', pair('Password (optional)', '密碼（可選）')), pw.el, h('div.switch-row', h('div.txt', h('b', pair('Encrypt file names too (7z only)', '連檔名都加密（只限 7z）'))), hdr.el), h('p.small.muted', pair('ZIP passwords use AES-256. Anyone without the password cannot open a 7z with encrypted names; keep the password safe.', 'ZIP 密碼用 AES-256。冇密碼就開唔到。'))),
+    actions: [{ label: t('cancel'), kind: 'outline', value: false }, { label: t('export'), run: async () => {
+      const d = getter(); const f = FORMATS.find((x) => x.id === inner.get()); const out = f.make(d);
+      if (!out) { toast(pair(`${f.label} cannot carry this data.`, `${f.label} 裝唔到呢啲資料。`), { kind: 'warn' }); return false; }
+      const dest = await window.mt.dialog.save({ defaultPath: `${d.name}.${fmt.get()}` }); if (!dest) return false;
+      try { const r = await window.mt.tools.archiveData({ name: `${d.name}.${f.ext}`, text: out.text, dest, format: fmt.get(), password: pw.get(), encryptHeaders: hdr.get() }); toast(pair(`Archive saved (${r.bytes} bytes).`, `已儲存壓縮檔（${r.bytes} 位元組）。`), { kind: 'ok', actions: [{ label: pair('Show in folder', '喺資料夾顯示'), run: () => window.mt.shell.showItem(dest) }] }); }
+      catch (e) { toast(e.message, { kind: 'err' }); return false; }
+    } }] });
 }

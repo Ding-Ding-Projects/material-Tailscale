@@ -129,6 +129,7 @@ handle('tools:ensureJava', (feature, job) => tools.ensureJava(feature, progress(
 handle('tools:archiveCreate', (opts, job) => tools.archiveCreate(opts, progress(job)));
 handle('tools:archiveExtract', (opts, job) => tools.archiveExtract(opts, progress(job)));
 handle('tools:archiveList', (file) => tools.archiveList(file));
+handle('tools:archiveData', (opts) => tools.archiveData(opts));
 handle('tools:convertMedia', (opts, job) => tools.convertMedia(opts, progress(job)));
 handle('tools:convertDocument', (opts) => tools.convertDocument(opts));
 handle('tools:grep', (opts) => tools.grep(opts));

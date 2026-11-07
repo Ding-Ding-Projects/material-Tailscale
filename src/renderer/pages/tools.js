@@ -9,6 +9,7 @@ import { workbench } from '../ui/regex.js';
 import { exportTo, FORMATS } from '../ui/exporter.js';
 import totpLib from '../../shared/totp.js';
 import QRCode from 'qrcode';
+import { withProgress, helpRequest } from '../ui/jobs.js';
 import jsQR from 'jsqr';
 
 const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.titles', h('div.eyebrow', eyebrow), h('h1', title), desc ? h('p', desc) : null), ...right);
@@ -147,47 +148,80 @@ registerPage('base64', () => {
 });
 
 // ---------------- File converter ----------------
-const ADAPTERS = [
-  { cat: 'Structured data', from: ['json'], to: ['yaml', 'csv', 'md', 'html', 'txt'], ok: true },
-  { cat: 'Structured data', from: ['csv'], to: ['json', 'md'], ok: true },
-  { cat: 'Images', from: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'svg'], to: ['png', 'jpeg', 'webp'], ok: true },
-  { cat: 'Code / text', from: ['txt', 'md', 'log', 'hujson'], to: ['html', 'txt'], ok: true },
-  { cat: 'Binary encodings', from: ['*'], to: ['base64', 'hex'], ok: true },
-  { cat: 'Documents / PDF', from: ['docx', 'pdf'], to: ['pdf', 'txt'], ok: false, need: 'LibreOffice (not bundled yet)' },
-  { cat: 'Audio', from: ['wav', 'mp3', 'flac'], to: ['mp3', 'ogg', 'wav'], ok: false, need: 'FFmpeg (not bundled yet)' },
-  { cat: 'Video', from: ['mp4', 'mkv', 'webm'], to: ['mp4', 'webm', 'gif'], ok: false, need: 'FFmpeg (not bundled yet)' },
-  { cat: 'Archives', from: ['zip', '7z', 'tar'], to: ['zip', '7z'], ok: false, need: '7-Zip (not bundled yet)' }
+const IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'svg'];
+const AUD = ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac', 'opus', 'wma'];
+const VID = ['mp4', 'mkv', 'webm', 'mov', 'avi', 'wmv', 'flv', 'm4v'];
+const ARC = ['zip', '7z', 'tar', 'gz', 'tgz', 'bz2', 'xz', 'rar', 'iso', 'cab'];
+const DOC = ['docx', 'pdf', 'md', 'markdown', 'html', 'htm', 'txt', 'log'];
+export const ADAPTERS = [
+  { cat: 'Structured data / spreadsheets', from: ['json', 'csv'], to: ['json', 'yaml', 'csv', 'md', 'html', 'txt'], engine: 'built in' },
+  { cat: 'Images', from: IMG, to: ['png', 'jpeg', 'webp'], engine: 'built in (Chromium)' },
+  { cat: 'Audio', from: [...AUD, ...VID], to: ['mp3', 'ogg', 'wav', 'flac', 'm4a', 'opus'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
+  { cat: 'Video', from: VID, to: ['mp4', 'webm', 'mkv', 'gif'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
+  { cat: 'Archives', from: ARC, to: ['extract', 'zip', '7z'], engine: '7-Zip (bundled)', tool: 'sevenZip' },
+  { cat: 'Documents / PDF', from: DOC, to: ['pdf', 'html', 'txt'], engine: 'built in (Chromium print, mammoth, pdf.js)' },
+  { cat: 'Code / text', from: ['txt', 'md', 'log', 'hujson', 'js', 'ts', 'py', 'go', 'yaml', 'yml', 'xml', 'ini', 'toml'], to: ['html', 'pdf', 'txt'], engine: 'built in' },
+  { cat: 'Binary encodings', from: ['*'], to: ['base64', 'hex'], engine: 'built in' }
 ];
 registerPage('converter', () => {
   let src = null;
+  let bundled = { ffmpegPresent: false, sevenZipPresent: false };
   const info = h('div.small');
-  const opts = h('div.row');
-  const drop = h('div.card.hero', { style: { minHeight: '140px', alignItems: 'center', justifyContent: 'center', borderStyle: 'dashed' } }, icon('upload_file'), h('b', pair('Drop a file here, or choose one', '拖檔案到呢度，或者揀一個')), h('button.btn.small', { on: { click: async () => { const p = await window.mt.dialog.open({}); if (p) pick(p[0]); } } }, pair('Choose file…', '揀檔…')));
+  const opts = h('div.stack');
+  const catalogue = h('div');
+  const drawCatalogue = () => clear(catalogue).append(h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', ['Category', 'From', 'To', 'Engine', 'Status'].map((c) => h('th', c)))), h('tbody', ADAPTERS.map((a) => { const ok = !a.tool || bundled[a.tool + 'Present']; return h('tr', h('td', a.cat), h('td.small', a.from.join(', ')), h('td.small', a.to.join(', ')), h('td.small', a.engine), h('td', ok ? h('span.badge.ok', pair('ready', '可用')) : h('span.badge.err', pair(`missing ${a.tool} in this installation`, `呢個安裝缺少 ${a.tool}`)))); })))));
+  window.mt.tools.bundled().then((b) => { bundled = b; drawCatalogue(); });
+  drawCatalogue();
+  const drop = h('div.card.hero', { style: { minHeight: '140px', alignItems: 'center', justifyContent: 'center', borderStyle: 'dashed' }, dataset: { el: 'converter-drop' } }, icon('upload_file'), h('b', pair('Drop a file here, or choose one', '拖檔案到呢度，或者揀一個')), h('button.btn.small', { on: { click: async () => { const p = await window.mt.dialog.open({}); if (p) pick(p[0]); } } }, pair('Choose file…', '揀檔…')));
   drop.addEventListener('dragover', (e) => e.preventDefault());
   drop.addEventListener('drop', (e) => { e.preventDefault(); e.stopPropagation(); const f = e.dataTransfer.files[0]; if (f) pick(window.mt.pathForFile(f)); });
+  const sniff = (b) => (b[0] === 0x89 && b[1] === 0x50 ? 'png' : b[0] === 0xff && b[1] === 0xd8 ? 'jpg' : b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 ? 'gif' : b[0] === 0x25 && b[1] === 0x50 ? 'pdf' : b[0] === 0x37 && b[1] === 0x7a ? '7z' : b[0] === 0x52 && b[1] === 0x61 && b[2] === 0x72 ? 'rar' : b[0] === 0x1f && b[1] === 0x8b ? 'gz' : b[0] === 0x52 && b[1] === 0x49 && b[8] === 0x57 ? 'webp' : b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33 ? 'mp3' : b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 ? 'mp4' : b[0] === 0x1a && b[1] === 0x45 ? 'mkv' : b[0] === 0x52 && b[1] === 0x49 && b[8] === 0x57 ? 'wav' : null);
   const pick = async (p) => {
-    const b64 = await window.mt.fs.readBytes(p);
-    const bytes = Uint8Array.from(atob(b64.slice(0, 64)), (c) => c.charCodeAt(0));
-    const magic = bytes[0] === 0x89 ? 'png' : bytes[0] === 0xff ? 'jpg' : bytes[0] === 0x50 && bytes[1] === 0x4b ? 'zip' : bytes[0] === 0x25 ? 'pdf' : bytes[0] === 0x47 ? 'gif' : null;
-    const ext = magic || p.split('.').pop().toLowerCase();
-    src = { p, ext, b64 };
-    info.textContent = pair(`Detected ${ext} by ${magic ? 'file signature' : 'extension'} · ${fmtBytes(b64.length * 0.75)}`, `偵測到 ${ext} · ${fmtBytes(b64.length * 0.75)}`);
+    const head64 = (await window.mt.fs.readBytes(p).catch(() => null));
+    if (!head64) { info.textContent = pair('That file could not be read (it may be larger than 256 MB).', '讀唔到呢個檔（可能大過 256 MB）。'); return; }
+    const bytes = Uint8Array.from(atob(head64.slice(0, 64)), (c) => c.charCodeAt(0));
+    const magic = sniff(bytes);
+    let ext = (magic === 'mp4' && /\.(mov|m4a|m4v)$/i.test(p)) ? p.split('.').pop().toLowerCase() : magic === 'gz' && /\.tgz$/i.test(p) ? 'tgz' : magic || p.split('.').pop().toLowerCase();
+    if (magic === 'zip' || (bytes[0] === 0x50 && bytes[1] === 0x4b)) ext = /\.docx$/i.test(p) ? 'docx' : 'zip';
+    src = { p, ext, b64: head64 };
+    info.textContent = pair(`Detected .${ext} from ${magic ? 'its first bytes' : 'its extension'} · ${fmtBytes(head64.length * 0.75)}`, `偵測到 .${ext} · ${fmtBytes(head64.length * 0.75)}`);
     clear(opts);
-    for (const a of ADAPTERS) if (a.from.includes(ext) || a.from.includes('*')) for (const to of a.to) opts.append(h('button.btn.small' + (a.ok ? '' : '.outline'), { disabled: !a.ok, title: a.ok ? '' : a.need, on: { click: () => convert(to) } }, `→ ${to}`, a.ok ? null : h('span.small', ` (${a.need})`)));
+    for (const a of ADAPTERS) {
+      if (!(a.from.includes(ext) || a.from.includes('*'))) continue;
+      const ok = !a.tool || bundled[a.tool + 'Present'];
+      opts.append(h('div.row', h('b', { style: { minWidth: '200px' } }, a.cat), ...a.to.map((to) => h('button.btn.small' + (ok ? '' : '.outline'), { disabled: !ok, title: ok ? a.engine : pair(`${a.tool} is missing from this installation`, `缺少 ${a.tool}`), on: { click: () => convert(a, to) } }, to === 'extract' ? pair('Extract', '解壓') : `→ ${to}`))));
+    }
+    if (!opts.childNodes.length) opts.append(h('div.small.muted', pair('No converter handles this type.', '冇轉換器處理呢個類型。')));
   };
-  const convert = async (to) => {
-    const name = src.p.split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+  const base = () => src.p.split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
+  const convert = async (a, to) => {
     try {
-      if (['png', 'jpeg', 'webp'].includes(to)) {
-        const img = new Image(); img.src = `data:image/${src.ext === 'svg' ? 'svg+xml' : src.ext};base64,${src.b64}`; await img.decode();
+      if (a.cat === 'Images') {
+        const img = new Image(); img.src = `data:image/${src.ext === 'svg' ? 'svg+xml' : src.ext === 'jpg' ? 'jpeg' : src.ext};base64,${src.b64}`; await img.decode();
         const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0);
-        const data = c.toDataURL('image/' + to, 0.92).split(',')[1];
-        const p = await window.mt.dialog.save({ defaultPath: `${name}.${to === 'jpeg' ? 'jpg' : to}` }); if (p) { await window.mt.fs.writeBytes(p, data); toast(pair('Converted.', '已轉換。'), { kind: 'ok' }); }
+        const p = await window.mt.dialog.save({ defaultPath: `${base()}.${to === 'jpeg' ? 'jpg' : to}` }); if (p) { await window.mt.fs.writeBytes(p, c.toDataURL('image/' + to, 0.92).split(',')[1]); toast(pair('Converted.', '已轉換。'), { kind: 'ok' }); }
+        return;
+      }
+      if (a.tool === 'ffmpeg') {
+        const out = await window.mt.dialog.save({ defaultPath: `${base()}.${to}` }); if (!out) return;
+        withProgress(pair(`Convert to ${to}`, `轉換做 ${to}`), (job) => window.mt.tools.convertMedia({ input: src.p, output: out, options: { audioOnly: a.cat === 'Audio', crf: a.cat === 'Video' && to !== 'gif' ? 23 : undefined } }, job), { onDone: (r, b) => r?.path && b.append(h('button.btn.small.outline', { on: { click: () => window.mt.shell.showItem(r.path) } }, icon('folder_open'), pair('Show in folder', '喺資料夾顯示'))) });
+        return;
+      }
+      if (a.tool === 'sevenZip') {
+        if (to === 'extract') { const d = await window.mt.dialog.open({ properties: ['openDirectory', 'createDirectory'], title: pair('Extract into', '解壓到') }); if (!d) return; withProgress(pair('Extract archive', '解壓'), (job) => window.mt.tools.archiveExtract({ file: src.p, dest: d[0] }, job), { onDone: () => window.mt.shell.openPath(d[0]) }); return; }
+        const out = await window.mt.dialog.save({ defaultPath: `${base()}.${to}` }); if (!out) return;
+        const tmp = await window.mt.dialog.open({ properties: ['openDirectory', 'createDirectory'], title: pair('Choose an empty working folder for repacking', '揀一個空資料夾做重新壓縮') }); if (!tmp) return;
+        withProgress(pair(`Repack as ${to}`, `重新壓縮做 ${to}`), async (job) => { await window.mt.tools.archiveExtract({ file: src.p, dest: tmp[0] }, job); return window.mt.tools.archiveCreate({ files: [tmp[0] + (navigator.platform.startsWith('Win') ? '\\*' : '/*')], dest: out, format: to }, job); });
+        return;
+      }
+      if (a.cat === 'Documents / PDF' || (a.cat === 'Code / text' && to !== 'txt')) {
+        const out = await window.mt.dialog.save({ defaultPath: `${base()}.${to}` }); if (!out) return;
+        withProgress(pair(`Convert to ${to}`, `轉換做 ${to}`), () => window.mt.tools.convertDocument({ input: src.p, output: out }), { onDone: (r, b) => r?.path && b.append(h('button.btn.small.outline', { on: { click: () => window.mt.shell.openPath(r.path) } }, icon('open_in_new'), pair('Open', '開'))) });
         return;
       }
       if (to === 'base64' || to === 'hex') {
         const out = to === 'base64' ? src.b64 : [...atob(src.b64)].map((c) => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
-        const p = await window.mt.dialog.save({ defaultPath: `${name}.${to}.txt` }); if (p) { await window.mt.fs.writeText(p, out); toast(pair('Converted.', '已轉換。'), { kind: 'ok' }); }
+        const p = await window.mt.dialog.save({ defaultPath: `${base()}.${to}.txt` }); if (p) { await window.mt.fs.writeText(p, out); toast(pair('Converted.', '已轉換。'), { kind: 'ok' }); }
         return;
       }
       const textIn = new TextDecoder().decode(Uint8Array.from(atob(src.b64), (c) => c.charCodeAt(0)));
@@ -196,11 +230,11 @@ registerPage('converter', () => {
       else if (src.ext === 'csv') { const [hd, ...rows] = textIn.trim().split(/\r?\n/).map((l) => l.split(',')); data = rows.map((r) => Object.fromEntries(hd.map((k, i) => [k, r[i]]))); }
       else data = textIn;
       const f = FORMATS.find((x) => x.id === to) || FORMATS.find((x) => x.id === 'txt');
-      await exportTo(f, () => ({ name, data, text: typeof data === 'string' ? data : undefined }));
-    } catch (e) { toast(pair(`Conversion failed: ${e.message}`, `轉換失敗：${e.message}`), { kind: 'err' }); }
+      await exportTo(f, () => ({ name: base(), data, text: typeof data === 'string' ? data : undefined }));
+    } catch (e) { toast(pair(`Conversion failed: ${e.message}`, `轉換失敗：${e.message}`), { kind: 'err', actions: [{ label: pair('Copy a help request', '複製求助訊息'), run: () => helpRequest('Converting a file', e.message).click() }] }); }
   };
-  return h('div.page', head(pair('Convert', '轉換'), t('converter'), pair('Detects a file\'s type from its first bytes and converts it locally. Formats that need a tool this app does not bundle yet are listed and disabled with the reason.', '用檔案頭幾個位元組偵測類型，本機轉換。未內置工具嘅格式會列出並停用，註明原因。')),
-    drop, info, opts, collapsible('conv-catalog', pair('Adapter catalogue', '轉換器目錄'), h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', ['Category', 'From', 'To', 'Status'].map((c) => h('th', c)))), h('tbody', ADAPTERS.map((a) => h('tr', h('td', a.cat), h('td', a.from.join(', ')), h('td', a.to.join(', ')), h('td', a.ok ? h('span.badge.ok', pair('ready', '可用')) : h('span.badge.warn', a.need))))))), { startCollapsed: true }));
+  return h('div.page', head(pair('Convert', '轉換'), t('converter'), pair('Detects a file\'s type from its first bytes and converts it locally with bundled ffmpeg and 7-Zip, Chromium, mammoth and pdf.js. Nothing is uploaded.', '用檔案頭位元組偵測類型，用內置 ffmpeg、7-Zip 等本機轉換，唔會上載。')),
+    drop, info, opts, collapsible('conv-catalog', pair('Adapter catalogue', '轉換器目錄'), catalogue, { startCollapsed: true }));
 });
 
 // ---------------- Regex page ----------------
@@ -249,31 +283,58 @@ registerPage('draw', (ctx) => {
   return h('div.page', head(pair('Annotate', '標註'), t('draw'), pair('Seven pens plus an eraser, Shift-locked straight strokes, undo and redo, SVG and 1x to 3x PNG export.', '七支筆加擦膠，Shift 畫直線，復原重做，匯出 SVG 同 PNG。')), h('div.card.tonal', toolbar), cv);
 });
 
-// ---------------- Ollama ----------------
-registerPage('ollama', () => {
-  const box = h('div.stack');
+// ---------------- Ollama suite ----------------
+const OLL = 'http://127.0.0.1:11434';
+registerPage('ollama', (ctx) => {
+  const box = h('div.stack'), running = h('div.stack'), chat = h('div.stack');
   const load = async () => {
     clear(box).append(h('div.skeleton', { style: { height: '80px' } }));
     try {
-      const r = await fetch('http://127.0.0.1:11434/api/tags').then((x) => x.json());
-      clear(box).append(h('span.badge.ok', pair('Ollama is running on this computer', '本機 Ollama 運行緊')), ...(r.models || []).map((m) => h('div.pick-row', { style: { cursor: 'default' } }, h('span.ava', icon('smart_toy')), h('span.meta', h('b', m.name), h('span', `${fmtBytes(m.size)} · ${m.details?.parameter_size || ''} ${m.details?.quantization_level || ''}`)))));
-      if (!r.models?.length) box.append(h('div.empty.small', pair('No models downloaded yet.', '未有模型。')));
+      const [tags, ps, ver] = await Promise.all([fetch(OLL + '/api/tags').then((x) => x.json()), fetch(OLL + '/api/ps').then((x) => x.json()).catch(() => ({ models: [] })), fetch(OLL + '/api/version').then((x) => x.json()).catch(() => ({}))]);
+      clear(box).append(h('div.row', h('span.badge.ok', pair(`Ollama ${ver.version || ''} is running`, `Ollama ${ver.version || ''} 運行緊`)), h('span.small.muted', pair(`${(tags.models || []).length} models`, `${(tags.models || []).length} 個模型`))));
+      for (const m of tags.models || []) box.append(h('div.pick-row', { style: { cursor: 'default' } }, h('span.ava', icon('smart_toy')), h('span.meta', h('b', m.name), h('span', `${fmtBytes(m.size)} · ${m.details?.family || ''} ${m.details?.parameter_size || ''} ${m.details?.quantization_level || ''}`)),
+        h('button.btn.small.outline', { on: { click: async () => dialog({ title: m.name, wide: true, body: h('div.out', JSON.stringify(await fetch(OLL + '/api/show', { method: 'POST', body: JSON.stringify({ name: m.name }) }).then((x) => x.json()), null, 2).slice(0, 20000)) }) } }, pair('Details', '詳情')),
+        h('button.btn.small.tonal', { on: { click: () => { modelSel.value = m.name; prompt.focus(); } } }, pair('Chat', '對話')),
+        h('button.icon-btn.sm', { 'aria-label': pair(`Delete ${m.name}`, `刪除 ${m.name}`), on: { click: async () => { if (await superConfirm({ action: pair(`Delete the model ${m.name}`, `刪除模型 ${m.name}`), affects: fmtBytes(m.size) })) { await fetch(OLL + '/api/delete', { method: 'DELETE', body: JSON.stringify({ name: m.name }) }); toast(pair('Model deleted.', '已刪除模型。'), { kind: 'ok' }); load(); } } } }, icon('delete'))));
+      if (!tags.models?.length) box.append(h('div.empty.small', pair('No models downloaded yet. Pull one below.', '未有模型，喺下面下載。')));
+      clear(running).append(h('b', pair('Loaded in memory', '已載入記憶體')), ...(ps.models?.length ? ps.models.map((m) => h('div.chip', `${m.name} · ${fmtBytes(m.size_vram || m.size)} VRAM`)) : [h('span.small.muted', pair('None', '無'))]));
+      clear(modelSel).append(...(tags.models || []).map((m) => h('option', { value: m.name }, m.name)));
     } catch {
-      clear(box).append(h('span.badge.warn', pair('Ollama is not running or not installed', 'Ollama 未運行或者未安裝')), h('p', pair('Ollama is a separate program. Install it from ollama.com, then come back and press Refresh.', 'Ollama 係獨立程式，喺 ollama.com 安裝後返嚟撳重新整理。')), h('button.btn', { on: { click: () => window.mt.shell.external('https://ollama.com/download') } }, icon('download'), pair('Get Ollama', '下載 Ollama')));
+      clear(box).append(h('span.badge.warn', pair('Ollama is not running or not installed', 'Ollama 未運行或者未安裝')),
+        h('p', pair('One click downloads the official Ollama installer, verifies its SHA-256 checksum from the release, and installs it. If a previous install is broken, this repairs it in place; your models are kept.', '一撳就下載官方 Ollama 安裝程式、驗證 SHA-256 再安裝。舊版壞咗都會原地修復，模型會保留。')),
+        h('button.btn', { dataset: { el: 'install-ollama' }, on: { click: () => withProgress(pair('Install Ollama', '安裝 Ollama'), (job) => window.mt.tools.installOllama(job), { onDone: (r, b) => { if (r?.ok) { b.append(h('p', pair(`Ollama ${r.version} installed; checksum verified.`, `已安裝 Ollama ${r.version}。`))); setTimeout(load, 4000); } else if (r?.message) b.append(h('p', r.message)); } }) } }, icon('download'), pair('Install or repair Ollama', '安裝或修復 Ollama')));
+      clear(running);
     }
   };
   const model = text('llama3.2', { label: 'Model', mono: true });
-  const prog = h('div.small');
+  const prog = h('div.sc-progress', h('i', { style: { background: 'var(--primary)' } })); const progText = h('div.small');
   const pull = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:11434/api/pull', { method: 'POST', body: JSON.stringify({ name: model.get() }) });
+      const res = await fetch(OLL + '/api/pull', { method: 'POST', body: JSON.stringify({ name: model.get() }) });
       const rd = res.body.getReader(); const dec = new TextDecoder();
-      for (;;) { const { done, value } = await rd.read(); if (done) break; for (const line of dec.decode(value).split('\n').filter(Boolean)) { const j = JSON.parse(line); prog.textContent = j.total ? `${j.status} ${Math.round((j.completed || 0) / j.total * 100)}%` : j.status; } }
+      for (;;) { const { done, value } = await rd.read(); if (done) break; for (const line of dec.decode(value).split('\n').filter(Boolean)) { const j = JSON.parse(line); if (j.error) throw new Error(j.error); const pct = j.total ? Math.round(((j.completed || 0) / j.total) * 100) : null; prog.firstChild.style.width = (pct ?? 5) + '%'; progText.textContent = `${j.status}${pct !== null ? ` ${pct}%` : ''}`; } }
       toast(pair('Model downloaded.', '模型已下載。'), { kind: 'ok' }); load();
     } catch (e) { toast(e.message, { kind: 'err' }); }
   };
+  const modelSel = h('select.input', { 'aria-label': pair('Chat model', '對話模型') });
+  const prompt = h('textarea.input', { placeholder: pair('Ask something…', '問啲嘢…'), style: { minHeight: '80px', fontFamily: 'var(--font-body)' }, 'aria-label': pair('Message', '訊息') });
+  const msgs = []; const log = h('div.stack');
+  const send = async () => {
+    if (!prompt.value.trim() || !modelSel.value) return;
+    msgs.push({ role: 'user', content: prompt.value }); log.append(h('div.card.tonal', { style: { padding: '12px' } }, h('b', pair('You', '你')), h('div', prompt.value))); prompt.value = '';
+    const out = h('div', { style: { whiteSpace: 'pre-wrap' } }); log.append(h('div.card', { style: { padding: '12px' } }, h('b', modelSel.value), out));
+    try {
+      const res = await fetch(OLL + '/api/chat', { method: 'POST', body: JSON.stringify({ model: modelSel.value, messages: msgs, stream: true }) });
+      const rd = res.body.getReader(); const dec = new TextDecoder(); let full = '';
+      for (;;) { const { done, value } = await rd.read(); if (done) break; for (const line of dec.decode(value).split('\n').filter(Boolean)) { const j = JSON.parse(line); full += j.message?.content || ''; out.textContent = full; } }
+      msgs.push({ role: 'assistant', content: full });
+    } catch (e) { out.textContent = e.message; }
+  };
   load();
-  return h('div.page', head('Local AI', t('ollama'), pair('See and manage local Ollama models.', '睇同管理本機 Ollama 模型。'), h('button.btn.outline', { on: { click: load } }, icon('refresh'), t('refresh'))), h('section.card', box), h('section.card.tonal', h('h3', pair('Download a model', '下載模型')), model.el, h('div.row', h('button.btn', { on: { click: pull } }, icon('download'), pair('Pull', '下載'))), prog));
+  clear(chat).append(h('h3', pair('Chat with a local model', '同本機模型對話')), modelSel, prompt, h('div.row', h('button.btn', { on: { click: send } }, icon('send'), pair('Send', '傳送')), h('button.btn.text', { on: { click: () => { msgs.length = 0; clear(log); } } }, pair('New conversation', '新對話'))), log);
+  return h('div.page', head('Local AI', t('ollama'), pair('Install, run and manage local Ollama models: list, details, pull with progress, delete, what is loaded, and chat.', '安裝、運行同管理本機 Ollama 模型。'), h('button.btn.outline', { on: { click: load } }, icon('refresh'), t('refresh'))),
+    h('div.grid', h('section.card.span-7', box, running), h('section.card.span-5.tonal', h('h3', pair('Download a model', '下載模型')), model.el, h('div.suggest', ['llama3.2', 'qwen2.5', 'gemma3', 'mistral', 'phi4', 'deepseek-r1'].map((m) => h('button.chip.choice', { on: { click: () => model.set(m) } }, m))), h('div.row', h('button.btn', { on: { click: pull } }, icon('download'), pair('Pull', '下載'))), prog, progText)),
+    h('section.card', chat));
 });
 
 // ---------------- Minecraft ----------------

@@ -23,7 +23,7 @@ contextBridge.exposeInMainWorld('mt', {
   lockStatus: call('lock:status'),
   lockClearState: call('lock:clearState'),
   ladder: { start: call('ladder:start'), answer: call('ladder:answer'), complete: call('ladder:complete') },
-  tools: { installTailscale: call('tools:installTailscale'), installOllama: call('tools:installOllama'), ensureJava: call('tools:ensureJava'), archiveCreate: call('tools:archiveCreate'), archiveExtract: call('tools:archiveExtract'), archiveList: call('tools:archiveList'), convertMedia: call('tools:convertMedia'), convertDocument: call('tools:convertDocument'), grep: call('tools:grep'), bundled: call('tools:bundled'), onProgress: on('tools:progress') },
+  tools: { installTailscale: call('tools:installTailscale'), installOllama: call('tools:installOllama'), ensureJava: call('tools:ensureJava'), archiveCreate: call('tools:archiveCreate'), archiveExtract: call('tools:archiveExtract'), archiveList: call('tools:archiveList'), archiveData: call('tools:archiveData'), convertMedia: call('tools:convertMedia'), convertDocument: call('tools:convertDocument'), grep: call('tools:grep'), bundled: call('tools:bundled'), onProgress: on('tools:progress') },
   authLoad: call('auth:load'),
   history: { record: call('history:record'), list: call('history:list'), files: call('history:files'), restore: call('history:restore') },
   shared: { get: call('shared:get'), set: call('shared:set'), onChange: on('shared:changed') },
