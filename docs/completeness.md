@@ -35,7 +35,7 @@ Generated from `src/shared/feature-inventory.js` by `npm run gen:completeness`; 
 | Your name for the app | finished | n/a | n/a | `src/renderer/ui/shell.js`, [article](features/language/display-name.md) |  |
 | ADHD modes | finished | finished | n/a | `src/renderer/app.js`, `src/shared/momentum.js`, [article](features/language/adhd-modes.md) | Momentum suggestions follow commands, so they are in the app only. |
 | Dim sum surprise | finished | finished | n/a | `src/renderer/ui/dimsum.js`, [article](features/language/dim-sum-surprise.md) |  |
-| Job Experience Document wording | n/a | n/a | n/a | — | This app has no job-related workflows. |
+| Resume wording in job workflows | n/a | n/a | n/a | — | This app has no job-related workflows. |
 
 ## Look and feel
 

@@ -13,13 +13,13 @@ import { FEATURES, STATES, SURFACES, CATEGORIES, tally } from '../../shared/feat
 const L = (o) => pair(o.en, o.yue);
 const P = (a) => pair(a[0], a[1]);
 const badge = (state) => h(`span.badge${STATES[state].tone ? '.' + STATES[state].tone : ''}`, icon(STATES[state].icon), L(STATES[state]));
-const haystack = (x) => [x.title, x.benefit, x.how, x.note || ['', '']].flat().concat(L(CATEGORIES[x.cat]), x.impl, x.article || '').join('\n');
+const haystack = (x) => [x.title, x.benefit, x.how, x.note || ['', '']].flat().concat(L(CATEGORIES[x.category]), x.impl, x.article || '').join('\n');
 
 registerPage('features', () => {
   const onSite = !!window.mt?.site;
   const saved = store.get('featureFilters') || {};
-  const f = { surface: saved.surface || (onSite ? 'site' : 'app'), states: new Set(saved.states || []), cats: new Set(saved.cats || []) };
-  const keep = () => store.set('featureFilters', { surface: f.surface, states: [...f.states], cats: [...f.cats] }, { record: false });
+  const f = { surface: saved.surface || (onSite ? 'site' : 'app'), states: new Set(saved.states || []), groups: new Set(saved.groups || []) };
+  const keep = () => store.set('featureFilters', { surface: f.surface, states: [...f.states], groups: [...f.groups] }, { record: false });
 
   const search = regexField({ id: 'features', placeholder: pair('Search what features do and how to reach them', '搜尋功能做乜同點去'), onChange: () => draw() });
   const stats = h('div.hero-stats');
@@ -30,15 +30,15 @@ registerPage('features', () => {
   const chip = (on, label, click, el) => h('button.chip.choice', { type: 'button', 'aria-pressed': String(on), dataset: { el }, on: { click } }, label);
   const toggle = (set, v) => { if (set.has(v)) set.delete(v); else set.add(v); keep(); drawFilters(); draw(); };
   const drawFilters = () => {
-    const active = f.states.size + f.cats.size;
+    const active = f.states.size + f.groups.size;
     const body = h('div.stack',
       h('div.stack', h('b.small', pair('Show the state on', '顯示邊個介面嘅狀態')),
         h('div.suggest', { role: 'group', 'aria-label': pair('Surface', '介面') }, Object.entries(SURFACES).map(([k, s]) => chip(f.surface === k, [icon(s.icon), L(s)], () => { f.surface = k; keep(); drawFilters(); draw(); }, `feature-surface-${k}`)))),
       h('div.stack', h('b.small', pair('State', '狀態')),
         h('div.suggest', { role: 'group', 'aria-label': pair('State', '狀態') }, Object.keys(STATES).map((k) => chip(f.states.has(k), [icon(STATES[k].icon), L(STATES[k])], () => toggle(f.states, k), `feature-state-${k}`)))),
       h('div.stack', h('b.small', pair('Category', '類別')),
-        h('div.suggest', { role: 'group', 'aria-label': pair('Category', '類別') }, Object.entries(CATEGORIES).map(([k, c]) => chip(f.cats.has(k), [icon(c.icon), L(c)], () => toggle(f.cats, k), `feature-cat-${k}`)))),
-      active ? h('div.row', h('button.btn.small.text', { type: 'button', on: { click: () => { f.states.clear(); f.cats.clear(); keep(); drawFilters(); draw(); } } }, icon('filter_alt_off'), pair('Clear filters', '清除篩選'))) : null);
+        h('div.suggest', { role: 'group', 'aria-label': pair('Category', '類別') }, Object.entries(CATEGORIES).map(([k, c]) => chip(f.groups.has(k), [icon(c.icon), L(c)], () => toggle(f.groups, k), `feature-cat-${k}`)))),
+      active ? h('div.row', h('button.btn.small.text', { type: 'button', on: { click: () => { f.states.clear(); f.groups.clear(); keep(); drawFilters(); draw(); } } }, icon('filter_alt_off'), pair('Clear filters', '清除篩選'))) : null);
     clear(filterBox).append(collapsible('features-filters', pair('Filters', '篩選'), body, { startCollapsed: true, badge: active ? String(active) : null }));
   };
 
@@ -46,7 +46,7 @@ registerPage('features', () => {
     const here = x.state[f.surface];
     const art = x.article ? 'docs/' + x.article : null;
     return h('article.card.span-4.feature-card', { role: 'listitem', dataset: { el: `feature-${x.id}` }, 'aria-label': P(x.title) },
-      h('div.row.nowrap', { style: { alignItems: 'flex-start', gap: '10px' } }, h('span.ico', icon(CATEGORIES[x.cat].icon)), h('h3', { style: { flex: 1, margin: 0 } }, P(x.title))),
+      h('div.row.nowrap', { style: { alignItems: 'flex-start', gap: '10px' } }, h('span.ico', icon(CATEGORIES[x.category].icon)), h('h3', { style: { flex: 1, margin: 0 } }, P(x.title))),
       h('div.row', { style: { marginTop: '8px' } }, badge(here)),
       h('p.small', { style: { margin: '8px 0' } }, P(x.benefit)),
       h('div.suggest', { 'aria-label': pair('State on the other surfaces', '其他介面嘅狀態') }, Object.entries(SURFACES).filter(([k]) => k !== f.surface && x.state[k] !== 'na').map(([k, s]) => h('span.chip', { title: `${L(s)}: ${L(STATES[x.state[k]])}` }, icon(STATES[x.state[k]].icon), `${L(s)}: ${L(STATES[x.state[k]])}`))),
@@ -65,7 +65,7 @@ registerPage('features', () => {
     const { q, re } = search.value();
     let match = (x) => !q || haystack(x).toLowerCase().includes(q.toLowerCase());
     if (re && q) { try { const r = new RegExp(q, 'i'); match = (x) => r.test(haystack(x)); } catch { match = () => false; } }
-    const shown = FEATURES.filter((x) => match(x) && (!f.states.size || f.states.has(x.state[f.surface])) && (!f.cats.size || f.cats.has(x.cat)));
+    const shown = FEATURES.filter((x) => match(x) && (!f.states.size || f.states.has(x.state[f.surface])) && (!f.groups.size || f.groups.has(x.category)));
     const n = tally(f.surface);
     stats.replaceChildren(...heroStats([
       { value: String(n.done), label: pair('finished', '完成'), tone: 'ok' },
@@ -76,11 +76,11 @@ registerPage('features', () => {
     status.textContent = pair(`${shown.length} of ${FEATURES.length} features shown, states on the ${SURFACES[f.surface].en.toLowerCase()}.`, `顯示 ${FEATURES.length} 個功能入面嘅 ${shown.length} 個，狀態以${SURFACES[f.surface].yue}為準。`);
     clear(results);
     if (!shown.length) {
-      results.append(h('div.empty', icon('search_off'), h('p', pair('No feature matches the search and filters.', '冇功能符合搜尋同篩選。')), h('button.btn.small.tonal', { type: 'button', on: { click: () => { search.set(''); f.states.clear(); f.cats.clear(); keep(); drawFilters(); draw(); } } }, pair('Show every feature', '顯示全部功能'))));
+      results.append(h('div.empty', icon('search_off'), h('p', pair('No feature matches the search and filters.', '冇功能符合搜尋同篩選。')), h('button.btn.small.tonal', { type: 'button', on: { click: () => { search.set(''); f.states.clear(); f.groups.clear(); keep(); drawFilters(); draw(); } } }, pair('Show every feature', '顯示全部功能'))));
       return;
     }
     for (const [k, c] of Object.entries(CATEGORIES)) {
-      const rows = shown.filter((x) => x.cat === k);
+      const rows = shown.filter((x) => x.category === k);
       if (!rows.length) continue;
       results.append(h('section.stack', { 'aria-label': L(c) }, h('h2.h3', { style: { margin: '6px 0 0' } }, icon(c.icon), ' ', L(c), h('span.small.muted', ` · ${rows.length}`)), h('div.grid', { role: 'list' }, rows.map(card))));
     }

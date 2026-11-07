@@ -38,8 +38,8 @@ const TAILNET = ['Not yet checked against a real tailnet: the build machine has 
 const APP_ONLY = ['The website documents it; using it needs the app.', '網站有說明；要用就要開程式。'];
 
 /** One row: id, category, title, what it does for you, how to reach it, state per surface, evidence, note. */
-const f = (id, cat, title, benefit, how, state, ev = {}, note = null) => ({
-  id, cat, title, benefit, how,
+const f = (id, category, title, benefit, how, state, ev = {}, note = null) => ({
+  id, category, title, benefit, how,
   state: { app: state.app || 'na', site: state.site || 'na', repo: state.repo || 'na' },
   impl: ev.impl || [], article: ev.article || null, capture: ev.capture || null, note
 });
@@ -72,7 +72,7 @@ export const FEATURES = [
   f('display-name', 'language', ['Your name for the app', '幫程式改名'], ['Rename the app everywhere it introduces itself, and reset in one click.', '程式自我介紹嘅地方全部改名，一撳就還原。'], ['Settings, Language.', '設定裏面嘅「語言」。'], { app: 'done', site: 'na' }, { impl: ['src/renderer/ui/shell.js'], article: 'features/language/display-name.md' }),
   f('adhd-modes', 'language', ['ADHD modes', 'ADHD 模式'], ['Focus, low stimulation and momentum suggestions, alone or together.', '專注、低刺激同順勢建議，單用或者一齊用都得。'], ['Settings, ADHD modes.', '設定裏面嘅「ADHD 模式」。'], { app: 'done', site: 'done' }, { impl: ['src/renderer/app.js', 'src/shared/momentum.js'], article: 'features/language/adhd-modes.md' }, ['Momentum suggestions follow commands, so they are in the app only.', '順勢建議跟指令走，所以只喺程式度有。']),
   f('dim-sum', 'language', ['Dim sum surprise', '點心驚喜'], ['Now and then a dim sum dish greets you at launch, from a public photo catalogue.', '間中開程式會有一碟點心同你打招呼，相片嚟自公開相簿。'], ['It just happens; Settings, Language explains it.', '佢自己會出現；設定裏面嘅「語言」有解釋。'], { app: 'done', site: 'done' }, { impl: ['src/renderer/ui/dimsum.js'], article: 'features/language/dim-sum-surprise.md' }),
-  f('job-wording', 'language', ['Job Experience Document wording', 'Job Experience Document 用詞'], ['The default wording for a resume in job-related workflows.', '求職流程入面履歷嘅預設用詞。'], ['Not applicable.', '唔適用。'], { app: 'na', site: 'na' }, {}, ['This app has no job-related workflows.', '呢個程式冇求職相關流程。']),
+  f('job-wording', 'language', ['Resume wording in job workflows', '求職流程嘅履歷用詞'], ['The default wording for a resume in job-related workflows.', '求職流程入面履歷嘅預設用詞。'], ['Not applicable.', '唔適用。'], { app: 'na', site: 'na' }, {}, ['This app has no job-related workflows.', '呢個程式冇求職相關流程。']),
 
   // Look and feel
   f('material-design', 'appearance', ['Material 3 design', 'Material 3 設計'], ['A frameless Material 3 Expressive window with themes, seed colours and density.', '冇邊框嘅 Material 3 Expressive 視窗，有主題、種子顏色同密度。'], ['Settings, Appearance.', '設定裏面嘅「外觀」。'], { app: 'done', site: 'done' }, { impl: ['src/renderer/styles/app.css', 'src/renderer/styles/mesh2.css'], article: 'features/appearance/material-design.md', capture: 'dark-settings-appearance.png' }),
