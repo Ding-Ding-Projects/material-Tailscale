@@ -2,7 +2,7 @@
 // <img>, which never runs scripts; audio and video get player controls and never autoplay; text
 // and markup show as text; anything else shows as a hex dump. Nothing decoded is ever opened,
 // executed or loaded as a page.
-import { h, clear, fmtBytes } from '../core/dom.js';
+import { h, clear, append, fmtBytes } from '../core/dom.js';
 import { pair } from '../core/i18n.js';
 import { segmented } from './controls.js';
 
@@ -58,10 +58,11 @@ export function renderPreview(box, bytes, type = {}, { textOf } = {}) {
       let s;
       try { s = textOf ? textOf(bytes.subarray(0, TEXT_LIMIT)) : new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(0, TEXT_LIMIT)); } catch { s = null; }
       if (s === null) { view.append(h('p.small', pair('These bytes are not text in the chosen encoding. The hex view shows them as they are.', '呢啲位元組喺揀咗嘅編碼唔係文字，可以睇十六進位。'))); return; }
-      view.append(h('pre.out.b64-text', { dataset: { label: pair('Decoded text', '解碼咗嘅文字') } }, s), bytes.length > TEXT_LIMIT ? h('p.small.muted', pair(`Showing the first ${fmtBytes(TEXT_LIMIT)} of ${fmtBytes(bytes.length)}.`, `顯示頭 ${fmtBytes(TEXT_LIMIT)}，共 ${fmtBytes(bytes.length)}。`)) : null);
+      // append() from dom.js drops the null; the native Element.append would print "null".
+      append(view, [h('pre.out.b64-text', { dataset: { label: pair('Decoded text', '解碼咗嘅文字') } }, s), bytes.length > TEXT_LIMIT ? h('p.small.muted', pair(`Showing the first ${fmtBytes(TEXT_LIMIT)} of ${fmtBytes(bytes.length)}.`, `顯示頭 ${fmtBytes(TEXT_LIMIT)}，共 ${fmtBytes(bytes.length)}。`)) : null]);
       return;
     }
-    view.append(h('pre.out.b64-hex', { dataset: { label: pair('Hex dump', '十六進位') } }, hexDump(bytes)), bytes.length > HEX_LIMIT ? h('p.small.muted', pair(`Showing the first ${fmtBytes(HEX_LIMIT)} of ${fmtBytes(bytes.length)}.`, `顯示頭 ${fmtBytes(HEX_LIMIT)}，共 ${fmtBytes(bytes.length)}。`)) : null);
+    append(view, [h('pre.out.b64-hex', { dataset: { label: pair('Hex dump', '十六進位') } }, hexDump(bytes)), bytes.length > HEX_LIMIT ? h('p.small.muted', pair(`Showing the first ${fmtBytes(HEX_LIMIT)} of ${fmtBytes(bytes.length)}.`, `顯示頭 ${fmtBytes(HEX_LIMIT)}，共 ${fmtBytes(bytes.length)}。`)) : null]);
   };
   const mode = segmented([{ value: 'auto', label: pair('Automatic', '自動') }, { value: 'text', label: pair('Text', '文字') }, { value: 'hex', label: pair('Hex', '十六進位') }], 'auto', { label: pair('Preview as', '預覽方式') });
   mode.onChange(draw);

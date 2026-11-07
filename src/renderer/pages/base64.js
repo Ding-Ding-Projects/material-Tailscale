@@ -66,9 +66,9 @@ export function explainFailure(e) {
 }
 
 const NAME_SOURCE = {
-  name: pair('from the file name', '由檔名'),
-  'data-url': pair('from the data: URL type', '由 data: URL 類型'),
-  signature: pair('from the file’s signature', '由檔案簽名'),
+  name: pair('named from the file name', '名由檔名嚟'),
+  'data-url': pair('named from the data: URL type', '名由 data: URL 類型嚟'),
+  signature: pair('named from the file’s signature', '名由檔案簽名嚟'),
   fallback: pair('no clue in the name, type or signature, so .bin', '檔名、類型同簽名都冇線索，所以用 .bin')
 };
 
@@ -143,17 +143,19 @@ registerPage('base64', () => {
   const outCount = h('div.small.muted');
   const status = h('div.small.b64-status', { role: 'status' });
   const say = (msg, kind = 'ok') => { status.textContent = msg; status.className = `small b64-status ${kind}`; };
+  // Characters as people count them (code points); error offsets stay in editor units.
+  const chars = (s) => { let n = 0; for (const _ of s) n++; return n; };
   function countIn() {
     const s = inp.value;
     let bytes;
     try { bytes = B.textToBytes(s, encoding.get()).length; } catch { bytes = null; }
     inCount.textContent = bytes === null
-      ? pair(`${s.length} characters; some cannot be written in ${encoding.get().toUpperCase()}`, `${s.length} 個字元；有啲用 ${encoding.get().toUpperCase()} 寫唔到`)
-      : pair(`${s.length} characters · ${fmtBytes(bytes)} in ${encoding.get().toUpperCase()}`, `${s.length} 個字元 · ${encoding.get().toUpperCase()} ${fmtBytes(bytes)}`);
+      ? pair(`${chars(s)} characters; some cannot be written in ${encoding.get().toUpperCase()}`, `${chars(s)} 個字元；有啲用 ${encoding.get().toUpperCase()} 寫唔到`)
+      : pair(`${chars(s)} characters · ${fmtBytes(bytes)} in ${encoding.get().toUpperCase()}`, `${chars(s)} 個字元 · ${encoding.get().toUpperCase()} ${fmtBytes(bytes)}`);
   }
   function countOut() {
     if (!out.value && last?.bytes && outKind === 'binary') { outCount.textContent = pair(`${fmtBytes(last.bytes.length)} of ${last.type.mime}; shown in Preview`, `${fmtBytes(last.bytes.length)} ${last.type.mime}；喺預覽度顯示`); return; }
-    outCount.textContent = out.value ? pair(`${out.value.length} characters`, `${out.value.length} 個字元`) + (last?.bytes ? ` · ${fmtBytes(last.bytes.length)}` : '') : '';
+    outCount.textContent = out.value ? pair(`${chars(out.value)} characters`, `${chars(out.value)} 個字元`) + (last?.bytes ? ` · ${fmtBytes(last.bytes.length)}` : '') : '';
   }
   let outKind = 'text';
   inp.addEventListener('input', countIn);
@@ -311,7 +313,7 @@ registerPage('base64', () => {
         const r = j.result;
         if (j.state === 'done') {
           const where = r.downloaded ? pair(`Downloaded as ${r.name}`, `下載咗做 ${r.name}`) : pair(`Written beside it as ${r.name}`, `寫咗喺旁邊，叫 ${r.name}`);
-          const from = j.kind === 'decode' && r.nameSource ? ` · ${pair('name', '檔名')} ${NAME_SOURCE[r.nameSource]}` : '';
+          const from = j.kind === 'decode' && r.nameSource ? ` · ${NAME_SOURCE[r.nameSource]}` : '';
           detail.textContent = `${where} · ${fmtBytes(r.written)} · SHA-256 ${short(r.sha256)}${from}${j.kind === 'decode' && !r.roundTrip ? ` · ${pair('the input was not in canonical form, so encoding the result gives slightly different text', '輸入唔係標準形式，所以再編碼會有少少唔同')}` : ''}`;
         } else if (j.state === 'failed' || j.state === 'cancelled') detail.textContent = explainFailure(j.error || { code: 'cancelled' });
         else if (j.state === 'queued') detail.textContent = pair('Waiting for the one before it.', '等緊前一個。');
@@ -466,7 +468,7 @@ registerPage('base64', () => {
   // Capture hook: real conversions of sample files made for screenshots (desktop capture runs only).
   window.__mtBase64Demo = async () => {
     const s = await window.mt.b64.samples();
-    jobs.clearFinished();
+    jobs.clearFinished(); hist.clear(); // capture runs start from the same empty lists
     jobs.start('encode', { path: s.encode }, options());
     jobs.start('decode', { path: s.decode }, options());
     jobs.start('decode', { path: s.broken }, options());
