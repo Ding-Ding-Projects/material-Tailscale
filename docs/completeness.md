@@ -63,7 +63,7 @@ Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`;
 | Rich controls and info buttons | finished | finished | n/a | `src/renderer/ui/controls.js`, `src/renderer/ui/command-form.js`, [article](features/navigation/rich-controls.md), [screenshot](screenshots/dark-cli-set.png) |  |
 | Guide me | finished | n/a | n/a | `src/renderer/ui/command-form.js`, [article](features/tailscale/cli-commands.md) | The website documents it; using it needs the app. |
 | Settings that explain themselves | finished | finished | n/a | `src/renderer/pages/settings.js`, `src/renderer/pages/settings-index.js`, [article](features/navigation/settings-explanations.md), [screenshot](screenshots/dark-settings.png) |  |
-| Regex builder beside every search | partly built | partly built | n/a | `src/renderer/ui/regex.js`, `src/shared/regex-flavors.js`, [article](features/navigation/regex-builder.md), [screenshot](screenshots/dark-regex.png) | A step-by-step backtracking view, other engines in the benchmark, and source-code editor integration are not built; the article lists each one. |
+| Regex builder beside every search | partly built | partly built | n/a | `src/renderer/ui/regex.js`, `src/shared/regex-flavors.js`, `src/renderer/ui/regex-debugger.js`, [article](features/navigation/regex-builder.md), [screenshot](screenshots/dark-regex.png) | Other engines in the benchmark and source-code editor integration are not built; the article lists each one. |
 | Search inside files | finished | n/a | n/a | `src/renderer/ui/regex.js`, `src/main/tools.js`, [article](features/navigation/regex-builder.md) | The website cannot read your folders. |
 | First-run setup | finished | n/a | n/a | `src/renderer/ui/onboarding.js`, [article](features/navigation/onboarding.md) | The website has nothing to set up. |
 | Progress and recovery where work happens | finished | partly built | n/a | `src/renderer/ui/jobs.js`, `src/renderer/ui/command-form.js`, [article](features/tools/minecraft.md) | The website runs only Base64 jobs, which show progress; it has no failures to hand on. |
@@ -95,14 +95,15 @@ Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`;
 
 | Feature | App | Website | Repository | Evidence | Note |
 | --- | --- | --- | --- | --- | --- |
+| Regex debugger | finished | finished | n/a | `src/shared/regex-debug.js`, `src/renderer/ui/regex-debugger.js`, `src/renderer/pages/regex-debug.js`, `test/regex-debug.test.mjs`, [article](features/tools/regex-debugger.md), [screenshot](screenshots/dark-regex-debug.png) | Lookbehind and Unicode property escapes are refused with a reason instead of stepped through. |
 | Base64 toolkit | finished | finished | n/a | `src/shared/base64.js`, `src/main/base64-files.js`, `src/renderer/pages/base64.js`, [article](features/tools/base64.md), [screenshot](screenshots/dark-base64-overlayb64-demo.png) | The website downloads results under the same names instead of writing beside the file. |
 | File converter | partly built | partly built | n/a | `src/renderer/pages/tools.js`, [article](features/tools/file-converter.md), [screenshot](screenshots/dark-converter.png) | Not every format family in the shared list has an adapter yet; the article lists what is there. |
 | Drawing and annotation | finished | finished | n/a | `src/renderer/pages/tools.js`, [article](features/tools/drawing.md), [screenshot](screenshots/dark-draw.png) |  |
-| Ollama manager | partly built | n/a | n/a | `src/renderer/pages/tools.js`, [article](features/tools/ollama.md), [screenshot](screenshots/dark-ollama.png) | Listing and pulling models only; the rest of the suite is not built. |
+| Ollama suite | built, proof pending | n/a | n/a | `src/main/ollama.js`, `src/main/ollama-harness.js`, `src/shared/ollama-catalog.js`, `src/shared/ollama-fit.js`, `src/renderer/pages/ollama/index.js`, `test/ollama.test.mjs`, [article](features/tools/ollama.md), [screenshot](screenshots/dark-ollama-store.png) | Built and checked by its tests and by reading the real ollama.com catalogue. Pulling, chatting and launching against a running Ollama were not tried here: the build machine has no Ollama. |
 | Minecraft server manager | built, proof pending | n/a | n/a | `src/renderer/pages/minecraft.js`, `src/main/minecraft.js`, [article](features/tools/minecraft.md), [screenshot](screenshots/dark-minecraft.png) | Catalogues and downloads are checked live for all seven flavours; running a server has not been checked on the build machine. |
 | Minecraft world generator | built, proof pending | n/a | n/a | `src/renderer/pages/minecraft.js`, [article](features/tools/minecraft.md) | Not yet run on the build machine. |
 | Extensions | finished | n/a | n/a | `src/main/extensions.js`, `src/renderer/pages/extensions.js`, [article](features/extensions/extensions.md), [screenshot](screenshots/dark-extensions.png) | Extensions are programs on your computer; the website carries their articles. |
-| Virtual disk manager | not started | n/a | n/a | — | Not started. It needs Windows to build and prove, and the build machine runs Linux. |
+| Virtual disk manager | partly built | n/a | n/a | `src/main/vdisk.js`, `src/main/vdisk/vdisk.ps1`, `src/renderer/pages/vdisks.js`, `scripts/vdisk-proof.ps1`, `test/vdisk.test.mjs`, [article](features/tools/virtual-disks.md), [screenshot](screenshots/dark-vdisks.png) | Every operation runs on a clean Windows runner in each release, which adds the results to the release notes. Not built: creating VHD Sets and their checkpoints, custom metadata, mirroring, change tracking and identity reset, which only the VirtDisk API offers on Windows Home. |
 
 ## Design and evidence
 
@@ -122,8 +123,8 @@ Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`;
 | Installer and automatic updates | finished | n/a | n/a | `scripts/package-win.mjs`, `src/main/main.js`, [article](features/release/updates.md) |  |
 | A release on every push | n/a | n/a | finished | `.github/workflows/release.yml`, [article](features/release/release-pipeline.md) |  |
 | One-click build | n/a | n/a | finished | `build.bat`, `build-installer.bat`, `download-dependencies.bat`, [article](features/release/build-from-source.md) |  |
-| Build companion app | n/a | n/a | not started | — | Not started. |
-| Website as a portable app | n/a | n/a | not started | — | Not started. |
+| Build companion app | n/a | n/a | built, proof pending | `companions/build/main.js`, `companions/build/ui.js`, `scripts/build-companions.mjs`, [article](features/release/companions.md) | Built into one unsigned .exe by every release; its window was photographed from the same files. Running a build through it needs Windows. |
+| Website as a portable app | n/a | n/a | built, proof pending | `companions/site/main.js`, `scripts/build-companions.mjs`, [article](features/release/companions.md) | Built into one unsigned .exe by every release; its pages were photographed from the same files. Opening the .exe itself needs Windows. |
 | The website | n/a | finished | finished | `site/site.js`, `scripts/build-site.mjs`, `.github/workflows/pages.yml` |  |
 
 ## Project records
@@ -135,9 +136,9 @@ Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`;
 | Handoff notes | n/a | n/a | finished | `HANDOFF.md`, `CLOSEOUT_PROMPT.md` |  |
 | One article per feature | n/a | n/a | finished | `docs/README.md` |  |
 | Postman collections | n/a | n/a | finished | `scripts/gen-postman.mjs` |  |
-| Wiki kept current | n/a | n/a | finished | — |  |
+| Wiki kept current | n/a | n/a | finished | `scripts/sync-wiki.mjs` |  |
 | Contributor guide | n/a | n/a | finished | `AGENTS.md`, `scripts/check-instructions-lock.mjs` |  |
-| Wording lock | n/a | n/a | not started | — | Not wired in yet. |
+| Wording lock | n/a | n/a | finished | `scripts/check-vocabulary.mjs`, `.githooks/pre-push`, `build.bat`, `test/vocabulary-lock.test.mjs`, [article](features/records/wording-lock.md) |  |
 | Status hub registration | not started | n/a | not started | — | Not started: the hub is reachable only from the maintainer's own network. |
 
 Unfinished items are also unchecked items in `ROADMAP.md`.

@@ -11,6 +11,10 @@ for %%a in (%*) do (
   if /i "%%~a"=="--silent" set "SIL=/s"
 )
 if "%SILENT%"=="1" set "SIL=/s"
+rem The wording lock (skipped where the maintainer's private rules are absent) and the pre-push hook.
+call node scripts\check-vocabulary.mjs
+if errorlevel 1 ( echo FAILED: wording lock & exit /b 1 )
+git config core.hooksPath .githooks >nul 2>&1
 echo [1/3] Dependencies
 call download-dependencies.bat %SIL%
 if errorlevel 1 exit /b %errorlevel%

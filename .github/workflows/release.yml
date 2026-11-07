@@ -91,6 +91,12 @@ jobs:
             exit 1
           fi
 
+      - name: Build the website and the portable companions
+        shell: bash
+        run: |
+          node scripts/build-site.mjs
+          node scripts/build-companions.mjs
+
       - name: Count lines
         shell: bash
         run: mkdir -p out && node scripts/count-lines.mjs > out/line-counts.md

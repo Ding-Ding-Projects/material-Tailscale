@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import electron from 'electron';
 import sharp from 'sharp';
-import { validate } from './lib/design-parity.mjs';
+import { validate, CANVASES } from './lib/design-parity.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const inv = JSON.parse(fs.readFileSync(path.join(root, 'docs/design-parity/inventory.json'), 'utf8'));
@@ -22,8 +22,11 @@ const sandbox = process.platform === 'linux' ? ['--no-sandbox'] : [];
 
 // 1. Design reference captures (one process for every board view).
 const refDir = path.join(work, 'reference');
-let r = spawnSync(electron, [path.join(root, 'tools/design-reference'), ...sandbox, '--all', refDir, '--width', String(W), '--height', String(H), '--scale', '1', '--themes', 'dark'], { stdio: 'inherit' });
-if (r.status) process.exit(r.status);
+let r;
+for (const canvas of CANVASES) {
+  r = spawnSync(electron, [path.join(root, 'tools/design-reference'), ...sandbox, '--canvas', canvas, '--all', path.join(refDir, path.basename(canvas)), '--width', String(W), '--height', String(H), '--scale', '1', '--themes', 'dark'], { stdio: 'inherit' });
+  if (r.status) process.exit(r.status);
+}
 
 // 2. Real app captures through the app's own capture mode, motion off.
 const appDir = path.join(work, 'app');
@@ -46,6 +49,23 @@ for (const s of inv.screens.filter((x) => x.surface === 'site')) {
 }
 await browser.close();
 
+// 3b. The portable companions, photographed from their staged folders with Playwright's Electron driver.
+const companionShots = {};
+const companions = inv.screens.filter((x) => x.surface === 'companion');
+if (companions.length) {
+  if (!fs.existsSync(path.join(root, 'out/companions/stage-build/main.js'))) spawnSync(process.execPath, [path.join(root, 'scripts/build-companions.mjs'), '--stage-only'], { stdio: 'inherit' });
+  const { _electron } = createRequire(import.meta.url)('playwright');
+  for (const s of companions) {
+    const app = await _electron.launch({ executablePath: electron, args: [path.join(root, 'out/companions', s.appRoute === 'companion-build' ? 'stage-build' : 'stage-site'), ...sandbox, '--disable-gpu'], colorScheme: 'dark' });
+    const win = await app.firstWindow();
+    await win.setViewportSize({ width: W, height: H });
+    await win.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+    await win.waitForTimeout(1500);
+    companionShots[s.id] = await win.screenshot({ type: 'png' });
+    await app.close();
+  }
+}
+
 // A page caught before it was drawn once produced a blank app capture (entrance animations that
 // never ticked). Capture mode now waits for an opaque page and records whether it got one;
 // refuse to write evidence from any capture that never rendered.
@@ -57,8 +77,8 @@ if (unrendered.length) { console.error(`The app never finished drawing these rou
 const label = (text, width) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="56"><rect width="100%" height="100%" fill="#10131f"/><text x="18" y="36" font-family="sans-serif" font-size="22" font-weight="700" fill="#e6e8f2">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text></svg>`);
 for (const s of inv.screens) {
   const board = path.basename(s.reference).replace('.dc.html', '');
-  const refPng = fs.readFileSync(path.join(refDir, `dark-${board}-${s.view}.png`));
-  const appPng = s.surface === 'site' ? siteShots[s.id] : fs.readFileSync(path.join(appDir, `dark-${sanitize(s.appRoute)}.png`));
+  const refPng = fs.readFileSync(path.join(refDir, path.basename(path.dirname(s.reference)), `dark-${board}-${s.view}.png`));
+  const appPng = s.surface === 'site' ? siteShots[s.id] : s.surface === 'companion' ? companionShots[s.id] : fs.readFileSync(path.join(appDir, `dark-${sanitize(s.appRoute)}.png`));
   const [ref, app] = await Promise.all([refPng, appPng].map((b) => sharp(b).resize(W, H, { fit: 'contain', position: 'left top', background: '#000' }).ensureAlpha().raw().toBuffer({ resolveWithObject: true })));
   const out = path.join(root, path.dirname(s.diff));
   fs.mkdirSync(out, { recursive: true });
@@ -77,7 +97,7 @@ for (const s of inv.screens) {
   await sharp(heat, { raw: { width: W, height: H, channels: 4 } }).resize(720).webp({ quality: 70 }).toFile(path.join(out, 'diff.webp'));
   const half = [await sharp(ref.data, { raw: ref.info }).resize(720).png().toBuffer(), await sharp(app.data, { raw: app.info }).resize(720).png().toBuffer()];
   await sharp({ create: { width: 1452, height: 536, channels: 3, background: '#10131f' } }).composite([
-    { input: label(`Design reference · ${board} · ${s.view}`, 720), left: 0, top: 0 }, { input: half[0], left: 0, top: 56 },
+    { input: label(`Design reference · ${path.basename(path.dirname(s.reference)) === 'additions' ? 'Everything added · ' : ''}${board} · ${s.view}`, 720), left: 0, top: 0 }, { input: half[0], left: 0, top: 56 },
     { input: label(`Real ${s.surface} · ${s.appRoute}`, 720), left: 732, top: 0 }, { input: half[1], left: 732, top: 56 }
   ]).webp({ quality: 78 }).toFile(path.join(root, s.comparison));
   const tuple = { ...s.tuple };

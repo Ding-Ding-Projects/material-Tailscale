@@ -68,6 +68,8 @@ One article per feature. The app bundles all of them into its offline docs brows
 - [Changelog viewer](features/records/changelog.md)
 - [Offline documentation](features/records/offline-docs.md)
 - [Notifications](features/records/notifications.md)
+- [This features page](features/records/features-page.md)
+- [Wording lock](features/records/wording-lock.md)
 
 ## Built-in tools
 
@@ -75,6 +77,8 @@ One article per feature. The app bundles all of them into its offline docs brows
 - [File converter](features/tools/file-converter.md)
 - [Drawing board](features/tools/drawing.md)
 - [Ollama](features/tools/ollama.md)
+- [Regex debugger](features/tools/regex-debugger.md)
+- [Virtual disks](features/tools/virtual-disks.md)
 - [Minecraft versions](features/tools/minecraft.md)
 
 ## Extensions
@@ -87,3 +91,4 @@ One article per feature. The app bundles all of them into its offline docs brows
 - [Automatic updates and installer](features/release/updates.md)
 - [Release pipeline](features/release/release-pipeline.md)
 - [Building from source](features/release/build-from-source.md)
+- [Portable companions](features/release/companions.md)

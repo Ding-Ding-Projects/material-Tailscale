@@ -2092,6 +2092,649 @@
           "approved": "Reviewed 2026-11-07: intentional, the site shows complete content."
         }
       ]
+    },
+    {
+      "id": "add-features",
+      "reference": "design/additions/Main.dc.html",
+      "view": "features",
+      "referenceRoute": "dcref://board/Main.dc.html?view=features&theme=dark",
+      "appRoute": "features",
+      "surface": "app",
+      "state": "Every feature, filters folded",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "collapsible filters (src/renderer/ui/overlay.js)",
+          "regex search field (src/renderer/ui/regex.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-features/reference.webp",
+        "app": "docs/design-parity/captures/add-features/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-features/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-features/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "add-features-filtered",
+      "reference": "design/additions/Main.dc.html",
+      "view": "features-filtered",
+      "referenceRoute": "dcref://board/Main.dc.html?view=features-filtered&theme=dark",
+      "appRoute": "features>Filters",
+      "surface": "app",
+      "state": "Filters open on the gaps (design); filters opened in the capture",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "collapsible filters (src/renderer/ui/overlay.js)",
+          "regex search field (src/renderer/ui/regex.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-features-filtered/reference.webp",
+        "app": "docs/design-parity/captures/add-features-filtered/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-features-filtered/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-features-filtered/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design pre-selects Partly built and Not started; the capture opens the filters with none selected.",
+          "reason": "The capture opens the Filters panel without changing saved choices.",
+          "approved": "Reviewed 2026-11-07: same panel, different selection."
+        }
+      ]
+    },
+    {
+      "id": "add-site-features",
+      "reference": "design/additions/SiteFeatures.dc.html",
+      "view": "site-features",
+      "referenceRoute": "dcref://board/SiteFeatures.dc.html?view=site-features&theme=dark",
+      "appRoute": "site#/features",
+      "surface": "site",
+      "state": "Website Features page",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-site-features/reference.webp",
+        "app": "docs/design-parity/captures/add-site-features/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-site-features/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-site-features/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "add-vdisks",
+      "reference": "design/additions/VirtualDisks.dc.html",
+      "view": "vdisks",
+      "referenceRoute": "dcref://board/VirtualDisks.dc.html?view=vdisks&theme=dark",
+      "appRoute": "vdisks",
+      "surface": "app",
+      "state": "Library",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-vdisks/reference.webp",
+        "app": "docs/design-parity/captures/add-vdisks/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-vdisks/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-vdisks/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows a Windows computer with disks in the library; the capture machine runs Linux.",
+          "reason": "Virtual disks are a Windows feature, so the app shows its honest Not Windows state with the buttons that change disks turned off.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-vdisk-create",
+      "reference": "design/additions/VirtualDisks.dc.html",
+      "view": "vdisk-create",
+      "referenceRoute": "dcref://board/VirtualDisks.dc.html?view=vdisk-create&theme=dark",
+      "appRoute": "vdisks:create",
+      "surface": "app",
+      "state": "Create a disk",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)",
+          "segmented buttons (app.css .seg)",
+          "switch (app.css .switch)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-vdisk-create/reference.webp",
+        "app": "docs/design-parity/captures/add-vdisk-create/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-vdisk-create/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-vdisk-create/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows a Windows computer with disks in the library; the capture machine runs Linux.",
+          "reason": "Virtual disks are a Windows feature, so the app shows its honest Not Windows state with the buttons that change disks turned off.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-vdisk-pack",
+      "reference": "design/additions/VirtualDisks.dc.html",
+      "view": "vdisk-pack",
+      "referenceRoute": "dcref://board/VirtualDisks.dc.html?view=vdisk-pack&theme=dark",
+      "appRoute": "vdisks:pack",
+      "surface": "app",
+      "state": "Quick pack, nothing dropped yet (capture)",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-vdisk-pack/reference.webp",
+        "app": "docs/design-parity/captures/add-vdisk-pack/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-vdisk-pack/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-vdisk-pack/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows a Windows computer with disks in the library; the capture machine runs Linux.",
+          "reason": "Virtual disks are a Windows feature, so the app shows its honest Not Windows state with the buttons that change disks turned off.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        },
+        {
+          "what": "The design shows a pack in progress; the capture shows the empty drop zone.",
+          "reason": "Packing needs Windows and dropped files.",
+          "approved": "Reviewed 2026-11-07: the real empty state."
+        }
+      ]
+    },
+    {
+      "id": "add-ollama-models",
+      "reference": "design/additions/Ollama.dc.html",
+      "view": "ollama-models",
+      "referenceRoute": "dcref://board/Ollama.dc.html?view=ollama-models&theme=dark",
+      "appRoute": "ollama:models",
+      "surface": "app",
+      "state": "Models",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-ollama-models/reference.webp",
+        "app": "docs/design-parity/captures/add-ollama-models/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-ollama-models/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-ollama-models/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows Ollama running with installed models; the capture machine has no Ollama.",
+          "reason": "The app shows its real Not installed state and the troubleshooter; populated states need a running Ollama.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-ollama-store",
+      "reference": "design/additions/Ollama.dc.html",
+      "view": "ollama-store",
+      "referenceRoute": "dcref://board/Ollama.dc.html?view=ollama-store&theme=dark",
+      "appRoute": "ollama:store",
+      "surface": "app",
+      "state": "Store with the real catalogue",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)",
+          "segmented buttons (app.css .seg)",
+          "regex search field (src/renderer/ui/regex.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-ollama-store/reference.webp",
+        "app": "docs/design-parity/captures/add-ollama-store/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-ollama-store/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-ollama-store/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows Ollama running with installed models; the capture machine has no Ollama.",
+          "reason": "The app shows its real Not installed state and the troubleshooter; populated states need a running Ollama.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-ollama-chat",
+      "reference": "design/additions/Ollama.dc.html",
+      "view": "ollama-chat",
+      "referenceRoute": "dcref://board/Ollama.dc.html?view=ollama-chat&theme=dark",
+      "appRoute": "ollama:chat",
+      "surface": "app",
+      "state": "Chat",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-ollama-chat/reference.webp",
+        "app": "docs/design-parity/captures/add-ollama-chat/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-ollama-chat/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-ollama-chat/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows Ollama running with installed models; the capture machine has no Ollama.",
+          "reason": "The app shows its real Not installed state and the troubleshooter; populated states need a running Ollama.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-ollama-create",
+      "reference": "design/additions/Ollama.dc.html",
+      "view": "ollama-create",
+      "referenceRoute": "dcref://board/Ollama.dc.html?view=ollama-create&theme=dark",
+      "appRoute": "ollama:create",
+      "surface": "app",
+      "state": "Create",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-ollama-create/reference.webp",
+        "app": "docs/design-parity/captures/add-ollama-create/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-ollama-create/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-ollama-create/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows Ollama running with installed models; the capture machine has no Ollama.",
+          "reason": "The app shows its real Not installed state and the troubleshooter; populated states need a running Ollama.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-ollama-harness",
+      "reference": "design/additions/Ollama.dc.html",
+      "view": "ollama-harness",
+      "referenceRoute": "dcref://board/Ollama.dc.html?view=ollama-harness&theme=dark",
+      "appRoute": "ollama:harness",
+      "surface": "app",
+      "state": "Harnesses",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "Material tabs (src/renderer/ui/mtabs.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-ollama-harness/reference.webp",
+        "app": "docs/design-parity/captures/add-ollama-harness/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-ollama-harness/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-ollama-harness/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows Ollama running with installed models; the capture machine has no Ollama.",
+          "reason": "The app shows its real Not installed state and the troubleshooter; populated states need a running Ollama.",
+          "approved": "Reviewed 2026-11-07: the real state of the capture machine."
+        }
+      ]
+    },
+    {
+      "id": "add-regex-debug",
+      "reference": "design/additions/RegexDebugger.dc.html",
+      "view": "regex-debug",
+      "referenceRoute": "dcref://board/RegexDebugger.dc.html?view=regex-debug&theme=dark",
+      "appRoute": "regex-debug",
+      "surface": "app",
+      "state": "Step 14 of 136 (design); step 1 in the capture",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "slider (app.css .slider)",
+          "segmented buttons (app.css .seg)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-regex-debug/reference.webp",
+        "app": "docs/design-parity/captures/add-regex-debug/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-regex-debug/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-regex-debug/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows step 14 (the first backtrack); the capture opens on step 1.",
+          "reason": "The page starts at the first step; the counts (136 steps, 30 backtracks) match.",
+          "approved": "Reviewed 2026-11-07: same run, different step."
+        }
+      ]
+    },
+    {
+      "id": "add-companion-build",
+      "reference": "design/additions/Companions.dc.html",
+      "view": "companion-build",
+      "referenceRoute": "dcref://board/Companions.dc.html?view=companion-build&theme=dark",
+      "appRoute": "companion-build",
+      "surface": "companion",
+      "state": "Build companion window",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-companion-build/reference.webp",
+        "app": "docs/design-parity/captures/add-companion-build/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-companion-build/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-companion-build/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "Captured by scripts/capture-companions.mjs from the staged companion, not by the app's capture mode; the design shows a running build with the bundled source.",
+          "reason": "The companion is a separate program; on Linux its buttons are off and no source is bundled in the staged copy.",
+          "approved": "Reviewed 2026-11-07: the real companion window."
+        }
+      ]
+    },
+    {
+      "id": "add-companion-site",
+      "reference": "design/additions/Companions.dc.html",
+      "view": "companion-site",
+      "referenceRoute": "dcref://board/Companions.dc.html?view=companion-site&theme=dark",
+      "appRoute": "companion-site",
+      "surface": "companion",
+      "state": "Offline website, home",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/add-companion-site/reference.webp",
+        "app": "docs/design-parity/captures/add-companion-site/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/add-companion-site/side-by-side.webp",
+      "diff": "docs/design-parity/captures/add-companion-site/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows a short offline guide; the real companion is the whole website.",
+          "reason": "The companion serves the built website unchanged, so it looks like the website's home page.",
+          "approved": "Reviewed 2026-11-07: the real companion page."
+        }
+      ]
     }
   ]
 }

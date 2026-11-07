@@ -18,7 +18,7 @@ Tools > Regex builder adds:
 | Build from tokens, explain, test, replace | Yes |
 | Code generation for 7 languages | Yes |
 | Flavour conversion with loss report | Yes (8 flavours) |
-| Debugger | Attempt trace per start position; a step-by-step backtracking view inside one attempt is not available because the browser engine does not expose it |
+| Debugger | Attempt trace per start position, and a step-by-step debugger that shows every attempt, match, failure and backtrack inside each attempt ([Regex debugger](../tools/regex-debugger.md)). The browser engine does not expose its own steps, so the debugger runs its own backtracking matcher and is checked against the browser engine's answers |
 | Benchmark | JavaScript engine variants only; other languages' engines are not executed |
 | GREP over folders | Yes |
 | Library of saved patterns | Yes (per device) |

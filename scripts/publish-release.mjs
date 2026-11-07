@@ -30,6 +30,10 @@ const files = fs.existsSync(installer) ? fs.readdirSync(installer) : [];
 const setup = files.find((f) => /Setup\.exe$/i.test(f));
 if (!setup) fail(`No Setup.exe in out/installer (found: ${files.join(', ') || 'nothing'})`);
 const assets = files.filter((f) => /Setup\.exe$|^RELEASES$|\.nupkg$/i.test(f)).map((f) => path.join(installer, f));
+// The two portable companions (build window and offline website), when they were built.
+const compDir = path.join(out, 'companions');
+const companions = fs.existsSync(compDir) ? fs.readdirSync(compDir).filter((f) => /^MaterialTailscale(BuildCompanion|OfflineWebsite)-.*\.exe$/.test(f)).map((f) => path.join(compDir, f)) : [];
+assets.push(...companions);
 const lines = fs.existsSync(path.join(out, 'line-counts.md')) ? fs.readFileSync(path.join(out, 'line-counts.md'), 'utf8') : 'Line count unavailable.';
 const subject = run('git', ['log', '-1', '--format=%s']).trim();
 // The changelog's "Unreleased" section is what this release ships, so it becomes the notes' change list.
@@ -44,6 +48,7 @@ const notes = [
   `Commit: ${env.GITHUB_SHA}`, '',
   '### Install',
   'Download **MaterialTailscaleSetup.exe** below and run it. The installer is **unsigned**, so Windows SmartScreen may warn about an unknown publisher. Installed copies update themselves from this release feed and ask before restarting.', '',
+  ...(companions.length ? ['### Portable companions', 'Both run from a single unsigned .exe with nothing to install:', '- **MaterialTailscaleBuildCompanion** has Build, Build and run, and Build installer buttons over build.bat and build-installer.bat, and carries the complete source of this commit, so it builds without a checkout.', '- **MaterialTailscaleOfflineWebsite** is the whole website, every article and the Features page included, working offline.', ''] : ['Portable companions were not built for this release.', '']),
   '### Checks',
   'This release workflow runs no automated test or lint gate. Local checks for this commit are recorded in HANDOFF.md.', '',
   '### Changes', changes, '',
@@ -65,4 +70,4 @@ const pad = (n) => String(n).padStart(2, '0');
 const timing = `\n\n### Workflow timing\n- Workflow started: ${started.toISOString().replace(/\.\d{3}Z$/, 'Z')}\n- Workflow completed: ${done.toISOString().replace(/\.\d{3}Z$/, 'Z')}\n- Workflow duration: ${pad(Math.floor(secs / 3600))}:${pad(Math.floor((secs % 3600) / 60))}:${pad(secs % 60)}\n`;
 fs.appendFileSync(path.join(out, 'notes.md'), timing);
 run('gh', ['release', 'edit', tag, '--notes-file', path.join(out, 'notes.md')]);
-console.log(`Published ${tag} with ${assets.length} installer assets.`);
+console.log(`Published ${tag} with ${assets.length} assets (${companions.length} portable companions).`);

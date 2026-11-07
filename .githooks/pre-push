@@ -1,0 +1,5 @@
+#!/bin/sh
+# Refuses a push while the maintainer's private wording rules have changed and not been
+# re-locked. Skips on machines without the private rules. Enabled by build.bat through
+# "git config core.hooksPath .githooks".
+exec node "$(git rev-parse --show-toplevel)/scripts/check-vocabulary.mjs"

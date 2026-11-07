@@ -11,14 +11,20 @@ export const TUPLE_FIELDS = ['theme', 'width', 'height', 'scale', 'motion'];
 const sha = (file) => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
 /** Views declared by each board through its data-props "view" options. */
+/** The checked-in canvases: the main design and the one for everything added in the final pass. */
+export const CANVASES = ['design/canvas', 'design/additions'];
+
 export function boardViews(root) {
-  const dir = path.join(root, 'design', 'canvas');
   const out = [];
-  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.dc.html')).sort()) {
-    const m = fs.readFileSync(path.join(dir, f), 'utf8').match(/data-props='([^']*)'/);
-    const props = m ? JSON.parse(m[1].replace(/&#39;/g, "'").replace(/&amp;/g, '&')) : {};
-    if (props.report) continue; // report boards record results; they are not screen designs
-    for (const v of props.view?.options || ['default']) out.push(`${f}#${v}`);
+  for (const rel of CANVASES) {
+    const dir = path.join(root, rel);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.dc.html')).sort()) {
+      const m = fs.readFileSync(path.join(dir, f), 'utf8').match(/data-props='([^']*)'/);
+      const props = m ? JSON.parse(m[1].replace(/&#39;/g, "'").replace(/&amp;/g, '&')) : {};
+      if (props.report) continue; // report boards record results; they are not screen designs
+      for (const v of props.view?.options || ['default']) out.push(`${rel}/${f}#${v}`);
+    }
   }
   return out;
 }
@@ -31,10 +37,10 @@ export function validate(inv, root, { checkFiles = true } = {}) {
   for (const s of inv.screens) {
     const id = s?.id || '(no id)';
     if (!s?.id) err(id, 'missing id');
-    if (!s.reference || !/^design\/canvas\/[A-Za-z0-9_-]+\.dc\.html$/.test(s.reference)) err(id, 'missing or invalid reference file');
+    if (!s.reference || !/^design\/(canvas|additions)\/[A-Za-z0-9_-]+\.dc\.html$/.test(s.reference)) err(id, 'missing or invalid reference file');
     else if (checkFiles && !fs.existsSync(path.join(root, s.reference))) err(id, `reference file not found: ${s.reference}`);
     if (!s.view) err(id, 'missing reference view');
-    const key = `${path.basename(s.reference || '')}#${s.view}`;
+    const key = `${s.reference || ''}#${s.view}`;
     if (seen.has(key)) err(id, `reference view ${key} listed twice (also ${seen.get(key)})`); else seen.set(key, id);
     if (!s.referenceRoute || !s.referenceRoute.startsWith('dcref://board/')) err(id, 'missing design-reference route');
     if (!s.appRoute) err(id, 'missing real-app route');
