@@ -45,11 +45,11 @@ registerPage('features', () => {
   const card = (x) => {
     const here = x.state[f.surface];
     const art = x.article ? 'docs/' + x.article : null;
-    return h('article.card.span-4.feature-card', { role: 'listitem', dataset: { el: `feature-${x.id}` }, 'aria-label': P(x.title) },
+    return h('div.card.span-4.feature-card', { role: 'listitem', dataset: { el: `feature-${x.id}` }, 'aria-label': P(x.title) },
       h('div.row.nowrap', { style: { alignItems: 'flex-start', gap: '10px' } }, h('span.ico', icon(CATEGORIES[x.category].icon)), h('h3', { style: { flex: 1, margin: 0 } }, P(x.title))),
       h('div.row', { style: { marginTop: '8px' } }, badge(here)),
       h('p.small', { style: { margin: '8px 0' } }, P(x.benefit)),
-      h('div.suggest', { 'aria-label': pair('State on the other surfaces', '其他介面嘅狀態') }, Object.entries(SURFACES).filter(([k]) => k !== f.surface && x.state[k] !== 'na').map(([k, s]) => h('span.chip', { title: `${L(s)}: ${L(STATES[x.state[k]])}` }, icon(STATES[x.state[k]].icon), `${L(s)}: ${L(STATES[x.state[k]])}`))),
+      h('div.suggest', { role: 'group', 'aria-label': pair('State on the other surfaces', '其他介面嘅狀態') }, Object.entries(SURFACES).filter(([k]) => k !== f.surface && x.state[k] !== 'na').map(([k, s]) => h('span.chip', { title: `${L(s)}: ${L(STATES[x.state[k]])}` }, icon(STATES[x.state[k]].icon), `${L(s)}: ${L(STATES[x.state[k]])}`))),
       h('details.feature-more',
         h('summary', pair('How to reach it, and the evidence', '點去，同埋證據')),
         h('div.stack.small', { style: { marginTop: '8px' } },

@@ -22,7 +22,7 @@ export function helpTab(ctx, suite) {
   const draw = (s) => {
     const now = s.rt?.state;
     grid.replaceChildren(...TOPICS.map(([id, ico, t, go, label]) => h(`section.card.span-6.stack${id === now ? '.tonal' : ''}`, { dataset: { el: `ollama-help-${id}` } },
-      h('div.card-head', h('span.ic', icon(ico)), h('h3', t.title), id === now ? h('span.badge.warn', pair('This is what is happening now', '而家就係咁')) : null),
+      h('div.card-head', h('span.ic', icon(ico)), h('h2.h3', t.title), id === now ? h('span.badge.warn', pair('This is what is happening now', '而家就係咁')) : null),
       h('div.small', t.body), h('div.row', h('button.btn.small.tonal', { type: 'button', on: { click: () => suite.go(go) } }, icon('arrow_forward'), label)))));
   };
   ctx.onCleanup(suite.on(draw));

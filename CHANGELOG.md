@@ -11,6 +11,7 @@ Every push to `main` publishes the next release. A section headed "Unreleased" i
 - Two portable companions in every release, each a single unsigned .exe: a build window with Build, Build and run, and Build installer that carries the complete source of its commit, and the whole website working offline.
 - A wording lock in build.bat and a pre-push hook checks that the maintainer's current private wording rules are present, without storing the rules or their hash in this repository.
 - A second design canvas, "Everything added", designs each of these before it was built; design parity now covers both canvases and the companions.
+- The release sweep now covers the new pages too, and what it found is fixed at the source: card headings on the Ollama, virtual disk and regex debugger pages follow the page title in order, choice rows announce themselves as radio buttons in a named group, Features cards are proper list items, the debugger's pattern and text are named groups, section tabs that run past an edge show their arrow beside the tabs instead of over one, and the chat buttons wrap on a phone instead of running off the screen.
 - The website hero shows the whole command window; the docs reader has an "On this page" outline.
 - Every screen redesigned on a design canvas, with the boards generated from the app's own stylesheets.
 - Page hero bands with animated illustrations, two-pane Settings, in-page tabs with a sliding indicator, a setup state with steps, live status dots.

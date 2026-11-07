@@ -155,7 +155,7 @@ export function chatTab(ctx, suite) {
   window.mt.ollama.chats().then((c) => { sessions = c.sessions || []; drawList(); });
   fresh();
   return h('div.chat-layout',
-    h('section.card.stack', { dataset: { el: 'ollama-sessions' } }, h('div.card-head', h('span.ic', icon('history')), h('h3', pair('Conversations', '對話')), h('button.icon-btn', { type: 'button', 'aria-label': pair('New conversation', '新對話'), title: pair('New conversation', '新對話'), on: { click: fresh } }, icon('add'))),
+    h('section.card.stack', { dataset: { el: 'ollama-sessions' } }, h('div.card-head', h('span.ic', icon('history')), h('h2.h3', pair('Conversations', '對話')), h('button.icon-btn', { type: 'button', 'aria-label': pair('New conversation', '新對話'), title: pair('New conversation', '新對話'), on: { click: fresh } }, icon('add'))),
       search.el, listBox,
       h('div.row', h('button.btn.small.text', { type: 'button', on: { click: rename } }, icon('edit'), pair('Rename', '改名')), h('button.btn.small.text', { type: 'button', on: { click: remove } }, icon('delete'), pair('Delete', '刪除')), h('button.btn.small.text', { type: 'button', on: { click: exportDialog } }, icon('ios_share'), pair('Export', '匯出')))),
     h('section.card.stack', { dataset: { el: 'ollama-chat' } },
@@ -166,5 +166,5 @@ export function chatTab(ctx, suite) {
           h('div.row', h('span.muted', pair('Recommended for chat: temperature 0.8, context 8,192, top_p 0.9. Empty seed means a different reply each time.', '對話建議：隨機程度 0.8、上下文 8,192、top_p 0.9。種子留空每次答案都唔同。')),
             h('button.btn.small.text', { type: 'button', on: { click: () => { cur.options = { ...REC }; drawSettings(); save(); } } }, icon('restart_alt'), pair('Use recommended', '用建議值'))))),
       log,
-      h('div.composer', prompt, h('div.row.nowrap', attachBtn, stopBtn, sendBtn, regenBtn)), attachInfo, capNote));
+      h('div.composer', prompt, h('div.row', attachBtn, stopBtn, sendBtn, regenBtn)), attachInfo, capNote));
 }

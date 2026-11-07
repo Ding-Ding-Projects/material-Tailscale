@@ -33,7 +33,7 @@ a step, not a habit.
 
 ## Shared instructions (sanitised mirror)
 
-This is a sanitised mirror of the maintainer's shared agent instructions. It was refreshed on 2026-11-07, and its source hash is checked by `npm run check:instructions`. Machine names, paths, hosts, addresses and credentials are removed, and rules that needed them are stated in general terms. Do not edit it here expecting the change to spread: change the canonical instructions first, then refresh this copy.
+This is a sanitised mirror of the maintainer's shared agent instructions. It was last reviewed against its source on 2026-11-07, and `npm run check:instructions` reports when that source has changed since, using a lock kept beside the source instead of a hash in this repository. Machine names, paths, hosts, addresses and credentials are removed, and rules that needed them are stated in general terms. Do not edit it here expecting the change to spread: change the canonical instructions first, then refresh this copy.
 
 **Delivery**
 - Commit and push coherent work promptly to the authorised branch, then read back the remote commit before calling it done. Never force-push or rewrite published history.
@@ -45,13 +45,14 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - Continuous integration builds and releases. Tests and linters run locally in the task that changes the code; their results are reported honestly, and they never gate a release.
 - Windows installers use Squirrel.Windows (`Setup.exe`, `RELEASES`, full and delta packages). They are unsigned and are verified as not signed. Installed copies update in the background and show the update as unsigned.
 - The repository keeps working `build.bat` and `build-installer.bat` entry points.
+- Every release also carries two portable, unsigned single-file companions: a build window over those entry points that carries its commit's complete source, and the whole website working offline.
 - The README, the per-feature docs, the roadmap, the handoff notes, the wiki and the website stay current with behaviour in the same change.
 
 **Every user-facing surface (app and website)**
 - English, playful Hong Kong Cantonese and a compact bilingual mode. Two independent funny-level sliders, from 1 to 5, default to 5; facts never change with them.
 - The version and its build-provenance time show on the front screen.
 - A command palette on `Ctrl+Shift+F` reaches every page, setting and command. Its results carry live controls and teleport to the exact element.
-- Every search, dropdown and context menu has its own filter and an anchored regex builder. Plain text is the default.
+- Every search, dropdown and context menu has its own filter and an anchored regex builder. Plain text is the default. Each regex builder is held to the full feature set of RegexBuddy, step-by-step debugging included.
 - Context menus exist for every element. They show working shortcuts and live controls for values, and include Edit appearance… and Lock this element….
 - A per-element appearance editor covers typography, colour, shape, layers, effects, and animation and transition, with reset and reduced motion respected.
 - Browser-style tabs with pinning, groups, four kinds of tab search, and closing tabs that do or do not contain a text.

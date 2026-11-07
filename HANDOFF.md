@@ -36,7 +36,7 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - The release workflow now has an install-proof job: previous release installed silently on a clean runner, updated with Update.exe to the new release, checked, uninstalled, and the result appended to the release notes. Its first real run happens on the next push.
 - `npm run gen:postman` writes a collection covering all 93 admin API operations; a test checks the count and that no token is stored.
 - `npm run wiki` builds 55 wiki pages. Publishing is blocked from the build machine: the wiki repository could not be cloned with the available credentials (it may also need its first page created on GitHub).
-- `npm run check:instructions` compares a SHA-256 of the maintainer's private instructions to `.instructions-lock`; it skips with a reason wherever those instructions are absent.
+- `npm run check:instructions` reports when the maintainer's private instructions changed since the mirror in AGENTS.md and README.md was last reviewed. Its lock sits beside the private source, like the wording lock; the repository holds no hash of it any more (the old `.instructions-lock` is gone). It skips with a reason wherever those instructions are absent.
 
 ## Midnight Mesh 2 (design pass)
 

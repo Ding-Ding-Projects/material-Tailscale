@@ -11,14 +11,14 @@ const put = (el, ...kids) => append(el, kids);
 
 export function harnessTab(ctx, suite) {
   let profiles = [], lastUsed = {}, selected = 'terminal', folder = null;
-  const listBox = h('div.stack');
+  const listBox = h('div.stack', { role: 'radiogroup', 'aria-label': pair('Launch profiles', '啟動設定') });
   const pre = h('div.stack');
   const snaps = h('div.stack');
   const modelSel = h('select.input', { 'aria-label': pair('Model', '模型'), on: { change: () => check() } });
   const folderBtn = h('button.btn.small.outline', { type: 'button', on: { click: async () => { const r = await window.mt.dialog.open({ properties: ['openDirectory'], title: pair('Working folder', '工作資料夾') }); if (r) { folder = r[0]; check(); } } } }, icon('folder_open'), pair('Choose the working folder', '揀工作資料夾'));
 
   const drawList = () => {
-    put(clear(listBox), ...profiles.map((p) => h('button.pick-row', { type: 'button', 'aria-checked': String(p.id === selected), dataset: { el: `harness-${p.id}` }, on: { click: () => { selected = p.id; drawList(); check(); } } },
+    put(clear(listBox), ...profiles.map((p) => h('button.pick-row', { type: 'button', role: 'radio', 'aria-checked': String(p.id === selected), dataset: { el: `harness-${p.id}` }, on: { click: () => { selected = p.id; drawList(); check(); } } },
       h('span.ava', icon({ terminal: 'terminal', aider: 'code', 'open-webui': 'web' }[p.id] || 'apps')), h('span.meta', h('b', p.name), h('span', p.found ? `${p.about || ''} ${pair('Found:', '搵到：')} ${p.program}` : `${pair('Not found.', '搵唔到。')} ${p.about || ''}`)), h('span.radio-dot'))),
     h('div.row', h('button.btn.small.outline', { type: 'button', on: { click: addDialog } }, icon('add'), pair('Add a profile', '加設定')),
       !profiles.find((p) => p.id === selected)?.builtin ? h('button.btn.small.text', { type: 'button', on: { click: async () => { const r = await window.mt.harness.remove(selected); profiles = r.profiles; selected = 'terminal'; drawList(); check(); } } }, icon('delete'), pair('Remove this profile', '移除呢個設定')) : null,
@@ -78,7 +78,7 @@ export function harnessTab(ctx, suite) {
   ctx.onCleanup(suite.on(() => { fillModels(); }));
   load();
   return h('div.grid',
-    h('section.card.span-5.stack', h('div.card-head', h('span.ic', icon('rocket_launch')), h('h3', pair('Profiles', '設定'))), h('div.small.muted', pair('Ollama itself never starts other programs; this app does, only from these profiles.', 'Ollama 本身唔會開其他程式；係呢個程式按呢啲設定去開。')), listBox),
-    h('section.card.span-7.tonal.stack', { dataset: { el: 'harness-preflight' } }, h('div.card-head', h('span.ic.alt', icon('checklist')), h('h3', pair('Before launching', '啟動之前'))), h('div.row', h('b.small', pair('Model', '模型')), modelSel), pre),
-    h('section.card.span-12.stack', h('div.card-head', h('span.ic', icon('history')), h('h3', pair('Snapshots', '快照'))), snaps));
+    h('section.card.span-5.stack', h('div.card-head', h('span.ic', icon('rocket_launch')), h('h2.h3', pair('Profiles', '設定'))), h('div.small.muted', pair('Ollama itself never starts other programs; this app does, only from these profiles.', 'Ollama 本身唔會開其他程式；係呢個程式按呢啲設定去開。')), listBox),
+    h('section.card.span-7.tonal.stack', { dataset: { el: 'harness-preflight' } }, h('div.card-head', h('span.ic.alt', icon('checklist')), h('h2.h3', pair('Before launching', '啟動之前'))), h('div.row', h('b.small', pair('Model', '模型')), modelSel), pre),
+    h('section.card.span-12.stack', h('div.card-head', h('span.ic', icon('history')), h('h2.h3', pair('Snapshots', '快照'))), snaps));
 }

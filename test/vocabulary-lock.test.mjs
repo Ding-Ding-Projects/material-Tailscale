@@ -49,3 +49,18 @@ test('the lock lives beside the private source, never in this repository, and ho
   const tracked = fs.readdirSync(repo).filter((f) => /\.wording\.lock$/.test(f));
   assert.deepEqual(tracked, []);
 });
+
+test('the instruction-mirror lock also lives beside the private source, never in the repository', async () => {
+  const { checkMirror, mirrorLockFor } = await import('../scripts/check-instructions-lock.mjs');
+  const { src } = setup();
+  assert.equal(checkMirror({ list: [], explicit: '' }).state, 'skipped');
+  assert.equal(checkMirror({ list: [src], explicit: '' }).state, 'unlocked');
+  assert.equal(checkMirror({ list: [src], explicit: '' }).code, 1);
+  assert.equal(checkMirror({ list: [src], explicit: '', update: true }).state, 'locked');
+  assert.ok(fs.existsSync(mirrorLockFor(src)) && path.dirname(mirrorLockFor(src)) === path.dirname(src));
+  assert.equal(checkMirror({ list: [src], explicit: '' }).state, 'current');
+  fs.appendFileSync(src, '\nchanged\n');
+  assert.equal(checkMirror({ list: [src], explicit: '' }).state, 'stale');
+  assert.equal(checkMirror({ list: [], explicit: src }).state, 'stale');
+  assert.equal(fs.existsSync(path.join(process.cwd(), '.instructions-lock')), false, 'no instruction hash is stored in the repository');
+});

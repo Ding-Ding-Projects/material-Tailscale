@@ -55,14 +55,14 @@ export function createTab(ctx, suite) {
   ctx.onCleanup(suite.on(fill));
   fill();
   return h('div.grid',
-    h('section.card.span-7.stack', { dataset: { el: 'ollama-create' } }, h('div.card-head', h('span.ic', icon('build')), h('h3', pair('Make a model from a Modelfile', '用 Modelfile 製作模型'))),
+    h('section.card.span-7.stack', { dataset: { el: 'ollama-create' } }, h('div.card-head', h('span.ic', icon('build')), h('h2.h3', pair('Make a model from a Modelfile', '用 Modelfile 製作模型'))),
       h('div.flag-card', h('b', pair('Start from', '由邊個開始')), base, h('div.small.muted', pair('Only models on this computer are listed. The new model reuses its files, so it takes almost no extra space.', '只列出呢部電腦嘅模型。新模型共用佢嘅檔案，幾乎唔使額外空間。'))),
       h('div.flag-card', h('b', pair('Name', '名稱')), name, nameErr),
       h('div.flag-card', h('b', pair('System prompt', '系統提示')), system),
       h('div.flag-card', h('b', pair('Settings', '設定')), h('div.row', pair('Temperature', '隨機程度'), temp, tempOut, pair('Context', '上下文'), ctxIn), h('div.small.muted', pair('Recommended for a focused helper: temperature 0.6 and an 8,192-token context.', '專注助手建議：隨機程度 0.6、上下文 8,192。'))),
       h('div.row', createBtn, reason), prog),
-    h('section.card.span-5.tonal.stack', h('div.card-head', h('span.ic.alt', icon('description')), h('h3', pair('The Modelfile', 'Modelfile'))), out, h('div.small.muted', pair('This is exactly what is sent to Ollama.', '呢個就係傳俾 Ollama 嘅內容。'))),
-    h('section.card.span-7.stack', h('div.card-head', h('span.ic', icon('content_copy')), h('h3', pair('Copy a model', '複製模型'))),
+    h('section.card.span-5.tonal.stack', h('div.card-head', h('span.ic.alt', icon('description')), h('h2.h3', pair('The Modelfile', 'Modelfile'))), out, h('div.small.muted', pair('This is exactly what is sent to Ollama.', '呢個就係傳俾 Ollama 嘅內容。'))),
+    h('section.card.span-7.stack', h('div.card-head', h('span.ic', icon('content_copy')), h('h2.h3', pair('Copy a model', '複製模型'))),
       h('div.row', copyFrom, copyTo, h('button.btn.outline', { type: 'button', on: { click: async () => {
         const to = copyTo.value.trim();
         if (!NAME.test(to)) { toast(pair('Choose a valid new name.', '揀一個有效嘅新名。'), { kind: 'warn' }); return; }

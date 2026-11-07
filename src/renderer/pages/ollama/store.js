@@ -161,6 +161,6 @@ export function storeTab(ctx, suite) {
       h('details.feature-more', h('summary', pair('Fit check settings', '適合程度設定')), h('div.row.small', { style: { marginTop: '8px' } }, pair('Context you will use', '會用嘅上下文'), ctxStep, pair('tokens · memory per 1,024 tokens', 'token · 每 1,024 token 記憶體'), perKStep, 'GB'),
         h('div.small.muted', pair('Each verdict counts the download size, this context and 0.5 GB for the runtime against this computer\'s video memory, memory and free disk. Open a verdict to see the numbers.', '每個判斷都會用下載大小、呢個上下文同 0.5 GB 執行空間，對比顯示記憶體、記憶體同磁碟空間。撳個判斷睇數字。'))),
       list),
-    h('aside.card.span-4.cart.stack', { dataset: { el: 'ollama-cart' } }, h('div.card-head', h('span.ic', icon('shopping_cart')), h('h3', pair('Download cart', '下載購物車'))),
+    h('aside.card.span-4.cart.stack', { dataset: { el: 'ollama-cart' } }, h('div.card-head', h('span.ic', icon('shopping_cart')), h('h2.h3', pair('Download cart', '下載購物車'))),
       h('div.small.muted', pair('No price, no account: the cart only lines up downloads to this computer.', '冇價錢、唔使帳戶：購物車只係排隊下載去呢部電腦。')), cartBox, queueBox));
 }

@@ -78,14 +78,15 @@
 .mtab[aria-selected="true"] .msr { font-variation-settings: 'FILL' 1; color: var(--primary); }
 .mtab[aria-selected="true"]::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: var(--primary); animation: mm-tab var(--dur-m) var(--ease-emph); }
 @keyframes mm-tab { from { transform: scaleX(.2); opacity: 0; } }
-/* Tabs that run past an edge: that edge fades and an arrow appears beside it. */
-.mtabs-wrap { position: relative; display: flex; align-items: stretch; min-width: 0; }
-.mtabs-wrap > .mtabs { flex: 1; min-width: 0; }
-.mtabs-wrap.can-left > .mtabs { -webkit-mask-image: linear-gradient(to right, transparent 0, #000 56px); mask-image: linear-gradient(to right, transparent 0, #000 56px); }
-.mtabs-wrap.can-right > .mtabs { -webkit-mask-image: linear-gradient(to left, transparent 0, #000 56px); mask-image: linear-gradient(to left, transparent 0, #000 56px); }
-.mtabs-wrap.can-left.can-right > .mtabs { -webkit-mask-image: linear-gradient(to right, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%); }
-.mtabs-arrow { position: absolute; top: 50%; z-index: 1; display: none; translate: 0 -50%; background: var(--surface-hi); border: 1px solid var(--outline-soft); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
-.mtabs-arrow.prev { left: 0; } .mtabs-arrow.next { right: 0; }
+/* Tabs that run past an edge: that edge fades and an arrow appears beside it, taking its own
+   space so it never covers a tab. */
+.mtabs-wrap { position: relative; display: flex; align-items: stretch; min-width: 0; border-bottom: 1px solid var(--outline-soft); }
+.mtabs-wrap > .mtabs { flex: 1; min-width: 0; border-bottom: 0; }
+.mtabs-wrap.can-left > .mtabs { -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px); mask-image: linear-gradient(to right, transparent 0, #000 32px); }
+.mtabs-wrap.can-right > .mtabs { -webkit-mask-image: linear-gradient(to left, transparent 0, #000 32px); mask-image: linear-gradient(to left, transparent 0, #000 32px); }
+.mtabs-wrap.can-left.can-right > .mtabs { -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%); mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%); }
+.mtabs-arrow { flex: none; align-self: center; display: none; background: var(--surface-hi); border: 1px solid var(--outline-soft); box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.mtabs-arrow.prev { margin-right: 4px; } .mtabs-arrow.next { margin-left: 4px; }
 .mtabs-wrap.can-left > .mtabs-arrow.prev, .mtabs-wrap.can-right > .mtabs-arrow.next { display: inline-grid; }
 
 /* ===== Two panes with a sub navigation ===== */

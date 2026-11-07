@@ -9,7 +9,7 @@ import { withProgress, helpRequest } from '../../ui/jobs.js';
 /** Appends children, skipping null, false and undefined. */
 const put = (el, ...kids) => append(el, kids);
 
-const card = (title, ico, ...kids) => h('section.card.stack', h('div.card-head', h('span.ic', icon(ico)), h('h3', title)), ...kids);
+const card = (title, ico, ...kids) => h('section.card.stack', h('div.card-head', h('span.ic', icon(ico)), h('h2.h3', title)), ...kids);
 const until = (d) => { const s = Math.round((new Date(d) - Date.now()) / 1000); if (!Number.isFinite(s)) return ''; if (s > 365 * 86400) return pair('stays loaded', '一直載入'); if (s <= 0) return pair('unloading now', '而家卸載'); return pair(`unloads in ${s < 60 ? s + ' s' : s < 3600 ? Math.round(s / 60) + ' min' : Math.round(s / 3600) + ' h'}`, `${s < 60 ? s + ' 秒' : s < 3600 ? Math.round(s / 60) + ' 分鐘' : Math.round(s / 3600) + ' 小時'}後卸載`); };
 const cap = (c) => h('span.chip', icon({ tools: 'build', vision: 'visibility', thinking: 'psychology', embedding: 'scatter_plot', completion: 'chat', insert: 'input' }[c] || 'label'), c);
 
@@ -112,7 +112,7 @@ export function installedCard(suite) {
     put(box, h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', [pair('Model', '模型'), pair('Size', '大小'), pair('Details', '詳情'), pair('Can', '能力'), pair('State', '狀態'), ''].map((x) => h('th', x)))), h('tbody', rows))));
   };
   suite.on(draw); draw(suite);
-  return h('section.card.stack', h('div.card-head', h('span.ic', icon('inventory_2')), h('h3', pair('Installed', '已安裝')), badgeCount), box);
+  return h('section.card.stack', h('div.card-head', h('span.ic', icon('inventory_2')), h('h2.h3', pair('Installed', '已安裝')), badgeCount), box);
 }
 
 export function modelsTab(ctx, suite) {

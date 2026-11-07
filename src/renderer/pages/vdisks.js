@@ -17,7 +17,7 @@ const put = (el, ...kids) => append(el, kids);
 
 const isWin = () => window.__MT_PLATFORM__ === 'win32';
 const WIN_ONLY = pair('Virtual disks are a Windows feature. This computer is not running Windows, so the buttons that change disks are off; everything else here still explains what they do.', '虛擬磁碟係 Windows 功能。呢部電腦唔係 Windows，所以改磁碟嘅掣會停用；其他說明照睇得到。');
-const card = (title, ico, ...kids) => h('section.card.stack', h('div.card-head', h('span.ic', icon(ico)), h('h3', title)), ...kids);
+const card = (title, ico, ...kids) => h('section.card.stack', h('div.card-head', h('span.ic', icon(ico)), h('h2.h3', title)), ...kids);
 const seg = (opts, v, label, onPick) => { const el = h('div.seg', { role: 'radiogroup', 'aria-label': label }, opts.map(([k, l]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(k === v), on: { click: (e) => { for (const b of el.children) b.setAttribute('aria-checked', String(b === e.currentTarget)); onPick(k); } } }, l))); return el; };
 
 /** Runs one operation with a progress dialog; resolves with the result or null. */
@@ -163,9 +163,9 @@ registerPage('vdisks', (ctx) => {
   const sizeIn = h('input.input', { type: 'number', min: 1, value: c.size, style: { width: '110px' }, 'aria-label': pair('Maximum size', '最大容量'), on: { input: (e) => { c.size = Number(e.target.value); drawPlan(); } } });
   const pickPath = async () => { const p = await window.mt.dialog.save({ defaultPath: `New disk.${c.format}`, filters: [{ name: c.format.toUpperCase(), extensions: [c.format] }] }); if (p) { c.path = p.replace(/\.(vhdx?|VHDX?)$/, '') + '.' + c.format; drawPlan(); } };
   const pickParent = async () => { const r = await window.mt.dialog.open({ filters: [{ name: 'VHD, VHDX', extensions: ['vhd', 'vhdx'] }], title: pair('Choose the parent disk', '揀父磁碟') }); if (r) { c.parent = r[0]; drawPlan(); } };
-  const typeRows = h('div.stack');
+  const typeRows = h('div.stack', { role: 'radiogroup', 'aria-label': pair('Disk type', '磁碟類型') });
   const drawTypes = () => put(clear(typeRows), ...[['dynamic', 'expand', pair('Dynamic (recommended)', '動態（建議）'), pair('Starts small and grows as you write, up to the maximum.', '開頭好細，寫入先慢慢變大，最多到上限。')], ['fixed', 'crop_square', pair('Fixed', '固定'), pair('Takes the whole size on the drive now; slower to create, a little faster to use.', '一開始就佔用全部空間；建立慢啲，用起嚟快少少。')], ['differencing', 'account_tree', pair('Differencing', '差異'), pair('Records changes on top of a parent disk you choose; the parent becomes read-only.', '喺你揀嘅父磁碟上面記錄改動；父磁碟會變唯讀。')]]
-    .map(([k, ic, t, d]) => h('button.pick-row', { type: 'button', 'aria-checked': String(c.type === k), on: { click: () => { c.type = k; drawTypes(); drawCreate(); drawPlan(); } } }, h('span.ava', icon(ic)), h('span.meta', h('b', t), h('span', d)), h('span.radio-dot'))));
+    .map(([k, ic, t, d]) => h('button.pick-row', { type: 'button', role: 'radio', 'aria-checked': String(c.type === k), on: { click: () => { c.type = k; drawTypes(); drawCreate(); drawPlan(); } } }, h('span.ava', icon(ic)), h('span.meta', h('b', t), h('span', d)), h('span.radio-dot'))));
   const sizeBox = h('div.flag-card');
   const drawCreate = () => {
     clear(sizeBox);
@@ -177,17 +177,17 @@ registerPage('vdisks', (ctx) => {
   createBtn.addEventListener('click', () => runOp(pair('Create a virtual disk', '建立虛擬磁碟'), 'create', { path: c.path, type: c.type, sizeMB: sizeMB(), parent: c.parent || undefined, prepare: c.prepare ? { style: c.style, fs: c.fs, label: c.label } : null, attach: c.attach }, { onDone: (r, b) => { setLib([...lib(), c.path]); put(b, h('p', pair(`Created ${c.path}.`, `已建立 ${c.path}。`))); refreshInfo(); } }));
   const sw = (label, desc, key) => h('div.switch-row', h('div.txt', h('b', label), h('span.small.muted', desc)), h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(c[key]), 'aria-label': label, on: { click: (e) => { c[key] = !c[key]; e.currentTarget.setAttribute('aria-checked', String(c[key])); drawPlan(); } } }));
   const createView = h('div.grid',
-    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('tune')), h('h3', pair('Format and type', '格式同類型'))),
+    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('tune')), h('h2.h3', pair('Format and type', '格式同類型'))),
       h('div.flag-card', h('b', pair('Format', '格式')), seg([['vhdx', pair('VHDX (recommended)', 'VHDX（建議）')], ['vhd', 'VHD']], c.format, pair('Format', '格式'), (k) => { c.format = k; if (c.path) c.path = c.path.replace(/\.\w+$/, '.' + k); drawPlan(); }),
         h('div.small.muted', pair('VHDX holds up to 64 TB and survives a power cut during a metadata update. VHD tops out at 2,040 GB and is for older systems.', 'VHDX 最大 64 TB，更新資料期間斷電都唔會壞。VHD 最大 2,040 GB，俾舊系統用。'))), typeRows),
-    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('straighten')), h('h3', pair('Size and place', '大小同位置'))), sizeBox,
+    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('straighten')), h('h2.h3', pair('Size and place', '大小同位置'))), sizeBox,
       h('div.flag-card', h('b', pair('File', '檔案')), h('div.row', h('button.btn.small.outline', { type: 'button', on: { click: pickPath } }, icon('folder_open'), pair('Choose where to save', '揀儲存位置')), pathOut), h('div.small.muted', pair('An existing file is never replaced; pick another name if this one is taken.', '唔會覆蓋現有檔案；個名用咗就揀第二個。')))),
-    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('storage')), h('h3', pair('Ready to use', '即刻用得'))),
+    h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('storage')), h('h2.h3', pair('Ready to use', '即刻用得'))),
       sw(pair('Partition and format after creating', '建立後分割同格式化'), pair('Initialise the disk, make one partition and format it, so it shows up in File Explorer.', '初始化、整一個分割區再格式化，咁檔案總管就見到。'), 'prepare'),
       h('div.row', seg([['GPT', 'GPT'], ['MBR', 'MBR']], c.style, pair('Partition style', '分割樣式'), (k) => { c.style = k; drawPlan(); }), seg([['NTFS', 'NTFS'], ['exFAT', 'exFAT'], ['FAT32', 'FAT32'], ['ReFS', 'ReFS']], c.fs, pair('File system', '檔案系統'), (k) => { c.fs = k; drawPlan(); })),
       h('input.input', { value: c.label, 'aria-label': pair('Volume label', '磁碟區標籤'), on: { input: (e) => { c.label = e.target.value; drawPlan(); } } }),
       sw(pair('Attach when done', '完成後掛載'), pair('Give it a drive letter straight away.', '即刻俾佢一個磁碟機代號。'), 'attach')),
-    h('section.card.span-6.tonal.stack', h('div.card-head', h('span.ic.alt', icon('terminal')), h('h3', pair('What will run', '會行乜嘢'))), steps,
+    h('section.card.span-6.tonal.stack', h('div.card-head', h('span.ic.alt', icon('terminal')), h('h2.h3', pair('What will run', '會行乜嘢'))), steps,
       h('p.small.muted', { style: { margin: 0 } }, icon('shield'), ' ', pair('Windows asks for permission once. Cancelling changes nothing.', 'Windows 會問一次權限；取消就乜都唔改。')),
       h('div.row', createBtn, h('button.btn.text', { type: 'button', on: { click: () => { navigator.clipboard.writeText(steps.textContent); toast(pair('Copied.', '已複製。'), { kind: 'ok' }); } } }, icon('content_copy'), pair('Copy these steps', '複製步驟'))), why));
   drawTypes(); drawCreate(); drawPlan();
@@ -220,8 +220,8 @@ registerPage('vdisks', (ctx) => {
     put(b, h('div.row', h('span.badge.ok', icon('verified'), pair(`${r.data.verified} files checked, all match`, `${r.data.verified} 個檔案核對過，全部一樣`)), h('span.badge.info', pair('Detached', '已卸載'))), h('div.small.mono', r.data.dest));
     refreshInfo();
   } }));
-  const packView = h('div.grid', drop, h('section.card.span-8.stack', h('div.card-head', h('span.ic', icon('folder_zip')), h('h3', pair('What will be packed', '會打包乜嘢'))), planBox, h('div.row', packBtn)),
-    h('section.card.span-4.tonal.stack', h('div.card-head', h('span.ic.alt', icon('checklist')), h('h3', pair('How it works', '點運作'))), h('ol.steps', h('li', pair('Create a dynamic VHDX sized to fit', '建立啱啱好大細嘅動態 VHDX')), h('li', pair('Attach and format NTFS', '掛載同格式化 NTFS')), h('li', pair('Copy every file', '複製每個檔案')), h('li', pair('Check every file against its original (SHA-256)', '逐個檔案同原本核對（SHA-256）')), h('li', pair('Detach', '卸載'))),
+  const packView = h('div.grid', drop, h('section.card.span-8.stack', h('div.card-head', h('span.ic', icon('folder_zip')), h('h2.h3', pair('What will be packed', '會打包乜嘢'))), planBox, h('div.row', packBtn)),
+    h('section.card.span-4.tonal.stack', h('div.card-head', h('span.ic.alt', icon('checklist')), h('h2.h3', pair('How it works', '點運作'))), h('ol.steps', h('li', pair('Create a dynamic VHDX sized to fit', '建立啱啱好大細嘅動態 VHDX')), h('li', pair('Attach and format NTFS', '掛載同格式化 NTFS')), h('li', pair('Copy every file', '複製每個檔案')), h('li', pair('Check every file against its original (SHA-256)', '逐個檔案同原本核對（SHA-256）')), h('li', pair('Detach', '卸載'))),
       h('div.small.muted', pair('A mismatch stops the pack and keeps the disk attached so you can look.', '有唔一樣就會停，磁碟會保持掛載俾你睇。'))));
 
   const views = { library: libraryView, create: createView, pack: packView };

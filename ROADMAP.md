@@ -86,6 +86,6 @@
 - [x] Final design pass reviewed with a product-shot checklist (`design/REHEARSAL.md`): overlays drawn over their pages, the Taildrop board's window-wide drop layer removed, dead corners filled, sparkle icons retired, section tabs with edge fades and arrows, choices that share their width or become a two-column grid, a docs outline on wide windows, notices above the update banner, the real app in the website hero, and a drift check in the design viewer
 - [ ] Extension actions seen in a populated device menu (needs a Tailscale daemon with peers on the capture machine)
 - [ ] Populated tailnet states in parity captures (needs a Tailscale daemon on the capture machine)
-- [ ] Virtual disk manager (VHD, VHDX and VHD Set files, ISO attach, Quick pack), added to the shared feature list on 2026-11-07: not started. Its operations create, partition, format, resize, merge and boot from disks, and its proof has to be real operations on a Windows computer; the build session runs on Linux with no Windows computer attached, so it is not shipped unrun
-- [ ] Dedicated build GUI companion (portable executable that drives build.bat and build-installer.bat)
+- ~~Virtual disk manager (VHD, VHDX and VHD Set files, ISO attach, Quick pack): not started~~ Superseded on 2026-11-07: it is built and proven per release on a Windows runner; what is still open is tracked by the virtual disk manager item under Phase 2.
+- ~~Dedicated build GUI companion (portable executable that drives build.bat and build-installer.bat)~~ Superseded on 2026-11-07: it ships as the portable build companion under Phase 2; running a build through it on Windows is listed under "Not verified" in HANDOFF.md.
 

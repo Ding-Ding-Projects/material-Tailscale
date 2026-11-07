@@ -25,8 +25,8 @@ export function stepDebugger(getSrc, getFlags, getText, { autorun = false, onRun
 
   const slider = h('input.slider', { type: 'range', min: 1, max: 1, value: 1, 'aria-label': pair('Step', '步驟'), dataset: { el: 'rx-step' }, on: { input: (e) => { stop(); go(Number(e.target.value) - 1); } } });
   const label = h('b');
-  const tokRow = h('div.rx-tokens', { 'aria-label': pair('Pattern, with the current token highlighted', '模式，而家嗰部分會標示') });
-  const subject = h('div.rx-subject', { 'aria-label': pair('Text, with the current position outlined', '文字，而家位置有框') });
+  const tokRow = h('div.rx-tokens', { role: 'group', 'aria-label': pair('Pattern, with the current token highlighted', '模式，而家嗰部分會標示') });
+  const subject = h('div.rx-subject', { role: 'group', 'aria-label': pair('Text, with the current position outlined', '文字，而家位置有框') });
   const note = h('div.small', { role: 'status', 'aria-live': 'polite' });
   const table = h('tbody');
   const ib = (name, label2, fn) => h('button.icon-btn', { type: 'button', 'aria-label': label2, title: label2, on: { click: fn } }, icon(name));
