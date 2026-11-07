@@ -21,14 +21,14 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "898f731215be2ee3b1ed6c1044b5f54f5a70efe036b8257cde4e3c2e21448eaf",
+  "boardSha256": "5e89ee03e39ce683346d4ca64a1c66d8ed2a03d20e028537c75817f3717cb325",
   "captureSha256": {
-    "reference": "ee6da36ed673fce2e2f08b1257a0e1cabe67b27edf7cd6033fd0b17c264e122b",
-    "app": "36c08e4b5ea384690b759bca9eec46cdc06668d845e379a357e37548024ca001"
+    "reference": "1623312d55a802b15c752300ffaae4547e4a2689741df005cc6eac54f7945e44",
+    "app": "9fcb4aac2eec9b07a5c1647b73fe631763021d726521a71b8a1c16601ba63827"
   },
-  "changedPixels": 98068,
+  "changedPixels": 165002,
   "totalPixels": 1382400,
-  "changedRatio": 0.0709,
+  "changedRatio": 0.1194,
   "threshold": "any channel delta above 40 of 255",
   "heatmap": "docs/design-parity/captures/minecraft-config/diff.webp"
 }

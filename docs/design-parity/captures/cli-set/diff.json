@@ -21,14 +21,14 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "3ce8a64c332aa257a0fffd44cd3f2c2d9f33c320a7d8ff94e6deed12afcfdc71",
+  "boardSha256": "1a62ad3c0612b64c6967cc2e3dd3808709f97652d30f83c25e3185f867e80fbf",
   "captureSha256": {
-    "reference": "fcb7886a7a4d6d5640c25cc12f33245852f0ec58e9ec02262cd11a51ceabfad6",
-    "app": "49e9685531e1e33b2270a6697d6738099c13689377e5439308129a2c2bd7fd1c"
+    "reference": "f3bd2e2045b333e2c31ec28f4bb3bd3026dcdcd20d24a9055e43b47062738c6c",
+    "app": "c3cea2509cfce1eb2dc43f615f20ed46639fbf3ff0cf6163bd7baf4e4a64c019"
   },
-  "changedPixels": 156491,
+  "changedPixels": 163130,
   "totalPixels": 1382400,
-  "changedRatio": 0.1132,
+  "changedRatio": 0.118,
   "threshold": "any channel delta above 40 of 255",
   "heatmap": "docs/design-parity/captures/cli-set/diff.webp"
 }

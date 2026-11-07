@@ -60,7 +60,7 @@
 
 ## Midnight Mesh 2
 
-- [x] Design canvas boards for every screen family, overlay and the website (15 boards, 49 views)
+- [x] Design canvas boards for every screen family, overlay, the extensions manager and the website (16 boards, 51 views, plus the sweep report board)
 - [x] Page hero bands with animated illustrations, two-pane Settings, in-page tabs, setup state with steps
 - [x] Context menus carry live controls (switch, choice, slider, swatch) with keyboard support
 - [x] Animation and transition tab in the per-element appearance editor
@@ -75,6 +75,7 @@
 - [ ] Title-bar overlay and Snap layouts seen on a real Windows desktop (the build workspace is Linux, where the app draws its own buttons)
 - [x] Extensions: manifest version 1, any-language JSON protocol over standard input and output, permissions with a review before first run and after every change, an allow-list of what reaches an extension, a clean environment, a five-second limit and a 64 KiB answer limit, checked answers, a manager with search and a master switch, device-menu actions and Diagnostics checks, four built-in extensions, an authoring guide with samples, and tests that run real extension processes
 - [x] Base64 toolkit to the full contract: same-folder drop conversion (name plus `.base64.txt` beside the source, original name and extension restored on decode, numbered instead of overwriting, SHA-256 round trip), streaming with pause, resume and cancel, custom line length and UTF-16 BE, strict offsets, `data:` URLs, sandboxed preview, JSON record and ZIP export, history with undo across restarts; tests run real conversions on disk
+- [x] Final design pass reviewed with a product-shot checklist (`design/REHEARSAL.md`): overlays drawn over their pages, the Taildrop board's window-wide drop layer removed, dead corners filled, sparkle icons retired, section tabs with edge fades and arrows, choices that share their width or become a two-column grid, a docs outline on wide windows, notices above the update banner, the real app in the website hero, and a drift check in the design viewer
 - [ ] Extension actions seen in a populated device menu (needs a Tailscale daemon with peers on the capture machine)
 - [ ] Populated tailnet states in parity captures (needs a Tailscale daemon on the capture machine)
 - [ ] Virtual disk manager (VHD, VHDX and VHD Set files, ISO attach, Quick pack), added to the shared feature list on 2026-11-07: not started. Its operations create, partition, format, resize, merge and boot from disks, and its proof has to be real operations on a Windows computer; the build session runs on Linux with no Windows computer attached, so it is not shipped unrun

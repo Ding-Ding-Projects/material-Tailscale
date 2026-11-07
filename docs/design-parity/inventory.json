@@ -1833,6 +1833,11 @@
           "what": "Sample text and values differ from the live app.",
           "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
           "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The board opens the editor over Peers; the capture opens it from a Settings card.",
+          "reason": "No peers exist without a daemon; a Settings card carries the same editor.",
+          "approved": "Reviewed 2026-11-07."
         }
       ]
     },
@@ -1875,6 +1880,11 @@
           "what": "Sample text and values differ from the live app.",
           "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
           "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The board shows the dialog over Accounts, where Log out lives; the capture opens it over Home.",
+          "reason": "Without a daemon there is no account to log out of, so the capture opens the same dialog from Home.",
+          "approved": "Reviewed 2026-11-07."
         }
       ]
     },
@@ -1955,6 +1965,11 @@
           "what": "Sample text and values differ from the live app.",
           "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
           "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The board adds the update banner under the two notices; the capture shows the notices alone.",
+          "reason": "An update banner needs a published update to exist; the board shows how notices stack above it.",
+          "approved": "Reviewed 2026-11-07."
         }
       ]
     },

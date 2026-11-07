@@ -2,7 +2,7 @@
 
 ## Behaviour
 
-Information and success messages are non-blocking toasts that dismiss themselves; errors and warnings stay until dismissed. The notification centre keeps everything searchable and bulk deletable.
+Information and success messages are non-blocking toasts that dismiss themselves; errors and warnings stay until dismissed. The notification centre keeps everything searchable and bulk deletable. When the update banner is showing, notices stack above it instead of covering it.
 
 ## Configuration
 

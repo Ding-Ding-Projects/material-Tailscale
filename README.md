@@ -84,7 +84,7 @@ All `.bat` scripts accept `/s`, `--silent` or `SILENT=1`.
 - `src/shared/cli-catalog.js` every CLI command and flag; `buildArgs` validates every value. `src/shared/api-catalog.json` is generated from `vendor/tailscale-openapi/openapi.yaml` (BSD 3-Clause) by `npm run gen:api`.
 - `src/renderer/` the interface: core state and language, rich controls, command and schema forms, pages.
 - `site/` the website, which reuses the renderer modules through a browser shim.
-- `design/canvas/` the design canvas the interface was built from.
+- `design/canvas/` the design canvas the interface was built from; `design/REHEARSAL.md` how the latest design pass was reviewed and `design/HANDOFF.md` how to change the boards.
 </details>
 
 <details>
