@@ -175,6 +175,8 @@ test('an answer larger than the limit is refused, and broken answers are reporte
 
   writeExt(dir, manifest(), 'process.stdout.write("not json");');
   assert.equal((await host.run('demo', 'go', { peer: PEER })).code, 'bad-answer');
+  writeExt(dir, manifest(), 'process.stdout.write("\\uFEFF" + JSON.stringify({ ok: true, message: "with a byte-order mark" }));');
+  assert.equal((await host.run('demo', 'go', { peer: PEER })).answer.message, 'with a byte-order mark');
   writeExt(dir, manifest(), 'console.error("disk on fire"); process.exit(3);');
   const r = await host.run('demo', 'go', { peer: PEER });
   assert.equal(r.code, 'exit');

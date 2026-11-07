@@ -46,8 +46,10 @@ function entries() {
     const g = t('extensions');
     out.push({ group: g, title: pair('Add an extension from a folder', '由資料夾加入擴充功能'), sub: 'extensions', icon: 'create_new_folder', run: () => teleport('[data-el="ext-add"]', 'extensions') });
     out.push({ group: g, title: pair('Open the extensions folder', '打開擴充功能資料夾'), sub: 'extensions', icon: 'folder_open', run: () => window.mt.ext.openFolder() });
+    // The switch shows the new value at once; the main process confirms it in the background.
+    let masterOn = !extensionsState().masterOff;
     out.push({ group: g, title: pair('Extensions can run', '擴充功能可以執行'), sub: pair('Turn every extension off or on at once', '一次過開關所有擴充功能'), icon: 'power_settings_new', run: () => teleport('[data-el="ext-master"]', 'extensions'),
-      live: { kind: 'switch', get: () => !extensionsState().masterOff, set: (on) => window.mt.ext.setMasterOff(!on).then(() => refreshExtensions()) } });
+      live: { kind: 'switch', get: () => masterOn, set: (on) => { masterOn = on; window.mt.ext.setMasterOff(!on).then(() => refreshExtensions(), () => { masterOn = !on; refreshExtensions(); }); } } });
     for (const { ext, action } of extensionActions('peer.action')) out.push({ group: g, title: `${extLoc(ext.manifest.name)}: ${extLoc(action.title)}`, sub: pair('On a device: open Peers and use its menu', '用喺裝置：打開裝置頁再用佢嘅選單'), icon: action.icon || 'extension', run: () => openDest('peers') });
   }
   for (const op of apiOps) out.push({ group: pair('Admin API', '管理 API'), title: op.summary, sub: `${op.method} ${op.path}`, icon: 'api', run: () => { openDest('admin', 'Everything'); } });

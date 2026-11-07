@@ -1,8 +1,8 @@
 # Handoff
 
-## State (2026-11-06)
+## State (2026-11-07)
 
-First complete build of Material Tailscale: Electron app, website, docs, release pipeline.
+Material Tailscale: Electron app, website, docs, release pipeline, extensions, and an every-surface sweep that gates each release.
 
 ## Verification actually run
 
@@ -65,12 +65,23 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 - Release packaging: release runs 13 and 14 failed in "Package Squirrel.Windows installer". Each release had re-uploaded every earlier package, so Squirrel's GitHub sync downloaded the same file name from several releases at once and hit "The process cannot access the file ... because it is being used by another process", then fell back to a URL that returns 404. Packaging now seeds only the previous release's `RELEASES` and newest full package, builds one delta, and trims `RELEASES` to what the release ships.
 - Canvas: version 10 publishes 15 boards and 49 views with the updated stylesheet.
 
+## Every-surface sweep and extensions (2026-11-07)
+
+- Sweep: `scripts/sweep.mjs` opens 59 app surfaces and 84 website pages in 4 window sizes, 2 themes and 3 language modes, and runs axe-core (WCAG 2.2 AA and best practices), console and blocked-content checks, clipped, off-screen and overlapping text probes, and a keyboard walk. The first runs reported 1,791 findings (a few from the checker itself). A final full run against the release build follows this pass.
+- Fixed at the source while sweeping: icon names read aloud; tab list holding buttons; nested controls in menus and the palette (now a combobox and listbox with live values drawn inside options); unnamed popovers; dialogs that let Tab leave; leaving toasts that took focus; timed toasts that dropped focus and stacked past the top of short windows; missing focus rings; read-only output boxes that focus did not scroll into view (Chromium does not scroll a read-only textarea on focus; `src/renderer/ui/focus-reveal.js`); scroll boxes missed after a resize or font load; four pointer-only file pickers; bilingual buttons, device rows and inline code running off phone screens; light-theme contrast; desktop-only website routes; the download button's accessible name; an aside with a status role.
+- Interruptions: the cloud machine restarted once during a full run. `node scripts/sweep.mjs --resume` now continues in the same folder and refuses when the build or the matrix changed.
+- Windows title bar: the window uses the title-bar overlay on Windows, so Windows draws the caption buttons and Snap layouts work; the overlay colours follow the theme through `win:overlay`, which accepts only `#rrggbb`. Linux and macOS keep the app's own buttons. The install-proof job now photographs the installed app on the runner's desktop (`windows-title-bar.png`, `windows-maximise-hover.png`); an in-app capture cannot see the overlay.
+- Extensions: `src/main/extensions.js` (host), `src/shared/extension-api.js` (protocol version 1), `src/renderer/pages/extensions.js` (manager), `src/renderer/ui/extensions-client.js` (device menus, Diagnostics, palette, consent review), `extensions/builtin` (SSH command, Device summary, Web page, Tailnet health), `extensions/samples` (Python, PowerShell, JavaScript), `test/extensions.test.mjs` (13 tests with real processes, including the Python sample). Two of those tests were watched failing when a key was let through and when the clipboard permission check was dropped.
+- Design canvas: an Extensions board (manager and permission review), the add-on tile on Tools, extension checks on Diagnostics, and the sweep report board with before and after scores; stylesheets uploaded again.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.
 - Installing Setup.exe and the update from one release to the next on a real Windows machine.
 - Update flow from one release to the next.
 - Narrator voices, camera QR scan and tray menu on Windows.
+- Extension actions in a populated device menu and extension checks against a running daemon: the capture machine has no Tailscale daemon, so the menus have no devices and the checks report that status is unavailable. The host, the built-ins and the samples are proven by the tests.
+- The title-bar overlay and Snap layouts on a person's own Windows desktop; the release's install-proof photographs come from a clean CI runner, whose edition may not offer Snap layouts.
 
 ## Remaining work
 

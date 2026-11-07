@@ -97,7 +97,7 @@ Nothing else is ever sent: no keys of any kind, Admin API tokens, e-mail address
 | `openUrl` | Needs `open-url`; an http or https link of up to 2,000 characters, without a user name or password |
 | `checks` | Only for `status.check`; up to 20 items, each `{ "title": "...", "state": "ok", "detail": "..." }` where `state` is `ok`, `warn` or `fail` (title up to 120 characters, detail up to 500 and optional) |
 
-Any other field is refused. Write nothing else to standard output; use standard error for logs (its first line is shown when the program fails).
+Any other field is refused. Write nothing else to standard output; use standard error for logs (its first line is shown when the program fails). Write UTF-8; a leading byte-order mark is tolerated.
 
 ### Limits
 
@@ -151,7 +151,7 @@ To try a program by hand, pipe a request into it: `echo '{"hook":"peer.action","
 `extensions/samples` in the source repository holds three runnable samples, one per runtime:
 
 - `hello-python`: Python 3, a device action that greets the device (`"run": { "command": ["python", "main.py"] }`).
-- `addresses-powershell`: Windows PowerShell 5.1, which every Windows 10 and 11 computer has, a device action that copies all of a device's addresses.
+- `addresses-powershell`: Windows PowerShell 5.1, which every Windows 10 and 11 computer has, a device action that copies all of a device's addresses. Windows PowerShell reads and writes pipes in the console code page, so the sample switches both directions to UTF-8 first; copy those three lines into your own PowerShell extensions.
 - `online-share-node`: JavaScript on the app's own runtime, a Diagnostics check that warns when fewer than half of the devices are online.
 
 The four built-in extensions in `extensions/builtin` are complete examples as well.

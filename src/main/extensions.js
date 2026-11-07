@@ -196,7 +196,8 @@ function runProcess({ dir, run, request, execPath = process.execPath, timeoutMs 
     child.on('close', (code) => {
       if (code !== 0) { const why = err.trim().split(/\r?\n/)[0]; finish({ ok: false, code: 'exit', error: `It stopped with exit code ${code}${why ? `: ${why.slice(0, 300)}` : ''}.` }); return; }
       let answer;
-      try { answer = JSON.parse(Buffer.concat(out).toString('utf8')); } catch { finish({ ok: false, code: 'bad-answer', error: 'Its answer was not valid JSON.' }); return; }
+      // A byte-order mark is tolerated: Windows PowerShell writes one with some encodings.
+      try { answer = JSON.parse(Buffer.concat(out).toString('utf8').replace(/^\uFEFF/, '')); } catch { finish({ ok: false, code: 'bad-answer', error: 'Its answer was not valid JSON.' }); return; }
       finish({ ok: true, answer });
     });
     child.stdin.on('error', () => { /* the program closed its input early; its answer still counts */ });
