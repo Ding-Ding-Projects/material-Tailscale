@@ -17,7 +17,7 @@ export function pageHero(eyebrow, title, desc, ...actions) {
   const stats = actions.filter(isStats);
   return h('section.hero-band', { dataset: { el: `hero-${dest}` } },
     h('div.hero-text',
-      h('span.hero-eyebrow', icon(d?.icon || 'auto_awesome'), eyebrow),
+      h('span.hero-eyebrow', icon(d?.icon || 'label'), eyebrow),
       h('h1', main, rest.length ? h('span.yue', rest.join(' · ')) : null),
       desc ? h('p', desc) : null,
       acts.length ? h('div.hero-actions', ...acts) : null,

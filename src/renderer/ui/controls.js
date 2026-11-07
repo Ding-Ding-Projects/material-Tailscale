@@ -21,10 +21,24 @@ export function switchCtl(value, { label, triState } = {}) {
   return { el, get: () => v, set: (x) => { v = !!x; el.setAttribute('aria-checked', String(v)); }, onChange: ev.on };
 }
 
+// A segmented control whose options do not fit on one line becomes an even two-column grid
+// (.seg.wrapped) instead of a pill broken across lines. It is measured again whenever its
+// size changes, on the next frame so the change never feeds back into the same observation.
+const segFit = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => requestAnimationFrame(() => entries.forEach((e) => fitSeg(e.target))));
+function fitSeg(el) {
+  if (!el.isConnected) { segFit.unobserve(el); return; }
+  el.classList.remove('wrapped');
+  const kids = el.children;
+  let wraps = false;
+  for (let i = 1; i < kids.length; i++) if (kids[i].offsetTop > kids[0].offsetTop + 2) { wraps = true; break; }
+  if (wraps) el.classList.add('wrapped');
+}
+
 export function segmented(options, value, { label } = {}) {
   const ev = emitter();
   let v = value;
   const el = h('div.seg', { role: 'radiogroup', 'aria-label': label || 'Choice' });
+  segFit?.observe(el);
   const btns = options.map((o) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === v), on: { click: () => { v = o.value; sync(); sound('click'); ev.fire(v); } } }, o.icon ? icon(o.icon) : null, o.label ?? String(o.value)));
   const sync = () => btns.forEach((b, i) => b.setAttribute('aria-checked', String(options[i].value === v)));
   el.addEventListener('keydown', (e) => {
@@ -200,7 +214,7 @@ export function exitNodePick(value, { label } = {}) {
   const filter = h('input.input', { placeholder: pair('Filter by name, country or city', '按名、國家或城市篩選'), 'aria-label': 'Filter exit nodes' });
   const draw = () => {
     clear(list);
-    const opts = [{ ip: '', name: pair('None: route traffic normally', '無：正常上網'), country: '', ico: 'block' }, { ip: 'auto:any', name: pair('Automatic (best available)', '自動（最佳）'), country: '', ico: 'auto_awesome' }, ...(ts.data.exitNodes || []).map((x) => ({ ...x, ico: 'travel_explore' }))];
+    const opts = [{ ip: '', name: pair('None: route traffic normally', '無：正常上網'), country: '', ico: 'block' }, { ip: 'auto:any', name: pair('Automatic (best available)', '自動（最佳）'), country: '', ico: 'auto_mode' }, ...(ts.data.exitNodes || []).map((x) => ({ ...x, ico: 'travel_explore' }))];
     const s = filter.value.toLowerCase();
     for (const o of opts.filter((o) => !s || `${o.name} ${o.country} ${o.city} ${o.ip}`.toLowerCase().includes(s))) {
       list.append(h('button.pick-row', { type: 'button', role: 'radio', 'aria-checked': String((v ?? null) === (o.ip ?? null) || (v === o.name && !!o.name)), on: { click: () => { v = o.ip; draw(); ev.fire(v); sound('click'); } } },

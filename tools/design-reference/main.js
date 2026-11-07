@@ -23,7 +23,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'dcref', privileges: { standard:
 app.commandLine.appendSwitch('force-device-scale-factor', String(tuple.scale));
 app.commandLine.appendSwitch('disable-gpu');
 
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.json': 'application/json' };
+const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.woff2': 'font/woff2', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp' };
 const blobs = JSON.parse(fs.readFileSync(path.join(canvasDir, 'assets.json'), 'utf8')).files;
 const send = (file) => {
   try { return new Response(fs.readFileSync(file), { headers: { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream' } }); }
@@ -47,12 +47,28 @@ async function settle(win) {
   await new Promise((r) => setTimeout(r, Number(arg('settle', 1500))));
 }
 
+const LAYOUT_DRIFT = `(() => {
+  const out = [];
+  for (const el of document.querySelectorAll('.seg:not(.wrapped)')) {
+    const k = el.children;
+    for (let i = 1; i < k.length; i++) if (k[i].offsetTop > k[0].offsetTop + 2) { out.push('choice "' + (el.getAttribute('aria-label') || '') + '" wraps without the two-column layout'); break; }
+  }
+  for (const el of document.querySelectorAll('.mtabs')) {
+    const wrap = el.parentElement;
+    const over = el.scrollWidth > el.clientWidth + 2;
+    if (over && !wrap.classList.contains('can-right')) out.push('tabs "' + el.textContent.trim().slice(0, 30) + '" run past the edge without the arrow');
+    if (!over && wrap.classList.contains('can-right')) out.push('tabs "' + el.textContent.trim().slice(0, 30) + '" show an arrow but fit');
+  }
+  return out;
+})()`;
+
 /** Captures every view of every board in each requested theme, with a manifest of tuples and hashes. */
 async function captureAll(win, outDir) {
   const crypto = require('node:crypto');
   fs.mkdirSync(outDir, { recursive: true });
   const themes = arg('themes', 'dark').split(',');
   const manifest = [];
+  const layoutDrift = [];
   for (const board of fs.readdirSync(canvasDir).filter((f) => f.endsWith('.dc.html')).sort()) {
     const html = fs.readFileSync(path.join(canvasDir, board), 'utf8');
     const m = html.match(/data-props='([^']*)'/);
@@ -66,9 +82,14 @@ async function captureAll(win, outDir) {
       const file = `${theme}-${board.replace('.dc.html', '')}-${view || 'default'}.png`;
       fs.writeFileSync(path.join(outDir, file), png);
       manifest.push({ file, board, view, theme, width: tuple.width, height: tuple.height, scale: tuple.scale, sha256: crypto.createHash('sha256').update(png).digest('hex') });
+      // The app lays out a choice that no longer fits one row as a two-column grid, and shows an
+      // arrow when section tabs run past the edge. A static board has to say so itself.
+      const drift = await win.webContents.executeJavaScript(LAYOUT_DRIFT).catch(() => []);
+      for (const d of drift) layoutDrift.push(`${board} ${view} ${theme}: ${d}`);
     }
   }
-  fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify({ tool: 'tools/design-reference', animations: 'off', fonts: 'vendored', captures: manifest }, null, 2));
+  fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify({ tool: 'tools/design-reference', animations: 'off', fonts: 'vendored', captures: manifest, layoutDrift }, null, 2));
+  if (layoutDrift.length) console.warn(`Boards that do not show the app's own layout for these controls:\n  ${layoutDrift.join('\n  ')}`);
   console.log(`${manifest.length} reference captures in ${outDir}`);
 }
 

@@ -163,10 +163,18 @@ textarea.input { height: auto; min-height: 120px; padding: 12px 14px; resize: ve
 .switch-row .txt b { display: block; font-weight: 600; overflow-wrap: anywhere; }
 
 .seg { display: inline-flex; border-radius: var(--r-full); border: 1px solid var(--outline); overflow: hidden; flex-wrap: wrap; max-width: 100%; }
-.seg button { min-height: calc(var(--ctl-h) - 6px); padding: 0 16px; border: 0; background: transparent; color: var(--on-2); cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: background var(--dur-m) var(--ease-emph), color var(--dur-m); border-right: 1px solid var(--outline); }
+/* A choice stretched to its card's width shares the width among its options. */
+.seg button { flex: 1 1 auto; justify-content: center; min-height: calc(var(--ctl-h) - 6px); padding: 0 16px; border: 0; background: transparent; color: var(--on-2); cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: background var(--dur-m) var(--ease-emph), color var(--dur-m); border-right: 1px solid var(--outline); }
 .seg button:last-child { border-right: 0; }
 .seg button[aria-checked="true"] { background: var(--primary-cont); color: var(--on); }
 .seg button[aria-checked="true"]::before { content: 'check'; font-family: 'Material Symbols Rounded'; font-size: 16px; }
+/* Too many options for one line: an even two-column grid with drawn dividers, never a pill
+   broken across lines (ui/controls.js decides when). An odd last option takes the full row. */
+.seg.wrapped { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; border-radius: var(--r-l); }
+.seg.wrapped button { border-right: 0; justify-content: center; text-align: center; white-space: normal; padding-top: 6px; padding-bottom: 6px; }
+.seg.wrapped button:nth-child(odd):not(:last-child) { border-right: 1px solid var(--outline); }
+.seg.wrapped button:nth-child(n + 3) { border-top: 1px solid var(--outline); }
+.seg.wrapped button:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 .stepper { display: inline-flex; align-items: center; border-radius: var(--r-full); border: 1px solid var(--outline); background: var(--surface-2); height: var(--ctl-h); }
 .stepper button { width: 40px; height: 100%; border: 0; background: transparent; color: var(--on); cursor: pointer; font-size: 18px; }

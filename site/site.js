@@ -29,7 +29,7 @@ import { revealFocus } from '../src/renderer/ui/focus-reveal.js';
 
 const S = window.__SITE__ || {};
 const REL = window.__RELEASE__ || null;
-const NAV = [['home', 'Home', '主頁', 'home'], ['features', 'Features', '功能', 'auto_awesome'], ['docs', 'Docs', '說明文件', 'menu_book'], ['download', 'Download', '下載', 'download'], ['changelog', 'Changelog', '更新紀錄', 'update'], ['status', 'Status', '狀態', 'monitoring'], ['tools', 'Tools', '工具', 'construction'], ['settings', 'Settings', '設定', 'settings']];
+const NAV = [['home', 'Home', '主頁', 'home'], ['features', 'Features', '功能', 'apps'], ['docs', 'Docs', '說明文件', 'menu_book'], ['download', 'Download', '下載', 'download'], ['changelog', 'Changelog', '更新紀錄', 'update'], ['status', 'Status', '狀態', 'monitoring'], ['tools', 'Tools', '工具', 'construction'], ['settings', 'Settings', '設定', 'settings']];
 let current = 'home', currentArg = null, cleanup = null;
 const outlet = h('div.outlet#outlet', { tabindex: '-1', style: { overflow: 'visible' } });
 
@@ -97,13 +97,20 @@ const desktopOnly = (id) => () => h('div.page',
     h('a.btn', { href: '#/download' }, icon('download'), pair('Download for Windows', '下載 Windows 版')),
     h('a.btn.outline', { href: '#/tools' }, icon('construction'), pair('Tools that run here', '喺度用到嘅工具'))));
 
+/** Puts the real app into a page hero: the dark or light capture, whichever matches the theme. */
+function withShot(band) {
+  const alt = pair('Material Tailscale editing tailscale set preferences with rich controls, captured from the built app', '用豐富控制項編輯 tailscale set，由實際程式截圖');
+  band.classList.add('has-shot');
+  band.querySelector('.hero-art')?.replaceWith(h('div.hero-shot', ['dark', 'light'].map((th) => h(`img.shot-${th}`, { src: `screenshots/${th}-cli-set.png`, alt, width: 1440, height: 940, loading: 'eager', decoding: 'async' }))));
+  return band;
+}
+
 const LOCAL = {
   home: () => h('div.page',
-    pageHero(pair('Material Tailscale for Windows', 'Windows 版 Material Tailscale'), pair('Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。'), pair('A Material 3 Expressive desktop app for Windows that gives every Tailscale command, flag and admin setting a real control. This website is its landing, documentation, download and status page; the app itself runs on your computer.', 'Windows 上嘅 Material 3 桌面程式，將每個 Tailscale 指令、旗標同管理設定變成真正嘅控制項。呢個網站係主頁、文件、下載同狀態頁；程式喺你部電腦運行。'),
+    withShot(pageHero(pair('Material Tailscale for Windows', 'Windows 版 Material Tailscale'), pair('Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。'), pair('A Material 3 Expressive desktop app for Windows that gives every Tailscale command, flag and admin setting a real control. This website is its landing, documentation, download and status page; the app itself runs on your computer.', 'Windows 上嘅 Material 3 桌面程式，將每個 Tailscale 指令、旗標同管理設定變成真正嘅控制項。呢個網站係主頁、文件、下載同狀態頁；程式喺你部電腦運行。'),
       h('a.btn.big', { href: '#/download' }, icon('download'), pair('Download for Windows', '下載 Windows 版')), h('a.btn.outline.big', { href: '#/docs' }, icon('menu_book'), pair('Read the docs', '睇文件')), h('a.btn.text', { href: 'https://github.com/Ding-Ding-Projects/material-Tailscale' }, icon('code'), 'GitHub'),
-      heroStats([{ value: '93', label: pair('API operations', '個 API 操作') }, { value: '73', label: pair('commands', '個指令') }, { value: String(ARTICLES.length), label: pair('articles', '篇文章') }])),
+      heroStats([{ value: '93', label: pair('API operations', '個 API 操作') }, { value: '73', label: pair('commands', '個指令') }, { value: String(ARTICLES.length), label: pair('articles', '篇文章') }]))),
     download(),
-    h('figure.site-shot', h('img', { src: 'screenshots/dark-cli-set.png', alt: pair('Material Tailscale editing tailscale set preferences with rich controls, captured from the built app', '用豐富控制項編輯 tailscale set，由實際程式截圖'), loading: 'eager' })),
     h('h2', pair('What it covers', '包括乜嘢')), h('div.grid.stagger', FEATURE_CARDS.map(([ic, en, yue, d], i) => h('a.cmd-tile.span-3', { href: '#/features', style: { '--i': i } }, h('span.ico', icon(ic)), h('span', h('b', pair(en, yue)), h('div.small.muted', d))))),
     h('h2', pair('Screens from the real app', '實際程式截圖')), gallery()),
   features: () => h('div.page', pageHero(pair('Everything', '全部'), pair('Features', '功能'), pair('Each feature has its own article.', '每個功能都有自己嘅文章。')),

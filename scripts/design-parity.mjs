@@ -46,6 +46,13 @@ for (const s of inv.screens.filter((x) => x.surface === 'site')) {
 }
 await browser.close();
 
+// A page caught before it was drawn once produced a blank app capture (entrance animations that
+// never ticked). Capture mode now waits for an opaque page and records whether it got one;
+// refuse to write evidence from any capture that never rendered.
+const appManifest = JSON.parse(fs.readFileSync(path.join(appDir, 'capture-manifest.json'), 'utf8'));
+const unrendered = appManifest.captures.filter((c) => c.rendered === false).map((c) => c.route);
+if (unrendered.length) { console.error(`The app never finished drawing these routes, so no evidence was written: ${unrendered.join(', ')}`); process.exit(1); }
+
 // 4. Evidence per inventory entry.
 const label = (text, width) => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="56"><rect width="100%" height="100%" fill="#10131f"/><text x="18" y="36" font-family="sans-serif" font-size="22" font-weight="700" fill="#e6e8f2">${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</text></svg>`);
 for (const s of inv.screens) {

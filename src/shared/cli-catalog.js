@@ -187,7 +187,7 @@ const COMMANDS = [
 
   // ---- Exit nodes ----
   { id: 'exit-node-list', path: ['exit-node', 'list'], group: 'exit', title: 'List exit nodes', icon: 'list', desc: 'List the exit nodes this device can use.', flags: [f('filter', 'string', 'Only show exit nodes in this country.')] },
-  { id: 'exit-node-suggest', path: ['exit-node', 'suggest'], group: 'exit', title: 'Suggest exit node', icon: 'auto_awesome', desc: 'Ask Tailscale for the best exit node right now.' },
+  { id: 'exit-node-suggest', path: ['exit-node', 'suggest'], group: 'exit', title: 'Suggest exit node', icon: 'network_check', desc: 'Ask Tailscale for the best exit node right now.' },
 
   // ---- DNS ----
   { id: 'dns-status', path: ['dns', 'status'], group: 'dns', title: 'DNS status', icon: 'dns', output: 'json', desc: 'Local DNS forwarder and MagicDNS configuration.', flags: [f('json', 'bool', 'JSON output.', { default: true }), f('all', 'bool', 'Advanced debug output.')] },

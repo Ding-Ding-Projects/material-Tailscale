@@ -101,7 +101,7 @@ registerPage('home', (ctx) => {
   const trafficCard = h('section.card.span-5', { dataset: { el: 'home-traffic' } }, h('div.card-head', h('h2', pair('Live traffic', '即時流量')), infoBtn(pair('Live traffic', '即時流量'), pair('Bytes per second across all peers, computed from the change in counters between status polls.', '所有裝置每秒位元組，由輪詢之間嘅計數差計出。'))), chart.el);
   const chip = (name, tone = '') => h('span.ic' + (tone ? '.' + tone : ''), icon(name));
   const firstRun = [
-    h('section.card.span-6', { dataset: { el: 'home-preview' } }, h('div.card-head', chip('auto_awesome'), h('h2.h3', pair('What you will see here', '你會喺呢度見到乜'))),
+    h('section.card.span-6', { dataset: { el: 'home-preview' } }, h('div.card-head', chip('visibility'), h('h2.h3', pair('What you will see here', '你會喺呢度見到乜'))),
       h('p.muted', pair('Peers with their live path, traffic, exit nodes, routes, sharing, DNS, Tailnet Lock and every CLI command as a form.', '裝置同佢哋嘅即時路徑、流量、出口節點、路由、分享、DNS、Tailnet Lock，仲有每個 CLI 指令嘅表格。'))),
     h('section.card.span-6', { dataset: { el: 'home-explore' } }, h('div.card-head', chip('explore', 'alt'), h('h2.h3', pair('Prefer to look around first?', '想先周圍睇下？'))),
       h('p.muted', pair('Settings, tools and every command form work without Tailscale. Each form previews the exact command it would run.', '設定、工具同每個指令表格冇 Tailscale 都用得。每個表格都會預覽佢會行嘅指令。')),
@@ -120,13 +120,14 @@ export function peerCard(p, i = 0, { selectable, selected, onSelect } = {}) {
   const st = ts.peerPath(p);
   const card = h('article.peer-card' + (selected ? '.selected' : ''), { style: { '--i': i }, dataset: { el: 'peer-' + p.ID }, tabindex: '0' },
     selectable ? h('input.sel-box', { type: 'checkbox', checked: selected, 'aria-label': pair(`Select ${ts.peerName(p)}`, `揀 ${ts.peerName(p)}`), on: { change: (e) => onSelect(e.target.checked) } }) : null,
-    h('div.row.nowrap', h('span.ava', icon(ts.peerIcon(p))), h('div', { style: { flex: 1, minWidth: 0 } }, h('div.name', ts.peerName(p)), h('div.ip', ts.peerIp(p))), h('span.badge.' + (st === 'direct' ? 'ok' : st === 'relay' ? 'warn' : st === 'offline' ? 'err' : 'info'), t(st))),
+    // The more button sits in the header beside the path badge, so it never wraps onto a line of its own.
+    h('div.row.nowrap', h('span.ava', icon(ts.peerIcon(p))), h('div', { style: { flex: 1, minWidth: 0 } }, h('div.name', ts.peerName(p)), h('div.ip', ts.peerIp(p))), h('span.badge.' + (st === 'direct' ? 'ok' : st === 'relay' ? 'warn' : st === 'offline' ? 'err' : 'info'), t(st)),
+      h('button.icon-btn.sm', { 'aria-label': pair(`More actions for ${ts.peerName(p)}`, `${ts.peerName(p)} 嘅更多動作`), on: { click: (e) => peerMenu(e.currentTarget, p) } }, icon('more_vert'))),
     h('div.row', (p.Tags || []).map((tg) => h('span.chip', tg)), p.ExitNodeOption ? h('span.chip', icon('travel_explore'), pair('exit node', '出口節點')) : null, p.ExitNode ? h('span.badge.ok', pair('in use', '使用緊')) : null, p.OS ? h('span.chip', p.OS) : null),
     h('div.small.muted', `${pair('Last seen', '最後見到')} ${p.Online ? pair('now', '而家') : fmtAgo(p.LastSeen)} · ↓${fmtBytes(p.RxBytes)} ↑${fmtBytes(p.TxBytes)}${p.Relay ? ` · DERP ${p.Relay}` : ''}`),
     h('div.row', h('button.btn.small.outline', { on: { click: () => openDest('cli', 'ping:' + ts.peerName(p)) } }, icon('network_ping'), 'Ping'),
       h('button.btn.small.outline', { on: { click: () => window.mt.ts.terminal('ssh', { positionals: [ts.peerName(p)] }).catch((e) => toast(e.message, { kind: 'err' })) } }, icon('terminal'), 'SSH'),
-      h('button.btn.small.outline', { on: { click: () => openDest('taildrop', ts.peerName(p)) } }, icon('send'), pair('Send', '傳送')),
-      h('button.icon-btn.sm', { 'aria-label': pair('More actions', '更多動作'), on: { click: (e) => peerMenu(e.currentTarget, p) } }, icon('more_vert'))));
+      h('button.btn.small.outline', { on: { click: () => openDest('taildrop', ts.peerName(p)) } }, icon('send'), pair('Send', '傳送'))));
   card.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); peerMenu({ x: e.clientX, y: e.clientY }, p); });
   return card;
 }
@@ -225,7 +226,7 @@ registerPage('exit', () => {
     if (r.code === 0) { sound('connect'); toast(v ? pair(`Using exit node ${v}.`, `使用緊出口節點 ${v}。`) : pair('Exit node off.', '已關出口節點。'), { kind: 'ok' }); } else renderResult(h('div'), r, findCommand('set'));
     ts.poll();
   } } }, icon('check'), t('apply'));
-  const suggest = h('button.btn.tonal.big', { on: { click: async () => { const r = await ts.run('exit-node-suggest'); const line = (r.stdout || '').trim(); toast(line || r.stderr || pair('No suggestion.', '冇建議。'), { kind: r.code === 0 ? 'info' : 'err', title: pair('Suggested exit node', '建議出口節點'), sticky: true }); } } }, icon('auto_awesome'), pair('Suggest the best one', '建議最好嗰個'));
+  const suggest = h('button.btn.tonal.big', { on: { click: async () => { const r = await ts.run('exit-node-suggest'); const line = (r.stdout || '').trim(); toast(line || r.stderr || pair('No suggestion.', '冇建議。'), { kind: r.code === 0 ? 'info' : 'err', title: pair('Suggested exit node', '建議出口節點'), sticky: true }); } } }, icon('network_check'), pair('Suggest the best one', '建議最好嗰個'));
   const adv = switchCtl(!!ts.self()?.ExitNodeOption, { label: pair('Advertise this device as an exit node', '將呢部機宣告做出口節點') });
   adv.onChange(async (v) => { const r = await ts.run('set', { flags: { 'advertise-exit-node': v } }); if (r.code === 0) toast(v ? pair('This device is offered as an exit node. Approve it in the admin console.', '已宣告做出口節點，記得喺管理控制台批准。') : pair('No longer offered as an exit node.', '唔再做出口節點。'), { kind: 'ok' }); else renderResult(h('div'), r, findCommand('set')); });
   return h('div.page', head(pair('Routing', '路由'), t('exit'), pair('Send internet traffic through another device, a Mullvad location, or let Tailscale pick automatically.', '經另一部裝置、Mullvad 地點上網，或者畀 Tailscale 自動揀。'), suggest),

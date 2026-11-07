@@ -290,6 +290,7 @@ async function captureAll(dir) {
   await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(captureLang)}); true`);
   const clipping = [];
   const provenance = [];
+  const RENDERED = `(() => { for (const a of document.getAnimations()) { try { a.finish(); } catch { /* infinite */ } } const p = document.querySelector('.outlet .page'); if (!p || p.getBoundingClientRect().height < 40) return false; const first = p.firstElementChild; return !first || Number(getComputedStyle(first).opacity) > 0.98; })()`;
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge.
   const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 6 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ sw: el.scrollWidth, cw: el.clientWidth, text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
@@ -298,13 +299,19 @@ async function captureAll(dir) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {
       await openRoute(wc, d);
+      // Entrance animations end in their final state before the picture: a window that is not
+      // in front may never tick them, which once left a page at zero opacity in a capture. The
+      // page must be present and opaque; the manifest records it if it never was.
+      let rendered = false;
+      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED).catch(() => false)); i++) await wait(250);
+      await wait(80);
       if (process.env.MT_CAPTURE_CLIP) { const found = await wc.executeJavaScript(CLIP_PROBE).catch(() => []); if (found.length) clipping.push({ theme, dest: d, found }); }
       const img = await wc.capturePage();
       const file = `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`;
       const png = img.toPNG();
       fs.writeFileSync(path.join(dir, file), png);
       const vp = await wc.executeJavaScript('({ width: innerWidth, height: innerHeight, dpr: devicePixelRatio, lang: document.documentElement.lang, motion: document.documentElement.classList.contains("reduce-motion") ? "reduced" : "full" })').catch(() => ({}));
-      provenance.push({ file, route: d, theme, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: captureLang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
+      provenance.push({ file, route: d, theme, rendered, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: captureLang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
     }
   }
   if (process.env.MT_CAPTURE_PALETTE !== '0') {
