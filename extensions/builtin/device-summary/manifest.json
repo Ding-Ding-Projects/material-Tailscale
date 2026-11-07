@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "device-summary",
+  "name": { "en": "Device summary", "yue": "裝置摘要" },
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": { "en": "Copies a short Markdown summary of a device: names, addresses, system, state and tags, ready for a ticket or a chat.", "yue": "複製一段簡短嘅 Markdown 裝置摘要：名、位址、系統、狀態同標籤，啱晒貼落工單或者對話。" },
+  "author": "Material Tailscale",
+  "run": { "script": "main.js" },
+  "permissions": ["peer-details", "clipboard"],
+  "actions": [
+    { "id": "copy", "hook": "peer.action", "title": { "en": "Copy device summary", "yue": "複製裝置摘要" }, "icon": "summarize" }
+  ]
+}

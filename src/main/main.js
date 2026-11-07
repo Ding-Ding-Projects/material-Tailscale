@@ -12,6 +12,7 @@ const history = require('./history');
 const ladder = require('./ladder');
 const tools = require('./tools');
 const mc = require('./minecraft');
+const extensions = require('./extensions');
 const { COMMANDS, GROUPS, GLOBAL_FLAGS } = require('../shared/cli-catalog');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -163,6 +164,31 @@ handle('fs:writeText', async (p, text) => { fs.writeFileSync(p, text); return p;
 handle('fs:writeBytes', async (p, b64) => { fs.writeFileSync(p, Buffer.from(b64, 'base64')); return p; });
 handle('fs:readText', async (p) => { const st = fs.statSync(p); if (st.size > 32 * 1024 * 1024) throw new Error('File is larger than 32 MB.'); return fs.readFileSync(p, 'utf8'); });
 handle('fs:readBytes', async (p) => { const st = fs.statSync(p); if (st.size > 256 * 1024 * 1024) throw new Error('File is larger than 256 MB.'); return fs.readFileSync(p).toString('base64'); });
+// ---------- extensions ----------
+let extHost = null;
+const exts = () => extHost || (extHost = extensions.createHost({
+  dir: path.join(app.getPath('userData'), 'extensions'),
+  statePath: path.join(app.getPath('userData'), 'extensions-state.json'),
+  builtinDir: path.join(__dirname, '..', '..', 'extensions', 'builtin')
+}));
+let extPicked = null; // the folder chosen in the last Add dialog; a replace may only use that one
+handle('ext:list', () => exts().list());
+handle('ext:allow', (id, fp) => exts().allow(id, fp));
+handle('ext:setEnabled', (id, on) => exts().setEnabled(id, on));
+handle('ext:setMasterOff', (off) => exts().setMasterOff(off));
+handle('ext:remove', (id) => exts().remove(id));
+handle('ext:openFolder', () => { fs.mkdirSync(exts().folder, { recursive: true }); return shell.openPath(exts().folder); });
+handle('ext:run', (id, action, context) => exts().run(id, action, context));
+handle('ext:add', async (opts = {}) => {
+  if (!opts.replace) {
+    const r = await dialog.showOpenDialog(win, { title: 'Add an extension folder', properties: ['openDirectory'] });
+    if (r.canceled || !r.filePaths[0]) return { canceled: true };
+    extPicked = r.filePaths[0];
+  }
+  if (!extPicked) throw new Error('Choose the extension folder again.');
+  return exts().addFromFolder(extPicked, { replace: !!opts.replace });
+});
+
 handle('shell:external', (url) => { if (!/^https?:\/\//.test(url)) throw new Error('Only web links can be opened.'); return shell.openExternal(url); });
 handle('shell:openPath', (p) => shell.openPath(p));
 handle('shell:showItem', (p) => shell.showItemInFolder(p));
@@ -243,7 +269,7 @@ async function captureAll(dir) {
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge.
   const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 6 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ sw: el.scrollWidth, cw: el.clientWidth, text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
-  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,converter,regex,draw,ollama,minecraft,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
+  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,converter,regex,draw,ollama,minecraft,extensions,extensions>overlay@ext-consent,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {
@@ -311,6 +337,7 @@ async function recordPath(dir) {
 if (process.env.MT_CAPTURE_DIR && process.env.MT_CAPTURE_SCALE) app.commandLine.appendSwitch('force-device-scale-factor', process.env.MT_CAPTURE_SCALE);
 
 app.whenReady().then(() => {
+  try { exts().installBuiltins(); } catch (e) { console.error('Built-in extensions were not installed:', e.message); }
   createWindow();
   if (process.env.MT_SWEEP_DIR) { win.webContents.once('did-finish-load', async () => { try { win.focus(); win.webContents.focus(); await require('./sweep.js').runSweep(win, process.env.MT_SWEEP_DIR); } catch (e) { console.error('sweep failed:', e); } app.quit(); }); return; }
   if (process.env.MT_RECORD_DIR) { win.setSize(1440, 900); win.webContents.once('did-finish-load', () => recordPath(process.env.MT_RECORD_DIR)); return; }

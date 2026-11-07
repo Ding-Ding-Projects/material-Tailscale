@@ -86,7 +86,8 @@ const DESKTOP_ONLY = {
   converter: pair('It converts files on your computer with the bundled ffmpeg and 7-Zip.', '佢用內置嘅 ffmpeg 同 7-Zip 喺你部電腦度轉換檔案。'),
   ollama: pair('It manages the Ollama models installed on your computer.', '佢管理你部電腦度嘅 Ollama 模型。'),
   minecraft: pair('It creates and runs game servers on your computer, in Docker or over SSH.', '佢喺你部電腦、Docker 或者 SSH 度建立同運行遊戲伺服器。'),
-  console: pair('It runs tailscale commands on your computer.', '佢喺你部電腦度執行 tailscale 指令。')
+  console: pair('It runs tailscale commands on your computer.', '佢喺你部電腦度執行 tailscale 指令。'),
+  extensions: pair('It runs programs you add on your computer, so it lives in the desktop app. How to write one is in the docs.', '佢喺你部電腦度執行你加入嘅程式，所以喺桌面版入面。點樣寫一個就睇說明文件。')
 };
 const desktopOnly = (id) => () => h('div.page',
   pageHero(pair('Desktop app', '桌面版'), DESKTOP_ONLY[id] ? t(id) : pair('In the desktop app', '喺桌面版入面'), `${DESKTOP_ONLY[id] || pair('This page manages Tailscale on your computer, so it lives in the desktop app.', '呢頁管理你部電腦嘅 Tailscale，所以喺桌面版入面。')} ${pair('The website shows everything that can run safely in a browser.', '網站只放可以安全喺瀏覽器運行嘅嘢。')}`,

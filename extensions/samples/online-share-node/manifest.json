@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "online-share-node",
+  "name": "Online share",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample extension in JavaScript, run by the app's own runtime: a Diagnostics check that warns when fewer than half of the devices are online.",
+  "author": "Material Tailscale samples",
+  "run": { "script": "main.js" },
+  "permissions": ["tailnet-status"],
+  "actions": [
+    { "id": "share", "hook": "status.check", "title": "Online share", "icon": "pie_chart" }
+  ]
+}

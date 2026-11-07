@@ -1292,6 +1292,91 @@
       ]
     },
     {
+      "id": "extensions",
+      "reference": "design/canvas/Extensions.dc.html",
+      "view": "extensions",
+      "referenceRoute": "dcref://board/Extensions.dc.html?view=extensions&theme=dark",
+      "appRoute": "extensions",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "switch (src/renderer/ui/controls.js switchCtl)",
+          "badge (app.css .badge)",
+          "search field with regex builder (src/renderer/ui/regex.js regexField)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/extensions/reference.webp",
+        "app": "docs/design-parity/captures/extensions/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/extensions/side-by-side.webp",
+      "diff": "docs/design-parity/captures/extensions/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows the four built-in extensions waiting for permission; the design shows two on, one waiting and one off, with recent runs.",
+          "reason": "No extension has been allowed on the capture machine, which starts from a fresh profile; the design shows the states a returning user sees.",
+          "approved": "Reviewed 2026-11-07: environment state, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "extensions-consent",
+      "reference": "design/canvas/Extensions.dc.html",
+      "view": "extensions-consent",
+      "referenceRoute": "dcref://board/Extensions.dc.html?view=extensions-consent&theme=dark",
+      "appRoute": "extensions>overlay@ext-consent",
+      "surface": "app",
+      "state": "Permission review",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "dialog (src/renderer/ui/overlay.js dialog)",
+          "list item (mesh2.css .consent-list)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/extensions-consent/reference.webp",
+        "app": "docs/design-parity/captures/extensions-consent/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/extensions-consent/side-by-side.webp",
+      "diff": "docs/design-parity/captures/extensions-consent/diff.json",
+      "deviations": [
+        {
+          "what": "The real app reviews the first extension waiting for permission (Device summary, which asks for the clipboard); the design reviews Web page (which asks to open links).",
+          "reason": "The capture opens the review for the first waiting extension in alphabetical order.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
       "id": "settings-appearance",
       "reference": "design/canvas/Settings.dc.html",
       "view": "settings-appearance",

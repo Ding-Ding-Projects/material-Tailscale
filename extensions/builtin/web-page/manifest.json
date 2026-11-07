@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "web-page",
+  "name": { "en": "Web page", "yue": "網頁" },
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": { "en": "Opens a device's own web page (http on port 80) through its MagicDNS name, for routers, NAS boxes and self-hosted apps.", "yue": "用 MagicDNS 名打開裝置自己嘅網頁（http，80 埠），啱用嚟開路由器、NAS 同自己架設嘅程式。" },
+  "author": "Material Tailscale",
+  "run": { "script": "main.js" },
+  "permissions": ["peer-details", "open-url"],
+  "actions": [
+    { "id": "open", "hook": "peer.action", "title": { "en": "Open web page", "yue": "打開網頁" }, "icon": "open_in_browser" }
+  ]
+}

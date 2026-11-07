@@ -30,6 +30,7 @@ export const DESTS = [
   { id: 'draw', icon: 'draw', rail: false },
   { id: 'ollama', icon: 'smart_toy', rail: false },
   { id: 'minecraft', icon: 'grass', rail: false },
+  { id: 'extensions', icon: 'extension', rail: false },
   { id: 'docs', icon: 'menu_book', rail: true },
   { id: 'status', icon: 'monitoring', rail: false },
   { id: 'history', icon: 'history', rail: false },

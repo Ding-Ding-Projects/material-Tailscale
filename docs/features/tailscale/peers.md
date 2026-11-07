@@ -2,7 +2,7 @@
 
 ## Behaviour
 
-The Peers destination lists every device on your tailnet from `tailscale status --json`, refreshed every few seconds. Each card shows the device name, Tailscale IPs, operating system, tags, whether it is an exit node, traffic in and out, last-seen time, and its path: **direct** (a peer-to-peer connection), **relayed** (through a DERP relay), **idle** or **offline**. Cards and the table view share one search box with a regex option, a connection filter, multi-select with select-all, invert and bulk ping, copy IPs and export. Right-click any device for copy, ping, whois, SSH, Taildrop, use as exit node, open in a new tab or raw details.
+The Peers destination lists every device on your tailnet from `tailscale status --json`, refreshed every few seconds. Each card shows the device name, Tailscale IPs, operating system, tags, whether it is an exit node, traffic in and out, last-seen time, and its path: **direct** (a peer-to-peer connection), **relayed** (through a DERP relay), **idle** or **offline**. Cards and the table view share one search box with a regex option, a connection filter, multi-select with select-all, invert and bulk ping, copy IPs and export. Right-click any device for copy, ping, whois, SSH, Taildrop, use as exit node, open in a new tab or raw details; actions from extensions you allowed (such as Copy SSH command or Open web page) follow, separated by a line (see [Extensions](../extensions/extensions.md)).
 
 ## Configuration
 

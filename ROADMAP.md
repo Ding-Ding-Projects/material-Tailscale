@@ -73,6 +73,8 @@
 - [x] Fixed at the source: icon names read aloud, nested controls in menus and the palette, tab list holding buttons, unnamed popovers, dialogs that let Tab leave, missing focus rings, skipped heading levels, sideways scrolling on narrow windows, an unreachable Settings list on short windows, light-theme contrast, desktop-only website routes
 - [x] Windows title bar keeps the system caption buttons through the title-bar overlay (Snap layouts), with overlay colours that follow the theme through validated IPC
 - [ ] Title-bar overlay and Snap layouts seen on a real Windows desktop (the build workspace is Linux, where the app draws its own buttons)
+- [x] Extensions: manifest version 1, any-language JSON protocol over standard input and output, permissions with a review before first run and after every change, an allow-list of what reaches an extension, a clean environment, a five-second limit and a 64 KiB answer limit, checked answers, a manager with search and a master switch, device-menu actions and Diagnostics checks, four built-in extensions, an authoring guide with samples, and tests that run real extension processes
+- [ ] Extension actions seen in a populated device menu (needs a Tailscale daemon with peers on the capture machine)
 - [ ] Populated tailnet states in parity captures (needs a Tailscale daemon on the capture machine)
 - [ ] Dedicated build GUI companion (portable executable that drives build.bat and build-installer.bat)
 

@@ -174,3 +174,30 @@
 .md li { margin: 4px 0; }
 .md li > a, .md li > p > a { display: inline-block; min-height: 24px; line-height: 24px; }
 .md .md-table { max-height: none; margin: 8px 0; }
+
+/* ===== Extensions ===== */
+.ext-card { display: flex; flex-direction: column; gap: 12px; }
+.ext-head { align-items: center; gap: 12px; }
+.ext-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ext-title h2 { margin: 0; overflow-wrap: anywhere; }
+.ext-title .mono { overflow-wrap: anywhere; }
+.ext-adds, .ext-perms, .ext-runs, .ext-errors { gap: 6px; }
+.ext-line { display: flex; align-items: flex-start; gap: 10px; font-size: calc(13px * var(--text-scale)); color: var(--on-2); overflow-wrap: anywhere; }
+.ext-line > .msr { font-size: 18px; color: var(--primary); flex: none; margin-top: 1px; }
+.ext-line code { font: 600 12px var(--font-mono); color: var(--on); }
+.ext-errors ul { margin: 0; padding-left: 18px; }
+.ext-runs .dot-live, .ext-checks .dot-live { animation: none; }
+.ext-master .row { align-items: center; gap: 14px; }
+.ext-master > p { margin: 12px 0 0; }
+.ext-waiting .row { gap: 12px; }
+.ext-write .row { align-items: center; gap: 14px; }
+.ext-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.addon-tile { background: linear-gradient(120deg, var(--surface-2), color-mix(in oklab, var(--primary-cont) 55%, var(--surface-2))); }
+.consent h3 { margin: 6px 0 0; }
+.consent-list, .consent-never, .consent-adds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.consent-list li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px; border-radius: var(--r-m); background: var(--surface-2); }
+.consent-list li > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.consent-list li .badge { align-self: flex-start; margin-top: 4px; }
+.consent-list li > .msr, .consent-adds li > .msr { color: var(--primary); flex: none; }
+.consent-never li, .consent-adds li { display: flex; gap: 10px; align-items: center; font-size: calc(13px * var(--text-scale)); color: var(--on-2); }
+.consent-never li > .msr { color: var(--error); font-size: 18px; flex: none; }

@@ -77,6 +77,11 @@ One article per feature. The app bundles all of them into its offline docs brows
 - [Ollama](features/tools/ollama.md)
 - [Minecraft versions](features/tools/minecraft.md)
 
+## Extensions
+
+- [Extensions](features/extensions/extensions.md)
+- [Writing extensions](features/extensions/writing-extensions.md)
+
 ## Build, install and release
 
 - [Automatic updates and installer](features/release/updates.md)

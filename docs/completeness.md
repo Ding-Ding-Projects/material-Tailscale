@@ -57,7 +57,11 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Website with every feature | n/a | yes | site/ | — | — |
 | Social preview | yes | yes | social-preview.png | — | — |
 
-Gaps are tracked as unchecked items in ROADMAP.md.
 | End-to-end recording | yes | n/a | scripts/record.mjs | README.md | docs/recording/end-to-end.gif |
 | Clipping matrix | yes | n/a | scripts/clip-matrix.mjs | README.md | out/clipping (not committed) |
 | Postman collection | n/a | n/a | scripts/gen-postman.mjs | docs/api/ | — |
+| Extensions: manager, permission review, built-in extensions, any-language protocol | yes | n/a (runs programs; the articles are on the site) | main/extensions.js, ui/extensions-client.js, pages/extensions.js, extensions/ | features/extensions/extensions.md, features/extensions/writing-extensions.md | dark-extensions.png, dark-extensions-overlayext-consent.png |
+| Every-surface sweep (release check) | yes | yes | scripts/sweep.mjs, main/sweep.js, shared/sweep-probes.js | features/appearance/every-surface-sweep.md | docs/sweep/summary.md |
+| Windows title bar with system caption buttons (Snap layouts) | yes (Windows) | n/a | main.js titleBarOverlay, ui/shell.js | features/appearance/window-and-navigation.md | windows-title-bar.png on each release |
+
+Gaps are tracked as unchecked items in ROADMAP.md.

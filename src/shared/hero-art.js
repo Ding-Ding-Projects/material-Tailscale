@@ -72,6 +72,12 @@ const ART = {
     <path class="g" d="M50 60 H290 M50 104 H290 M50 148 H290" opacity=".45"/>
     <g class="float"><circle class="n" cx="120" cy="60" r="14"/></g><g class="float d2"><circle class="n alt" cx="222" cy="104" r="14"/></g><g class="float d3"><circle class="n warm" cx="160" cy="148" r="14"/></g>
     <path class="l" d="M50 60 H106 M50 104 H208 M50 148 H146"/>`),
+  extensions: wrap(`
+    <path class="l" d="M86 128 L170 96 L254 128"/><path class="l alt" d="M170 96 V44"/>
+    <circle class="soft pulse" cx="170" cy="96" r="26"/><circle class="solid" cx="170" cy="96" r="12"/>
+    <g class="float"><path class="n alt" d="M62 112 h18 a8 8 0 1 1 16 0 h18 v18 a8 8 0 1 1 0 16 v18 h-52 Z"/></g>
+    <g class="float d2"><path class="n warm" d="M228 112 h52 v52 h-18 a8 8 0 1 0 -16 0 h-18 v-18 a8 8 0 1 0 0 -16 Z"/></g>
+    <g class="float d3"><path class="n" d="M146 20 h48 v14 a8 8 0 1 1 0 16 v14 h-48 v-14 a8 8 0 1 0 0 -16 Z"/></g>`),
   library: wrap(`
     <g class="float d3"><rect class="n" x="96" y="40" width="150" height="120" rx="16" opacity=".6" transform="rotate(-8 170 100)"/></g>
     <g class="float d2"><rect class="n alt" x="96" y="40" width="150" height="120" rx="16" transform="rotate(4 170 100)"/></g>
@@ -89,7 +95,7 @@ const FAMILY = {
   dns: 'dns', diagnostics: 'diagnostics',
   cli: 'command', console: 'command', admin: 'admin',
   tools: 'tools', authenticator: 'security', base64: 'tools', converter: 'tools', regex: 'tools', draw: 'tools', ollama: 'tools',
-  minecraft: 'minecraft', settings: 'settings',
+  minecraft: 'minecraft', settings: 'settings', extensions: 'extensions',
   docs: 'library', changelog: 'library', history: 'library', about: 'library'
 };
 

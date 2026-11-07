@@ -14,6 +14,7 @@
 - **93 admin API operations** generated from Tailscale's OpenAPI specification: devices, policy file, auth keys, DNS, users, tailnet settings, webhooks, logs and streaming, services, posture, invites, contacts, OAuth apps and organisations.
 - Bespoke pages for peers, exit nodes, subnet routes, Serve and Funnel, Taildrop, MagicDNS, Tailnet Lock, Taildrive, certificates, accounts and diagnostics.
 - English, Hong Kong Cantonese or both; Ctrl+Shift+F command palette; regex builder on every search; appearance editor on every element; locks, authenticator, local Git history, exports in every format, and full accessibility tools.
+- **Extensions in any language** add actions to every device and checks to Diagnostics. Each one waits for your permission, sees only what you allow (never keys or tokens), and is stopped after five seconds; four built-in extensions come with the app ([how to write one](docs/features/extensions/writing-extensions.md)).
 
 The installer is **unsigned**. Windows SmartScreen may warn about an unknown publisher; choose *More info* then *Run anyway*. Material Tailscale is independent and not affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.
 
@@ -30,6 +31,7 @@ Captured from the built app by `npm run screenshots` (Electron, both themes). Ta
 | ![tailscale set, dark](docs/screenshots/dark-cli-set.png) | ![Serve and Funnel target builder, dark](docs/screenshots/dark-cli-serve.png) |
 | ![Admin console, light](docs/screenshots/light-admin.png) | ![Settings, light](docs/screenshots/light-settings.png) |
 | ![Exit nodes, light](docs/screenshots/light-exit.png) | ![Command palette, light](docs/screenshots/light-palette.png) |
+| ![Extensions manager, dark](docs/screenshots/dark-extensions.png) | ![Allowing an extension, dark](docs/screenshots/dark-extensions-overlayext-consent.png) |
 
 All captures: [docs/screenshots](docs/screenshots).
 
@@ -149,10 +151,13 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - A dim sum surprise and app-logo presets.
 - A personal-vocabulary JSON can be dropped on the window. It stays on the device.
 - Destructive actions need a super confirmation. Notices never block work, and a failed operation offers a copyable help request.
+- Extension support tailored to the app: a versioned manifest per extension folder, a language-neutral out-of-process protocol, declared permissions with consent before first use and after any change, limits on time and answer size, no sensitive values handed over, a searchable manager with a master switch, useful built-in extensions, a public authoring article with runnable samples, and tests and screenshots as proof.
+- On Windows, a frameless title bar keeps the system minimise, maximise and close buttons through the title-bar overlay, so Snap layouts keep working, and the overlay colours follow the theme through validated messages.
 
 **Design and evidence**
 - A checked-in design reference has a plain viewer, a hand-written per-screen parity inventory, side-by-side and diff evidence, and a negative test.
 - Screenshots and recordings come from the real built app. They are inspected, carry provenance, and contain no private data.
+- Before every release, an automated sweep opens every state, dialog, menu, overlay and website page in both themes, every language mode and four window sizes (phone, tablet, a 1080p screen at 200 percent, desktop), and reports console errors and blocked content, accessibility violations (WCAG 2.2 AA and best practices), clipped, off-screen and overlapping text, and keyboard-focus problems. A release needs zero findings, each fixed at its source, followed by fresh screenshots and an honest before and after score on the design canvas.
 
 **Safety and privacy**
 - Never expose secrets or personal data in source, logs, exports, captures or public records.

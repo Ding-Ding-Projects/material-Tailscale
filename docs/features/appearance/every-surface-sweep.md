@@ -4,8 +4,8 @@
 
 Before a release, an automated sweep opens every surface of the app and of the website and reports what eyes skip:
 
-- **App:** every page, every Settings section, the command palette, the setup wizard, the super confirmation, the unlock ladder, toasts, the New tab catalogue, a context menu with live values, both tabs of the appearance editor, and the Minecraft dialogs (56 surfaces).
-- **Website:** every page, every Settings section the website offers, and every bundled article (80 pages).
+- **App:** every page, every Settings section, the command palette, the setup wizard, the super confirmation, the unlock ladder, toasts, the New tab catalogue, a context menu with live values, both tabs of the appearance editor, the Minecraft dialogs, and the extensions manager with its permission review (58 surfaces).
+- **Website:** every page, every Settings section the website offers, and every bundled article (84 pages).
 - **Each in:** dark and light themes; English, Cantonese and bilingual modes; and four window sizes: desktop (1440 by 940), a 1080p screen at 200 percent (960 by 540), tablet (820 by 1180) and phone (390 by 844).
 
 For each surface and combination it records:

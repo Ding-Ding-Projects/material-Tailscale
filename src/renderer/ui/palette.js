@@ -12,6 +12,7 @@ import { ARTICLES } from '../docs-bundle.js';
 import { liveOption } from './live-options.js';
 import { settingLive } from './setting-live.js';
 import { announce, holdFocus } from './overlay.js';
+import { current as extensionsState, refresh as refreshExtensions, actionsFor as extensionActions, loc as extLoc } from './extensions-client.js';
 
 let open = null;
 let apiOps = [];
@@ -40,6 +41,14 @@ function entries() {
   for (const c of COMMANDS) {
     out.push({ group: pair('Commands', '指令'), title: pair(c.title, YUE_TITLES[c.id]), sub: 'tailscale ' + c.path.join(' '), icon: c.icon || 'terminal', run: () => openDest('cli', c.id) });
     for (const f of c.flags || []) out.push({ group: pair('Flags', '旗標'), title: `--${f.name}`, sub: `tailscale ${c.path.join(' ')} · ${f.desc}`, icon: 'flag', run: () => teleport(`[data-el="cmd-${c.id}-flag-${f.name}"]`, 'cli', c.id) });
+  }
+  if (window.mt?.ext) {
+    const g = t('extensions');
+    out.push({ group: g, title: pair('Add an extension from a folder', '由資料夾加入擴充功能'), sub: 'extensions', icon: 'create_new_folder', run: () => teleport('[data-el="ext-add"]', 'extensions') });
+    out.push({ group: g, title: pair('Open the extensions folder', '打開擴充功能資料夾'), sub: 'extensions', icon: 'folder_open', run: () => window.mt.ext.openFolder() });
+    out.push({ group: g, title: pair('Extensions can run', '擴充功能可以執行'), sub: pair('Turn every extension off or on at once', '一次過開關所有擴充功能'), icon: 'power_settings_new', run: () => teleport('[data-el="ext-master"]', 'extensions'),
+      live: { kind: 'switch', get: () => !extensionsState().masterOff, set: (on) => window.mt.ext.setMasterOff(!on).then(() => refreshExtensions()) } });
+    for (const { ext, action } of extensionActions('peer.action')) out.push({ group: g, title: `${extLoc(ext.manifest.name)}: ${extLoc(action.title)}`, sub: pair('On a device: open Peers and use its menu', '用喺裝置：打開裝置頁再用佢嘅選單'), icon: action.icon || 'extension', run: () => openDest('peers') });
   }
   for (const op of apiOps) out.push({ group: pair('Admin API', '管理 API'), title: op.summary, sub: `${op.method} ${op.path}`, icon: 'api', run: () => { openDest('admin', 'Everything'); } });
   for (const s of SETTINGS_INDEX) out.push({ group: t('settings'), title: pair(s.en, s.yue), sub: s.help, icon: 'tune', live: settingLive(s.key)?.live, run: () => teleport(`[data-el="set-${s.key}"]`, 'settings', s.section) });

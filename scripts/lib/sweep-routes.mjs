@@ -15,6 +15,7 @@ export const APP_ROUTES = [
   'cli', 'cli:set', 'cli:set>Guide me', 'cli:serve', 'admin', 'console',
   'tools', 'authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama',
   'minecraft', 'minecraft>New server', 'minecraft>Discover and adopt',
+  'extensions', 'extensions>overlay@ext-consent',
   'docs', 'status', 'history', 'changelog', 'notifications', 'about',
   ...SETTINGS.map((s) => `settings:${s}`),
   'home>overlay@palette', 'home>overlay@onboarding', 'home>overlay@confirm', 'home>overlay@ladder', 'home>overlay@toasts',
@@ -28,7 +29,7 @@ export function siteRoutes(root) {
   const articles = JSON.parse(bundle.match(/export const ARTICLES = (\[.*?\]);\n/s)[1]).map((a) => a.path);
   return [
     'home', 'features', 'docs', 'download', 'changelog', 'status', 'tools',
-    'authenticator', 'base64', 'converter', 'regex', 'draw',
+    'authenticator', 'base64', 'converter', 'regex', 'draw', 'extensions',
     ...SETTINGS.filter((s) => !['tailscale', 'data', 'about'].includes(s)).map((s) => `settings/${s}`),
     ...articles.map((p) => `docs/${encodeURIComponent(p)}`)
   ];

@@ -128,6 +128,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .chip.choice[aria-pressed="true"] { background: var(--primary-cont); border-color: var(--primary); }
 .chip.mono { font-family: var(--font-mono); }
 .badge { padding: 3px 10px; border-radius: 10px; font: 600 11px var(--font-body); white-space: nowrap; }
+.badge:has(> .msr) { display: inline-flex; align-items: center; gap: 4px; padding-left: 7px; }
+.badge > .msr { font-size: 14px; line-height: 1; }
 .badge.ok { background: var(--secondary-cont); color: var(--on-secondary-cont); }
 .badge.warn { background: var(--tertiary-cont); color: var(--tertiary); }
 .badge.err { background: var(--error-cont); color: var(--error); }
@@ -321,6 +323,8 @@ textarea.input { height: auto; min-height: 120px; padding: 12px 14px; resize: ve
 .md h1 { font-size: 32px; margin: 0 0 12px; } .md h2 { margin: 24px 0 8px; font-size: 22px; } .md h3 { margin: 18px 0 6px; }
 .md pre { background: var(--bg); padding: 12px; border-radius: var(--r-m); overflow: auto; border: 1px solid var(--outline-soft); }
 .md code { background: var(--surface-3); padding: 1px 6px; border-radius: 6px; font-size: .92em; }
+/* A long command or JSON written inline breaks at any character rather than running off a phone screen. */
+.md :not(pre) > code { overflow-wrap: anywhere; }
 .md pre code { background: transparent; padding: 0; }
 .md table { border-collapse: collapse; } .md td, .md th { border: 1px solid var(--outline); padding: 6px 10px; }
 .md blockquote { margin: 0; padding: 8px 14px; border-radius: var(--r-m); background: var(--surface-2); }

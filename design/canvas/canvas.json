@@ -109,9 +109,18 @@
       "expand": "fill",
       "is_interactive": true
     },
-    "Settings.dc.html": {
+    "Extensions.dc.html": {
       "x": 3040,
       "y": 4860,
+      "w": 1440,
+      "h": 1500,
+      "title": "Extensions: manager and permission review",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Settings.dc.html": {
+      "x": 0,
+      "y": 6480,
       "w": 1440,
       "h": 1300,
       "title": "Settings",
@@ -119,7 +128,7 @@
       "is_interactive": true
     },
     "Library.dc.html": {
-      "x": 0,
+      "x": 1520,
       "y": 6480,
       "w": 1440,
       "h": 1400,
@@ -128,7 +137,7 @@
       "is_interactive": true
     },
     "Overlays.dc.html": {
-      "x": 1520,
+      "x": 3040,
       "y": 6480,
       "w": 1440,
       "h": 1300,
@@ -137,8 +146,8 @@
       "is_interactive": true
     },
     "Landing.dc.html": {
-      "x": 3040,
-      "y": 6480,
+      "x": 0,
+      "y": 8000,
       "w": 1440,
       "h": 1500,
       "title": "Website · landing, docs and download",
@@ -147,7 +156,7 @@
     },
     "Sweep.dc.html": {
       "x": 0,
-      "y": 8100,
+      "y": 9620,
       "w": 1440,
       "h": 1500,
       "title": "Every-surface sweep · before and after",
@@ -167,6 +176,7 @@
     "Tools.dc.html",
     "Minecraft.dc.html",
     "WorldGenerator.dc.html",
+    "Extensions.dc.html",
     "Settings.dc.html",
     "Library.dc.html",
     "Overlays.dc.html",

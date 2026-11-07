@@ -20,6 +20,8 @@ import { runMcSchedules } from './pages/minecraft.js';
 import { runSchedules } from './core/schedules.js';
 import { SETTINGS_INDEX } from './pages/settings-index.js';
 import './pages/meta.js';
+import './pages/extensions.js';
+import * as extensions from './ui/extensions-client.js';
 import { settingLive } from './ui/setting-live.js';
 import { watchScrollRegions } from './ui/scroll-focus.js';
 import { revealFocus } from './ui/focus-reveal.js';
@@ -185,6 +187,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   new MutationObserver(() => applyLocks()).observe(document.getElementById('outlet'), { childList: true, subtree: true });
   applyLocks();
   ts.startPolling();
+  extensions.refresh();
   runSchedules(); setInterval(runSchedules, 30000);
   setInterval(() => runMcSchedules().catch(() => {}), 30000);
   window.addEventListener('mt:palette', openPalette);
@@ -206,6 +209,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
     if (kind === 'onboarding') { onboarding(); return true; }
     if (kind === 'confirm') { const { superConfirm } = await import('./ui/safety.js'); superConfirm({ action: pair('Log out of this tailnet', '登出呢個 tailnet'), affects: pair('This device leaves the tailnet until you log in again.', '呢部機會離開 tailnet，直到你再登入。') }); return true; }
     if (kind === 'ladder') { const { ladder } = await import('./ui/locks.js'); ladder(arg || 'capture-sample'); return true; }
+    if (kind === 'ext-consent') { const c = await extensions.refresh(); const item = c.items.find((i) => i.valid && i.consent !== 'granted' && (!arg || i.id === arg)) || c.items.find((i) => i.valid); if (!item) return false; extensions.reviewConsent(item); return true; }
     if (kind === 'toasts') { toast(pair('Connected to your tailnet.', '已連線到你嘅 tailnet。'), { kind: 'ok' }); toast(pair('tailscale up failed: exit code 1.', 'tailscale up 失敗：結束碼 1。'), { kind: 'err' }); return true; }
     return false;
   };

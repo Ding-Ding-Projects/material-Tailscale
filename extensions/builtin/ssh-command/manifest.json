@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "ssh-command",
+  "name": { "en": "SSH command", "yue": "SSH 指令" },
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": { "en": "Copies a ready-to-paste Tailscale SSH command for a device.", "yue": "複製一條可以直接貼上嘅 Tailscale SSH 指令。" },
+  "author": "Material Tailscale",
+  "run": { "script": "main.js" },
+  "permissions": ["peer-details", "clipboard"],
+  "actions": [
+    { "id": "copy", "hook": "peer.action", "title": { "en": "Copy SSH command", "yue": "複製 SSH 指令" }, "icon": "terminal" }
+  ]
+}

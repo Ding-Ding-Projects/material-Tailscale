@@ -24,6 +24,7 @@ Every push to `main` publishes the next release. A section headed "Unreleased" i
 - Light-theme success and danger buttons and badges meet the contrast minimum.
 - Toasts wait while they have keyboard focus or the pointer, at most three stay on screen (fewer on short windows), and focus goes back where it came from when one leaves. Keyboard focus always brings the focused control into view, including read-only output boxes, and long button labels wrap inside the button instead of running off a phone screen.
 - Website routes for desktop-only tools explain that the tool is in the desktop app instead of failing to render.
+- Extensions: small programs in any language add actions to every device's menu and checks to Diagnostics. A manager (Tools > Extensions) lists each one with its state, what it adds, what it may see or do, its recent runs and any manifest problems, and has a switch that stops them all. New and changed extensions stay off until you review exactly what they ask for; they never receive keys, tokens, e-mail addresses or vault contents, start with a clean environment, are stopped after five seconds, and have their answers checked. Four built-in extensions come with the app: SSH command, Device summary, Web page and Tailnet health. The docs include an authoring guide with Python, PowerShell and JavaScript samples.
 
 ## v1.0.12 · 2026-11-07 · Crab Roe Siu Mai · 蟹籽燒賣 · cd93523
 

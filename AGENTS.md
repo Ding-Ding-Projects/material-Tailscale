@@ -26,6 +26,8 @@ a step, not a habit.
 - Refresh the admin API catalogue with `npm run gen:api -- --fetch`.
 - Every user-facing change updates the matching article in `docs/features/`, `ROADMAP.md` and `HANDOFF.md` in the same commit.
 - Capture real screenshots with `npm run screenshots` (`MT_CAPTURE_DIR` required) after interface changes.
+- Before a release, run the every-surface sweep (`npm run build && node scripts/build-site.mjs`, then `node scripts/sweep.mjs`, under `xvfb-run` on Linux); it must report zero findings. `--resume` continues an interrupted run against the same build. Record the result with `node scripts/sweep-history.mjs`.
+- Extensions: the host is `src/main/extensions.js` (with `src/shared/extension-api.js` for the protocol), the built-ins are in `extensions/builtin`, samples in `extensions/samples`, and `test/extensions.test.mjs` runs real extension processes. A protocol change bumps `API_VERSION` and updates `docs/features/extensions/writing-extensions.md`.
 - Never add code signing. Never force-push.
 
 ## Shared instructions (sanitised mirror)
@@ -63,10 +65,13 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - A dim sum surprise and app-logo presets.
 - A personal-vocabulary JSON can be dropped on the window. It stays on the device.
 - Destructive actions need a super confirmation. Notices never block work, and a failed operation offers a copyable help request.
+- Extension support tailored to the app: a versioned manifest per extension folder, a language-neutral out-of-process protocol, declared permissions with consent before first use and after any change, limits on time and answer size, no sensitive values handed over, a searchable manager with a master switch, useful built-in extensions, a public authoring article with runnable samples, and tests and screenshots as proof.
+- On Windows, a frameless title bar keeps the system minimise, maximise and close buttons through the title-bar overlay, so Snap layouts keep working, and the overlay colours follow the theme through validated messages.
 
 **Design and evidence**
 - A checked-in design reference has a plain viewer, a hand-written per-screen parity inventory, side-by-side and diff evidence, and a negative test.
 - Screenshots and recordings come from the real built app. They are inspected, carry provenance, and contain no private data.
+- Before every release, an automated sweep opens every state, dialog, menu, overlay and website page in both themes, every language mode and four window sizes (phone, tablet, a 1080p screen at 200 percent, desktop), and reports console errors and blocked content, accessibility violations (WCAG 2.2 AA and best practices), clipped, off-screen and overlapping text, and keyboard-focus problems. A release needs zero findings, each fixed at its source, followed by fresh screenshots and an honest before and after score on the design canvas.
 
 **Safety and privacy**
 - Never expose secrets or personal data in source, logs, exports, captures or public records.

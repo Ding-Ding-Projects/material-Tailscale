@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "hello-python",
+  "name": "Hello from Python",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample extension in Python: greets a device by name. Needs Python 3 on the PATH (on Windows, the python.org installer or the Microsoft Store).",
+  "author": "Material Tailscale samples",
+  "run": { "command": ["python", "main.py"] },
+  "permissions": ["peer-details"],
+  "actions": [
+    { "id": "hello", "hook": "peer.action", "title": "Say hello", "icon": "waving_hand" }
+  ]
+}

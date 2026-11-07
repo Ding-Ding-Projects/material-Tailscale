@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "addresses-powershell",
+  "name": "Copy addresses (PowerShell)",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample extension in Windows PowerShell 5.1, which every Windows 10 and 11 computer has: copies a device's Tailscale addresses, one per line.",
+  "author": "Material Tailscale samples",
+  "run": { "command": ["powershell.exe", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "main.ps1"] },
+  "permissions": ["peer-details", "clipboard"],
+  "actions": [
+    { "id": "copy", "hook": "peer.action", "title": "Copy all addresses", "icon": "lan" }
+  ]
+}

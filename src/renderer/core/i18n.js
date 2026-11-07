@@ -18,6 +18,7 @@ export const S = {
   about: { en: 'About', yue: '關於' }, authenticator: { en: 'Authenticator', yue: '驗證器' }, base64: { en: 'Base64', yue: 'Base64' },
   converter: { en: 'File converter', yue: '檔案轉換' }, regex: { en: 'Regex builder', yue: '正則表達式' }, draw: { en: 'Drawing board', yue: '畫板' },
   ollama: { en: 'Ollama', yue: 'Ollama' }, minecraft: { en: 'Minecraft servers', yue: 'Minecraft 伺服器' }, notifications: { en: 'Notifications', yue: '通知' },
+  extensions: { en: 'Extensions', yue: '擴充功能' },
   connect: { en: 'Connect', yue: '連線' }, disconnect: { en: 'Disconnect', yue: '斷線' }, run: { en: 'Run', yue: '執行' }, copy: { en: 'Copy', yue: '複製' },
   cancel: { en: 'Cancel', yue: '取消' }, apply: { en: 'Apply', yue: '套用' }, reset: { en: 'Reset', yue: '重設' }, refresh: { en: 'Refresh', yue: '重新整理' },
   search: { en: 'Search', yue: '搜尋' }, close: { en: 'Close', yue: '關閉' }, next: { en: 'Next', yue: '下一步' }, back: { en: 'Back', yue: '上一步' },

@@ -1,0 +1,14 @@
+{
+  "manifestVersion": 1,
+  "id": "tailnet-health",
+  "name": { "en": "Tailnet health", "yue": "Tailnet 健康" },
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": { "en": "Adds plain-language checks to Diagnostics: connection state, this device's key expiry, exit node, devices online, health warnings and version.", "yue": "喺診斷加入淺白嘅檢查：連線狀態、本機金鑰到期、出口節點、在線裝置、健康警告同版本。" },
+  "author": "Material Tailscale",
+  "run": { "script": "main.js" },
+  "permissions": ["tailnet-status"],
+  "actions": [
+    { "id": "checks", "hook": "status.check", "title": { "en": "Tailnet health checks", "yue": "Tailnet 健康檢查" }, "icon": "monitor_heart" }
+  ]
+}

@@ -29,7 +29,7 @@ const [appDir] = await packager({
   dir: root, out: path.join(out, 'packaged'), overwrite: true, platform: 'win32', arch: 'x64',
   name: 'MaterialTailscale', executableName: 'MaterialTailscale', appVersion: version, buildVersion: version,
   icon: path.join(root, 'assets/icon.ico'), asar: { unpack: '**/node_modules/{ffmpeg-static,7zip-bin}/**' }, prune: true,
-  ignore: [/^\/(out|design|docs|site|site-dist|vendor|scripts|test|\.github|src\/renderer)(\/|$)/, /^\/assets\/fonts(\/|$)/, /\.md$/, /\/node_modules\/7zip-bin\/(mac|linux)\//],
+  ignore: [/^\/(out|design|docs|site|site-dist|vendor|scripts|test|\.github|src\/renderer|extensions\/samples)(\/|$)/, /^\/assets\/fonts(\/|$)/, /\.md$/, /\/node_modules\/7zip-bin\/(mac|linux)\//],
   win32metadata: { CompanyName: 'Ding-Ding-Projects', FileDescription: 'Material Tailscale', ProductName: 'Material Tailscale', InternalName: 'MaterialTailscale' }
 });
 

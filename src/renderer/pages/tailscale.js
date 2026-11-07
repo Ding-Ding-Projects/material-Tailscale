@@ -17,6 +17,7 @@ import { COMMANDS, GROUPS, findCommand } from '../../shared/cli-catalog.js';
 import { YUE_TITLES, YUE_GROUPS } from '../ui/cli-yue.js';
 import { regexField } from '../ui/regex.js';
 import { installTailscaleButton } from '../ui/jobs.js';
+import * as extensions from '../ui/extensions-client.js';
 
 const head = pageHero;
 const cmdBlock = (id, opts) => { const c = findCommand(id); return collapsible(`cmd-${id}`, h('span', pair(c.title, YUE_TITLES[id]), h('code.small.muted', { style: { marginLeft: '8px' } }, 'tailscale ' + c.path.join(' '))), h('div.card', commandForm(c, { compact: true, ...opts })), { startCollapsed: opts?.collapsed }); };
@@ -140,6 +141,8 @@ export function peerMenu(at, p) {
     { label: pair('Send files', '傳送檔案'), icon: 'send', run: () => openDest('taildrop', ts.peerName(p)) },
     p.ExitNodeOption ? { label: pair('Use as exit node', '用做出口節點'), icon: 'travel_explore', live: { kind: 'switch', get: () => !!ts.peers().find((x) => x.ID === p.ID)?.ExitNode, set: (on) => setExit(on ? ts.peerName(p) : '') } } : null,
     { label: pair('Open in a new tab', '喺新分頁開'), icon: 'tab', run: () => openInNewTab('peers', ts.peerName(p)) },
+    // Actions added by extensions you allowed; each runs with only this device's allowed details.
+    ...(() => { const xs = extensions.actionsFor('peer.action'); return xs.length ? ['-', ...xs.map(({ ext, action }) => ({ label: extensions.loc(action.title), icon: action.icon || 'extension', run: () => extensions.runAction(ext, action, { peer: p }) }))] : []; })(),
     '-',
     { label: pair('Show raw details', '顯示原始資料'), icon: 'data_object', run: () => dialog({ title: ts.peerName(p), wide: true, body: jsonTree(p, { open: 1 }) }) }
   ].filter(Boolean));
@@ -359,6 +362,34 @@ registerPage('accounts', () => {
 });
 
 // ---------------- Diagnostics ----------------
+// Checks that extensions you allowed add to Diagnostics. Each extension sees only the status
+// summary its permission names; the answers are checked before they are shown.
+function extensionChecks() {
+  const box = h('div.stack');
+  const results = h('div.stack');
+  const label = (s) => (s === 'ok' ? pair('fine', '正常') : s === 'warn' ? pair('needs a look', '要留意') : pair('problem', '有問題'));
+  const run = async () => {
+    clear(results).append(h('div.skeleton', { style: { height: '64px' } }));
+    const out = [];
+    for (const { ext, action } of extensions.actionsFor('status.check')) out.push({ ext, action, a: await extensions.runAction(ext, action, { status: ts.data.status }) });
+    clear(results);
+    for (const { ext, action, a } of out) results.append(h('div.stack', h('b', `${extensions.loc(ext.manifest.name)} · ${extensions.loc(action.title)}`),
+      a?.checks?.length ? h('ul.ext-checks', a.checks.map((c) => h('li', h('span.state-mark', h(`span.dot-live.${c.state === 'fail' ? 'err' : c.state}`, { 'aria-hidden': 'true' }), h('span', h('b', c.title), ` · ${label(c.state)}`)), c.detail ? h('div.small.muted', c.detail) : null)))
+        : h('div.small.muted', a ? pair('It returned no checks.', '佢冇交檢查結果。') : pair('It did not finish; the message above says why.', '佢未做完；上面嘅訊息有講原因。'))));
+  };
+  const draw = () => {
+    clear(box);
+    const xs = extensions.actionsFor('status.check');
+    box.append(h('div.row', h('span.small.muted', { style: { flex: 1 } }, xs.length ? pair(`${xs.length} ${xs.length > 1 ? 'checks' : 'check'} from extensions you allowed.`, `你批准嘅擴充功能有 ${xs.length} 項檢查。`) : pair('No extension adds checks yet. Allow one in Extensions.', '仲未有擴充功能加檢查。去擴充功能批准一個。')),
+      xs.length ? h('button.btn.small', { dataset: { el: 'diag-ext-run' }, on: { click: run } }, icon('play_arrow'), pair('Run checks', '執行檢查')) : null,
+      h('button.btn.small.outline', { on: { click: () => openDest('extensions') } }, icon('extension'), t('extensions'))), results);
+  };
+  let shownOnce = false;
+  const off = extensions.onChange(() => { if (box.isConnected) { shownOnce = true; draw(); } else if (shownOnce) off(); });
+  draw();
+  return box;
+}
+
 registerPage('diagnostics', () => {
   const nc = h('div.stack');
   const runNet = async () => {
@@ -375,6 +406,7 @@ registerPage('diagnostics', () => {
   };
   return h('div.page', head(pair('Health', '健康'), t('diagnostics'), pair('Network check with DERP latency bars, pings, metrics, versions, bug reports, system policies and updates.', '網絡檢查、DERP 延遲、Ping、指標、版本、錯誤報告、系統政策同更新。'), h('button.btn', { on: { click: runNet } }, icon('speed'), pair('Run network check', '執行網絡檢查'))),
     h('section.card', h('h2', pair('Network check', '網絡檢查')), nc),
+    extensions.available() ? h('section.card', { dataset: { el: 'diag-extensions' } }, h('h2', pair('Checks from extensions', '擴充功能檢查')), extensionChecks()) : null,
     ...['ping', 'netcheck', 'version', 'metrics-print', 'metrics-write', 'bugreport', 'syspolicy-list', 'syspolicy-reload', 'update', 'web', 'wait', 'licenses', 'completion', 'configure-kubeconfig', 'configure-systray', 'configure-synology', 'configure-mac-vpn-install', 'configure-mac-vpn-uninstall', 'configure-sysext-activate', 'configure-sysext-deactivate', 'configure-sysext-status', 'systray', 'nc', 'ssh', 'get'].map((id) => cmdBlock(id, { collapsed: true })));
 });
 

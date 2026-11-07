@@ -2,7 +2,7 @@
 
 ## Behaviour
 
-Network check (`tailscale netcheck --format=json`) shows UDP, IPv4, IPv6, NAT type, nearest DERP, public IP and animated latency bars for every DERP region. Forms for ping, version, metrics print and write, bug report, system policies list and reload, update, local web interface, wait, licences, shell completion, kubeconfig, systray, Synology and macOS system extension commands, nc, ssh and get.
+Network check (`tailscale netcheck --format=json`) shows UDP, IPv4, IPv6, NAT type, nearest DERP, public IP and animated latency bars for every DERP region. Checks from extensions you allowed run with **Run checks** and list each result as fine, needs a look or problem (see [Extensions](../extensions/extensions.md)). Forms for ping, version, metrics print and write, bug report, system policies list and reload, update, local web interface, wait, licences, shell completion, kubeconfig, systray, Synology and macOS system extension commands, nc, ssh and get.
 
 ## Configuration
 
