@@ -45,7 +45,8 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Rendered provider text | yes | yes | ui/markdown.js | features/records/offline-docs.md | — |
 | Notifications and centre | yes | yes | ui/overlay.js | features/records/notifications.md | dark-notifications.png |
 | File converter | partial | partial | pages/tools.js | features/tools/file-converter.md | dark-converter.png |
-| Base64 toolkit | yes | yes | pages/tools.js | features/tools/base64.md | dark-base64.png |
+| Virtual disk manager (VHD, VHDX, VHD Set, ISO attach, Quick pack) | no, not started | no (feature article not written) | — | — | — |
+| Base64 toolkit: same-folder drop conversion, variants and options, strict offsets, data: URLs, sandboxed preview, exports, history with undo | yes | yes (results download under the same names) | pages/base64.js, main/base64-files.js, shared/base64.js | features/tools/base64.md | dark-base64-overlayb64-demo.png |
 | Minecraft server manager | built; catalogues and download resolution verified live for all seven flavours; running a server and the generator unverified here | n/a | pages/minecraft.js, main/minecraft.js | features/tools/minecraft.md | dark-minecraft.png |
 | Ollama suite | partial (list, pull) | n/a | pages/tools.js | features/tools/ollama.md | dark-ollama.png |
 | Drawing and annotation | yes | yes | pages/tools.js | features/tools/drawing.md | dark-draw.png |

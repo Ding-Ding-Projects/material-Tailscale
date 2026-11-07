@@ -52,6 +52,12 @@ function entries() {
       live: { kind: 'switch', get: () => masterOn, set: (on) => { masterOn = on; window.mt.ext.setMasterOff(!on).then(() => refreshExtensions(), () => { masterOn = !on; refreshExtensions(); }); } } });
     for (const { ext, action } of extensionActions('peer.action')) out.push({ group: g, title: `${extLoc(ext.manifest.name)}: ${extLoc(action.title)}`, sub: pair('On a device: open Peers and use its menu', '用喺裝置：打開裝置頁再用佢嘅選單'), icon: action.icon || 'extension', run: () => openDest('peers') });
   }
+  {
+    const g = t('base64');
+    out.push({ group: g, title: pair('Encode files to Base64 beside them', '將檔案編碼成 Base64，放喺旁邊'), sub: 'report.pdf → report.pdf.base64.txt', icon: 'note_add', run: () => teleport('[data-el="b64-pick-encode"]', 'base64') });
+    out.push({ group: g, title: pair('Decode Base64 files back to the originals', '將 Base64 檔案解碼返原本檔案'), sub: 'report.pdf.base64.txt → report.pdf', icon: 'restore_page', run: () => teleport('[data-el="b64-pick-decode"]', 'base64') });
+    out.push({ group: g, title: pair('Base64 history, undo and redo', 'Base64 紀錄、還原同重做'), sub: 'base64', icon: 'history', run: () => teleport('[data-el="b64-history"]', 'base64') });
+  }
   for (const op of apiOps) out.push({ group: pair('Admin API', '管理 API'), title: op.summary, sub: `${op.method} ${op.path}`, icon: 'api', run: () => { openDest('admin', 'Everything'); } });
   for (const s of SETTINGS_INDEX) out.push({ group: t('settings'), title: pair(s.en, s.yue), sub: s.help, icon: 'tune', live: settingLive(s.key)?.live, run: () => teleport(`[data-el="set-${s.key}"]`, 'settings', s.section) });
   for (const a of ARTICLES) out.push({ group: t('docs'), title: a.title, sub: a.path, icon: 'article', run: () => openDest('docs', a.path) });

@@ -72,6 +72,7 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - Interruptions: the cloud machine restarted once during a full run. `node scripts/sweep.mjs --resume` now continues in the same folder and refuses when the build or the matrix changed.
 - Windows title bar: the window uses the title-bar overlay on Windows, so Windows draws the caption buttons and Snap layouts work; the overlay colours follow the theme through `win:overlay`, which accepts only `#rrggbb`. Linux and macOS keep the app's own buttons. The install-proof job now photographs the installed app on the runner's desktop (`windows-title-bar.png`, `windows-maximise-hover.png`); an in-app capture cannot see the overlay.
 - Extensions: `src/main/extensions.js` (host), `src/shared/extension-api.js` (protocol version 1), `src/renderer/pages/extensions.js` (manager), `src/renderer/ui/extensions-client.js` (device menus, Diagnostics, palette, consent review), `extensions/builtin` (SSH command, Device summary, Web page, Tailnet health), `extensions/samples` (Python, PowerShell, JavaScript), `test/extensions.test.mjs` (13 tests with real processes, including the Python sample). Two of those tests were watched failing when a key was let through and when the clipboard permission check was dropped.
+- Base64 toolkit, brought to the full shared contract after a new rule asked for same-folder drop conversion: `src/shared/base64.js` (streaming encoder and decoder, strict errors with exact offsets, `data:` URLs, bounded type detection, naming, incremental SHA-256), `src/shared/zip-store.js` (stored ZIP for the website), `src/main/base64-files.js` (conversions beside the source through a hidden partial file that takes its final name by an exclusive link or copy, never overwriting; pause, resume, cancel; SHA-256 round trip), and the page `src/renderer/pages/base64.js` with `ui/base64-jobs.js`, `ui/base64-history.js` and `ui/base64-preview.js`. `test/base64.test.mjs` (18 tests) runs real conversions on disk, including a 96 MB file with live memory under 16 MB; the padding guard was watched failing when padding was dropped on encode and when the missing-padding check was removed. Captures and the sweep open a state with real sample conversions (`base64>overlay@b64-demo`).
 - Design canvas: an Extensions board (manager and permission review), the add-on tile on Tools, extension checks on Diagnostics, and the sweep report board with before and after scores; stylesheets uploaded again.
 
 ## Not verified
@@ -85,7 +86,7 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 
 ## Remaining work
 
-See unchecked items in `ROADMAP.md`.
+See unchecked items in `ROADMAP.md`. The largest is the virtual disk manager added to the shared feature list on 2026-11-07: it creates, partitions, formats, resizes and merges disks and edits boot entries, so it needs a Windows computer to build and prove every operation on; it was not started in this Linux session rather than shipped unrun.
 
 ## Blockers
 

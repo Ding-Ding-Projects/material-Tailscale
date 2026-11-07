@@ -33,9 +33,16 @@ function scan(root, sizes) {
   }
 }
 
+// A change is scanned on the next animation frame, so a box that starts to scroll gets keyboard
+// access before it is painted, even when the page is still busy rendering; a second scan 150 ms
+// after the last change catches layout that settles later (transitions, images, late fonts).
 export function watchScrollRegions(root = document.body) {
-  let t = null;
-  const later = () => { clearTimeout(t); t = setTimeout(() => scan(root, sizes), 120); };
+  let t = null, frame = 0;
+  const now = () => { frame = 0; scan(root, sizes); };
+  const later = () => {
+    if (!frame) frame = requestAnimationFrame(now);
+    clearTimeout(t); t = setTimeout(now, 150);
+  };
   const sizes = new ResizeObserver(later);
   new MutationObserver(later).observe(root, { childList: true, subtree: true, characterData: true });
   document.fonts?.addEventListener?.('loadingdone', later);

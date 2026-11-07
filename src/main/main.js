@@ -13,6 +13,7 @@ const ladder = require('./ladder');
 const tools = require('./tools');
 const mc = require('./minecraft');
 const extensions = require('./extensions');
+const b64files = require('./base64-files');
 const { COMMANDS, GROUPS, GLOBAL_FLAGS } = require('../shared/cli-catalog');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -189,6 +190,29 @@ handle('ext:add', async (opts = {}) => {
   return exts().addFromFolder(extPicked, { replace: !!opts.replace });
 });
 
+// Base64 toolkit: conversions beside the source file, with progress on 'b64:progress'.
+handle('b64:convert', (kind, src, opts, id) => {
+  if (kind !== 'encode' && kind !== 'decode') throw new Error('Unknown conversion.');
+  if (typeof src !== 'string' || !path.isAbsolute(src)) throw new Error('A full file path is needed.');
+  if (typeof id !== 'string' || !/^[\w-]{1,40}$/.test(id)) throw new Error('Bad job id.');
+  return b64files.run(kind, src, opts && typeof opts === 'object' ? opts : {}, { id, onProgress: (p) => win?.webContents.send('b64:progress', p) });
+});
+handle('b64:control', (id, what) => (['pause', 'resume', 'cancel'].includes(what) ? b64files.control(String(id), what) : false));
+// Sample files for screenshots, the sweep and the recording only; never available in normal use. Each call
+// replaces the previous set, so repeated captures start from the same folder contents.
+let b64Samples = null;
+handle('b64:samples', () => {
+  if (!process.env.MT_CAPTURE_DIR && !process.env.MT_SWEEP_DIR && !process.env.MT_RECORD_DIR) throw new Error('Sample files exist only for screenshots and recordings.');
+  if (b64Samples) fs.rmSync(b64Samples, { recursive: true, force: true });
+  const dir = b64Samples = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'mt-base64-samples-'));
+  const pdf = Buffer.from('%PDF-1.4\n% Material Tailscale sample\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n');
+  fs.writeFileSync(path.join(dir, 'tailnet-report.pdf'), pdf);
+  fs.writeFileSync(path.join(dir, 'route-map.png'), Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64'));
+  fs.writeFileSync(path.join(dir, 'route-map.png.base64.txt'), fs.readFileSync(path.join(dir, 'route-map.png')).toString('base64'));
+  fs.writeFileSync(path.join(dir, 'broken.base64.txt'), 'SGVsbG8sIHRhaWxuZXQh*IQ==');
+  return { encode: path.join(dir, 'tailnet-report.pdf'), decode: path.join(dir, 'route-map.png.base64.txt'), broken: path.join(dir, 'broken.base64.txt') };
+});
+
 handle('shell:external', (url) => { if (!/^https?:\/\//.test(url)) throw new Error('Only web links can be opened.'); return shell.openExternal(url); });
 handle('shell:openPath', (p) => shell.openPath(p));
 handle('shell:showItem', (p) => shell.showItemInFolder(p));
@@ -269,7 +293,7 @@ async function captureAll(dir) {
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge.
   const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 6 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ sw: el.scrollWidth, cw: el.clientWidth, text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
-  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,converter,regex,draw,ollama,minecraft,extensions,extensions>overlay@ext-consent,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
+  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,base64>overlay@b64-demo,converter,regex,draw,ollama,minecraft,extensions,extensions>overlay@ext-consent,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {
@@ -325,6 +349,7 @@ async function recordPath(dir) {
     () => js("document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); window.__mtOpen('cli', 'set')"), () => wait(1200),
     () => press('Guide me'), () => wait(1200), () => press('Next'), () => wait(900), () => press('Next'), () => wait(900), () => press('Show all options'), () => wait(1000),
     () => js("window.__mtOpen('regex')"), () => wait(1200), () => press('Trace the attempts'), () => wait(1200), () => js("window.scrollBy?.(0, 0); document.querySelector('.outlet')?.scrollTo({ top: 900, behavior: 'smooth' })"), () => wait(1500),
+    () => js("window.__mtOpen('base64')"), () => wait(1400), () => js("window.__mtOverlay('b64-demo')"), () => wait(2600),
     () => js("window.__mtOpen('minecraft')"), () => wait(1200), () => press('New server'), () => wait(1200), () => press('Paper'), () => wait(900), () => press('Next'), () => wait(3500),
     () => js("document.querySelector('.scrim')?.remove(); window.__mtOpen('settings', 'appearance')"), () => wait(1500)
   ];

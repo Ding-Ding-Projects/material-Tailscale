@@ -897,9 +897,9 @@
       "reference": "design/canvas/Tools.dc.html",
       "view": "base64",
       "referenceRoute": "dcref://board/Tools.dc.html?view=base64&theme=dark",
-      "appRoute": "base64",
+      "appRoute": "base64>overlay@b64-demo",
       "surface": "app",
-      "state": "Default view",
+      "state": "Files converted beside their source: real sample conversions (encode, decode with a taken name, a refused file)",
       "tuple": {
         "theme": "dark",
         "width": 1440,
@@ -929,6 +929,11 @@
           "what": "Sample text and values differ from the live app.",
           "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
           "approved": "Reviewed 2026-11-07: content, not chrome."
+        },
+        {
+          "what": "The design shows a fourth file still decoding; the capture shows three finished conversions.",
+          "reason": "The capture converts real sample files, which finish in milliseconds; a running row appears only while a large file streams.",
+          "approved": "Reviewed 2026-11-07: state timing, not chrome."
         }
       ]
     },

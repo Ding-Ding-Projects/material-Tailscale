@@ -28,6 +28,7 @@ a step, not a habit.
 - Capture real screenshots with `npm run screenshots` (`MT_CAPTURE_DIR` required) after interface changes.
 - Before a release, run the every-surface sweep (`npm run build && node scripts/build-site.mjs`, then `node scripts/sweep.mjs`, under `xvfb-run` on Linux); it must report zero findings. `--resume` continues an interrupted run against the same build. Record the result with `node scripts/sweep-history.mjs`.
 - Extensions: the host is `src/main/extensions.js` (with `src/shared/extension-api.js` for the protocol), the built-ins are in `extensions/builtin`, samples in `extensions/samples`, and `test/extensions.test.mjs` runs real extension processes. A protocol change bumps `API_VERSION` and updates `docs/features/extensions/writing-extensions.md`.
+- Base64 toolkit: the core is `src/shared/base64.js`, conversions beside the source file are `src/main/base64-files.js`, and the page is `src/renderer/pages/base64.js` with `src/renderer/ui/base64-*.js`; `test/base64.test.mjs` runs real conversions on disk.
 - Never add code signing. Never force-push.
 
 ## Shared instructions (sanitised mirror)
@@ -61,6 +62,7 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - A built-in TOTP authenticator, with secrets stored only in the system vault.
 - Local version history with redaction, exports in common formats, and bulk actions.
 - A local file converter with a searchable adapter catalogue.
+- A local Base64 toolkit with every variant, strict error offsets, `data:` URLs, safe previews, exports and a history with undo. Dropping a file writes its Base64 beside it as the full name plus `.base64.txt`, and dropping that text writes the original back beside it with its name and extension restored, never overwriting; a website downloads the same names instead.
 - A local Ollama manager and a Minecraft server manager.
 - A dim sum surprise and app-logo presets.
 - A personal-vocabulary JSON can be dropped on the window. It stays on the device.

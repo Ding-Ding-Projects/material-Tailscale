@@ -14,6 +14,7 @@
 - **93 admin API operations** generated from Tailscale's OpenAPI specification: devices, policy file, auth keys, DNS, users, tailnet settings, webhooks, logs and streaming, services, posture, invites, contacts, OAuth apps and organisations.
 - Bespoke pages for peers, exit nodes, subnet routes, Serve and Funnel, Taildrop, MagicDNS, Tailnet Lock, Taildrive, certificates, accounts and diagnostics.
 - English, Hong Kong Cantonese or both; Ctrl+Shift+F command palette; regex builder on every search; appearance editor on every element; locks, authenticator, local Git history, exports in every format, and full accessibility tools.
+- **Base64 beside your files**: drop a file to write `report.pdf.base64.txt` next to it, drop that text to get `report.pdf` back, never overwriting, with every variant, strict error offsets, `data:` URLs, safe previews and a history with undo, all verified by a SHA-256 round trip ([how it works](docs/features/tools/base64.md)).
 - **Extensions in any language** add actions to every device and checks to Diagnostics. Each one waits for your permission, sees only what you allow (never keys or tokens), and is stopped after five seconds; four built-in extensions come with the app ([how to write one](docs/features/extensions/writing-extensions.md)).
 
 The installer is **unsigned**. Windows SmartScreen may warn about an unknown publisher; choose *More info* then *Run anyway*. Material Tailscale is independent and not affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.
@@ -32,6 +33,7 @@ Captured from the built app by `npm run screenshots` (Electron, both themes). Ta
 | ![Admin console, light](docs/screenshots/light-admin.png) | ![Settings, light](docs/screenshots/light-settings.png) |
 | ![Exit nodes, light](docs/screenshots/light-exit.png) | ![Command palette, light](docs/screenshots/light-palette.png) |
 | ![Extensions manager, dark](docs/screenshots/dark-extensions.png) | ![Allowing an extension, dark](docs/screenshots/dark-extensions-overlayext-consent.png) |
+| ![Base64 files converted beside their source, dark](docs/screenshots/dark-base64-overlayb64-demo.png) | ![Base64 toolkit, light](docs/screenshots/light-base64-overlayb64-demo.png) |
 
 All captures: [docs/screenshots](docs/screenshots).
 
@@ -41,7 +43,7 @@ Design parity: every screen is designed on a design canvas and compared with the
 
 Every-surface sweep: before a release, every page, dialog, menu and overlay of the app and every page of the website is checked in both themes, all three language modes and four window sizes for accessibility rules, console errors, cut-off or overlapping text and keyboard focus ([how it works](docs/features/appearance/every-surface-sweep.md), [latest results](docs/sweep/summary.md)).
 
-End-to-end recording (command palette, guided `tailscale set`, regex trace, Minecraft server wizard, settings), made by `npm run record` from the built app:
+End-to-end recording (command palette, guided `tailscale set`, regex trace, Base64 files converted beside their source, Minecraft server wizard, settings), made by `npm run record` from the built app:
 
 ![End-to-end recording](docs/recording/end-to-end.gif)
 </details>
@@ -147,6 +149,7 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - A built-in TOTP authenticator, with secrets stored only in the system vault.
 - Local version history with redaction, exports in common formats, and bulk actions.
 - A local file converter with a searchable adapter catalogue.
+- A local Base64 toolkit with every variant, strict error offsets, `data:` URLs, safe previews, exports and a history with undo. Dropping a file writes its Base64 beside it as the full name plus `.base64.txt`, and dropping that text writes the original back beside it with its name and extension restored, never overwriting; a website downloads the same names instead.
 - A local Ollama manager and a Minecraft server manager.
 - A dim sum surprise and app-logo presets.
 - A personal-vocabulary JSON can be dropped on the window. It stays on the device.

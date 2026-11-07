@@ -288,7 +288,7 @@ registerPage('serve', () => {
 
 // ---------------- Taildrop ----------------
 registerPage('taildrop', (ctx) => {
-  const zone = h('div.card.hero', { style: { minHeight: '200px', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderStyle: 'dashed' }, dataset: { el: 'taildrop-zone' } },
+  const zone = h('div.card.hero', { style: { minHeight: '200px', alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderStyle: 'dashed' }, dataset: { el: 'taildrop-zone', dropTarget: 'taildrop' } },
     icon('cloud_upload'), h('h2', pair('Drop files here to send them', '將檔案拖到呢度傳送')), h('p.muted', pair('Then choose the device below and press Run.', '然後揀裝置再撳執行。')));
   let files = [];
   const slot = h('div');

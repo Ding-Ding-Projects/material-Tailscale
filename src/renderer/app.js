@@ -16,6 +16,7 @@ import './pages/tailscale.js';
 import './pages/admin.js';
 import './pages/settings.js';
 import './pages/tools.js';
+import './pages/base64.js';
 import { runMcSchedules } from './pages/minecraft.js';
 import { runSchedules } from './core/schedules.js';
 import { SETTINGS_INDEX } from './pages/settings-index.js';
@@ -146,9 +147,12 @@ let dz = null, depth = 0;
 const isJsonDrag = (e) => [...(e.dataTransfer?.items || [])].some((i) => i.kind === 'file');
 document.addEventListener('dragenter', (e) => { if (!isJsonDrag(e) || i18n.schoolOn()) return; depth++; if (!dz) { dz = h('div.drop-zone', pair('Drop a personal vocabulary JSON to apply it', '放低個人詞彙 JSON 即刻套用')); document.body.append(dz); } });
 document.addEventListener('dragleave', () => { depth = Math.max(0, depth - 1); if (!depth) { dz?.remove(); dz = null; } });
-document.addEventListener('dragover', (e) => e.preventDefault());
+// Over a page's own drop target (Base64, Taildrop) the vocabulary banner steps aside.
+document.addEventListener('dragover', (e) => { e.preventDefault(); if (dz) dz.hidden = !!e.target.closest?.('[data-drop-target]'); });
+// Runs first, even when a drop target handles the drop and stops it going further.
+document.addEventListener('drop', () => { depth = 0; dz?.remove(); dz = null; }, true);
 document.addEventListener('drop', async (e) => {
-  e.preventDefault(); depth = 0; dz?.remove(); dz = null;
+  e.preventDefault();
   if (i18n.schoolOn()) return;
   const f = e.dataTransfer.files[0];
   if (!f || !/\.json$/i.test(f.name)) return;
@@ -211,6 +215,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
     if (kind === 'ladder') { const { ladder } = await import('./ui/locks.js'); ladder(arg || 'capture-sample'); return true; }
     if (kind === 'ext-consent') { const c = await extensions.refresh(); const item = c.items.find((i) => i.valid && i.consent !== 'granted' && (!arg || i.id === arg)) || c.items.find((i) => i.valid); if (!item) return false; extensions.reviewConsent(item); return true; }
     if (kind === 'dimsum') { showSurprise({ name: { en: 'Classic Har Gow', zhHant: '蝦餃' }, alt: { en: 'Warm tea-house photograph of Classic Har Gow' }, photo: arg || null }); return true; }
+    if (kind === 'b64-demo') return window.__mtBase64Demo ? window.__mtBase64Demo() : false;
     if (kind === 'toasts') { toast(pair('Connected to your tailnet.', '已連線到你嘅 tailnet。'), { kind: 'ok' }); toast(pair('tailscale up failed: exit code 1.', 'tailscale up 失敗：結束碼 1。'), { kind: 'err' }); return true; }
     return false;
   };

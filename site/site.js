@@ -21,6 +21,7 @@ import { runSchedules } from '../src/renderer/core/schedules.js';
 import { COMMANDS } from '../src/shared/cli-catalog.js';
 import '../src/renderer/pages/settings.js';
 import '../src/renderer/pages/tools.js';
+import '../src/renderer/pages/base64.js';
 import '../src/renderer/pages/meta.js';
 import { settingLive } from '../src/renderer/ui/setting-live.js';
 import { watchScrollRegions } from '../src/renderer/ui/scroll-focus.js';

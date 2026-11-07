@@ -5,7 +5,7 @@ import * as store from '../core/store.js';
 import { registerPage, openDest, openInNewTab } from '../ui/shell.js';
 import { toast, dialog, collapsible } from '../ui/overlay.js';
 import { superConfirm } from '../ui/safety.js';
-import { segmented, stepper, switchCtl, text, fileButton } from '../ui/controls.js';
+import { segmented, stepper, text, fileButton } from '../ui/controls.js';
 import { workbench, folderSearch } from '../ui/regex.js';
 import { exportTo, FORMATS } from '../ui/exporter.js';
 import totpLib from '../../shared/totp.js';
@@ -104,52 +104,6 @@ async function cameraScan(onUri) {
   const loop = () => { if (!alive) return; if (v.videoWidth) { c.width = v.videoWidth; c.height = v.videoHeight; const g = c.getContext('2d'); g.drawImage(v, 0, 0); const im = g.getImageData(0, 0, c.width, c.height); const code = jsQR(im.data, im.width, im.height); if (code?.data.startsWith('otpauth://')) { d.close(); onUri(code.data); return; } } requestAnimationFrame(loop); };
   loop();
 }
-
-// ---------------- Base64 ----------------
-registerPage('base64', () => {
-  const variant = segmented([{ value: 'std', label: 'Standard' }, { value: 'url', label: 'URL-safe' }, { value: 'mime', label: 'MIME (76)' }], 'std', { label: 'Variant' });
-  const pad = switchCtl(true, { label: 'Padding' });
-  const strict = switchCtl(true, { label: 'Strict decoding' });
-  const enc = segmented([{ value: 'utf-8', label: 'UTF-8' }, { value: 'utf-16le', label: 'UTF-16LE' }, { value: 'latin1', label: 'Latin-1' }], 'utf-8', { label: 'Text encoding' });
-  const inp = h('textarea.input', { 'aria-label': pair('Input', '輸入'), placeholder: pair('Type or paste text or Base64', '輸入或貼上文字或 Base64') });
-  const out = h('textarea.input', { 'aria-label': pair('Output', '輸出'), readonly: true });
-  const status = h('div.small');
-  const preview = h('div');
-  const bytesOf = (s) => { const e = enc.get(); if (e === 'utf-8') return new TextEncoder().encode(s); if (e === 'utf-16le') { const b = new Uint8Array(s.length * 2); for (let i = 0; i < s.length; i++) { b[i * 2] = s.charCodeAt(i) & 255; b[i * 2 + 1] = s.charCodeAt(i) >> 8; } return b; } return Uint8Array.from(s, (c) => c.charCodeAt(0) & 255); };
-  const textOf = (b) => new TextDecoder(enc.get() === 'latin1' ? 'iso-8859-1' : enc.get()).decode(b);
-  const toB64 = (b) => { let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000)); let r = btoa(s); if (variant.get() === 'url') r = r.replace(/\+/g, '-').replace(/\//g, '_'); if (!pad.get()) r = r.replace(/=+$/, ''); if (variant.get() === 'mime') r = r.match(/.{1,76}/g)?.join('\r\n') || ''; return r; };
-  const fromB64 = (s) => {
-    let t0 = s.replace(/^data:[^,]*,/, '');
-    if (!strict.get()) t0 = t0.replace(/[^A-Za-z0-9+/=_-]/g, ''); else t0 = t0.replace(/\r?\n/g, '');
-    const bad = t0.search(/[^A-Za-z0-9+/=_-]/);
-    if (bad >= 0) throw new Error(pair(`Invalid character at offset ${bad}`, `第 ${bad} 位有無效字元`));
-    t0 = t0.replace(/-/g, '+').replace(/_/g, '/');
-    while (t0.length % 4) t0 += '=';
-    const bin = atob(t0); return Uint8Array.from(bin, (c) => c.charCodeAt(0));
-  };
-  const sniff = (b) => (b[0] === 0x89 && b[1] === 0x50 ? 'image/png' : b[0] === 0xff && b[1] === 0xd8 ? 'image/jpeg' : b[0] === 0x47 && b[1] === 0x49 ? 'image/gif' : b[0] === 0x25 && b[1] === 0x50 ? 'application/pdf' : b[0] === 0x50 && b[1] === 0x4b ? 'application/zip' : 'application/octet-stream');
-  let lastBytes = null;
-  const doEnc = () => { lastBytes = bytesOf(inp.value); out.value = toB64(lastBytes); status.textContent = pair(`${fmtBytes(lastBytes.length)} → ${out.value.length} characters`, `${fmtBytes(lastBytes.length)} → ${out.value.length} 字元`); };
-  const doDec = () => { try { lastBytes = fromB64(inp.value.trim()); const mt = sniff(lastBytes); out.value = mt === 'application/octet-stream' ? textOf(lastBytes) : `(${mt}, ${fmtBytes(lastBytes.length)})`; status.textContent = pair(`Decoded ${fmtBytes(lastBytes.length)} · detected ${mt}`, `解碼 ${fmtBytes(lastBytes.length)} · ${mt}`); clear(preview); if (mt.startsWith('image/')) preview.append(h('img', { src: URL.createObjectURL(new Blob([lastBytes], { type: mt })), alt: pair('Decoded image preview', '解碼圖片預覽'), style: { maxWidth: '100%', maxHeight: '240px', borderRadius: '12px' } })); } catch (e) { status.textContent = e.message; status.className = 'err-text'; } };
-  const file = async (dec) => {
-    const p = await window.mt.dialog.open({}); if (!p) return;
-    status.textContent = pair('Reading…', '讀緊…');
-    const b64 = await window.mt.fs.readBytes(p[0]);
-    if (dec) { inp.value = await window.mt.fs.readText(p[0]); doDec(); return; }
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map((x) => x.toString(16).padStart(2, '0')).join('');
-    lastBytes = bytes; out.value = toB64(bytes);
-    const back = fromB64(out.value);
-    const hash2 = [...new Uint8Array(await crypto.subtle.digest('SHA-256', back))].map((x) => x.toString(16).padStart(2, '0')).join('');
-    status.textContent = pair(`Encoded ${fmtBytes(bytes.length)} · SHA-256 round trip ${hash === hash2 ? 'verified' : 'FAILED'} (${hash.slice(0, 16)}…)`, `已編碼 ${fmtBytes(bytes.length)} · SHA-256 來回 ${hash === hash2 ? '驗證通過' : '失敗'}`);
-  };
-  return h('div.page', head(pair('Encoding', '編碼'), t('base64'), pair('Encode and decode text and files with every Base64 variant, data: URLs, strict error offsets and a verified round trip.', '用各種 Base64 變體編解碼文字同檔案。')),
-    h('div.grid', h('section.card.span-12.tonal', h('div.row', variant.el, enc.el), h('div.row', h('div.switch-row', h('b', pair('Padding', '填充')), pad.el), h('div.switch-row', h('b', pair('Strict decoding', '嚴格解碼')), strict.el))),
-      h('section.card.span-6', h('h2.h3', pair('Input', '輸入')), inp, h('div.row', h('button.btn', { on: { click: doEnc } }, icon('lock'), pair('Encode', '編碼')), h('button.btn.tonal', { on: { click: doDec } }, icon('lock_open'), pair('Decode', '解碼')), h('button.btn.outline', { on: { click: () => file(false) } }, icon('upload_file'), pair('Encode a file', '編碼檔案')), h('button.btn.outline', { on: { click: () => file(true) } }, icon('file_open'), pair('Decode a file', '解碼檔案')))),
-      h('section.card.span-6', h('h2.h3', pair('Output', '輸出')), out, status, preview, h('div.row', h('button.btn.small.outline', { on: { click: () => { navigator.clipboard.writeText(out.value); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'), t('copy')),
-        h('button.btn.small.outline', { on: { click: () => { const mt = lastBytes ? sniff(lastBytes) : 'text/plain'; navigator.clipboard.writeText(`data:${mt};base64,${toB64(lastBytes || bytesOf(inp.value)).replace(/\r\n/g, '')}`); toast(pair('data: URL copied.', '已複製 data: URL。'), { kind: 'ok' }); } } }, icon('link'), 'data: URL'),
-        h('button.btn.small.outline', { on: { click: async () => { if (!lastBytes) return; const p = await window.mt.dialog.save({ defaultPath: 'decoded.bin' }); if (p) { await window.mt.fs.writeBytes(p, toB64(lastBytes).replace(/\r\n/g, '').replace(/-/g, '+').replace(/_/g, '/')); toast(pair('Saved.', '已儲存。'), { kind: 'ok' }); } } } }, icon('save'), pair('Save bytes', '儲存位元組'))))));
-});
 
 // ---------------- File converter ----------------
 const IMG = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'svg'];

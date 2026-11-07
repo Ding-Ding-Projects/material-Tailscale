@@ -138,7 +138,7 @@ export function workbench({ initial = '', onUse } = {}) {
   const repOut = h('div.out', { style: { maxHeight: '120px' } });
   const expl = h('div.stack.small');
   const groups = h('div.small');
-  const code = h('div.out', { style: { maxHeight: '140px' } });
+  const code = h('div.out'); // seven short lines: shown whole rather than in a scrolling box
   const status = h('div.small');
   const lib = JSON.parse(localStorage.getItem('mt.regex.lib') || '[]');
   const libBox = h('div.suggest');

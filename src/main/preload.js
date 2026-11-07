@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('mt', {
   authLoad: call('auth:load'),
   mc: Object.assign(Object.fromEntries(['registry', 'catalog', 'resolve', 'probe', 'discover', 'create', 'adopt', 'acceptEula', 'start', 'stop', 'command', 'status', 'readFile', 'writeFile', 'update', 'searchExtensions', 'installExtension', 'listExtensions', 'toggleExtension', 'removeExtension', 'backup', 'listBackups', 'restore', 'extractWorldgen', 'generateWorld', 'cancelGenerate', 'lookupPlayer', 'remove', 'followLogs'].map((n) => [n, call('mc:' + n)])), { onLog: on('mc:log'), onState: on('mc:state') }),
   ext: Object.fromEntries(['list', 'allow', 'setEnabled', 'setMasterOff', 'remove', 'openFolder', 'run', 'add'].map((k) => [k, call('ext:' + k)])),
+  b64: { convert: call('b64:convert'), control: call('b64:control'), samples: call('b64:samples'), onProgress: on('b64:progress') },
   history: { record: call('history:record'), list: call('history:list'), files: call('history:files'), restore: call('history:restore') },
   shared: { get: call('shared:get'), set: call('shared:set'), onChange: on('shared:changed') },
   dialog: { open: call('dialog:open'), save: call('dialog:save') },

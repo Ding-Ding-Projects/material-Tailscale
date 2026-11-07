@@ -11,7 +11,9 @@
 //
 // --quick runs one size, theme and language for a fast look. --resume continues an interrupted
 // run in the same output folder: finished checks are kept, and the run refuses to resume when
-// the build or the matrix changed, so one report never mixes two builds. Results:
+// the build or the matrix changed, so one report never mixes two builds. --merge=dirA,dirB
+// joins parts that ran side by side (for example one per window size, and the website) into
+// one report, and refuses parts that checked different builds or have not finished. Results:
 // out/sweep/report.json and out/sweep/summary.md. Exit code 1 when anything is found, 0 when
 // the sweep is clean.
 import fs from 'node:fs';
@@ -28,11 +30,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = new Set(process.argv.slice(2));
 const quick = args.has('--quick');
 const resume = args.has('--resume');
-const pick = (envName, all) => (process.env[envName] ? process.env[envName].split(',') : quick ? all.slice(0, 1) : all);
+const mergeArg = process.argv.slice(2).find((a) => a.startsWith('--merge='))?.slice('--merge='.length);
+const pick = (envName, all) => (process.env[envName] ? process.env[envName].split(',') : quick ? all.slice(0, 1) : [...all]);
 const sizes = pick('MT_SWEEP_SIZES', SIZES);
 const themes = pick('MT_SWEEP_THEMES', THEMES);
 const langs = pick('MT_SWEEP_LANGS', LANGS);
 const out = process.env.MT_SWEEP_OUT || path.join(root, 'out', 'sweep');
+const mergeDirs = mergeArg ? mergeArg.split(',').map((d) => path.resolve(d)) : [];
+if (mergeDirs.includes(path.resolve(out))) { console.error('Merge into a new folder, not into one of the parts.'); process.exit(2); }
 if (!resume) fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out, { recursive: true });
 const t0 = Date.now();
@@ -45,15 +50,44 @@ const stamp = {
 };
 const stampFile = path.join(out, 'build.json');
 let resumed = 0;
-if (resume && fs.existsSync(stampFile)) {
+let started = new Date(t0).toISOString();
+let wallSeconds = null;
+let partsFinished = null;
+const union = (xs) => [...new Set(xs.flat())];
+if (mergeDirs.length) {
+  const parts = mergeDirs.map((d) => ({ dir: d, ...JSON.parse(fs.readFileSync(path.join(d, 'build.json'), 'utf8')) }));
+  if (new Set(parts.map((p) => JSON.stringify(p.build))).size !== 1) { console.error('Cannot merge: the parts checked different builds.'); process.exit(2); }
+  if (parts.some((p) => !p.finished)) { console.error('Cannot merge: a part has not finished.'); process.exit(2); }
+  for (const f of ['app.jsonl', 'site.jsonl']) {
+    const seen = new Set(), lines = [];
+    for (const d of mergeDirs) {
+      if (!fs.existsSync(path.join(d, f))) continue;
+      for (const l of fs.readFileSync(path.join(d, f), 'utf8').split('\n').filter(Boolean)) {
+        const r = JSON.parse(l), k = `${r.surface}|${r.route}|${r.size}|${r.theme}|${r.lang}`;
+        if (seen.has(k)) { console.error(`Cannot merge: ${k} was checked by more than one part.`); process.exit(2); }
+        seen.add(k); lines.push(l);
+      }
+    }
+    if (lines.length) fs.writeFileSync(path.join(out, f), lines.join('\n') + '\n');
+  }
+  started = parts.map((p) => p.started).sort()[0];
+  partsFinished = parts.map((p) => p.finished).sort().pop();
+  wallSeconds = Math.round((Date.parse(partsFinished) - Date.parse(started)) / 1000);
+  stamp.build = parts[0].build;
+  stamp.matrix = { sizes: union(parts.map((p) => p.matrix.sizes)), themes: union(parts.map((p) => p.matrix.themes)), langs: union(parts.map((p) => p.matrix.langs)),
+    parts: parts.map((p) => ({ dir: path.basename(p.dir), matrix: p.matrix, started: p.started, finished: p.finished, resumed: p.resumed || 0 })) };
+  sizes.splice(0, sizes.length, ...stamp.matrix.sizes); themes.splice(0, themes.length, ...stamp.matrix.themes); langs.splice(0, langs.length, ...stamp.matrix.langs);
+  resumed = parts.reduce((n, p) => n + (p.resumed || 0), 0);
+} else if (resume && fs.existsSync(stampFile)) {
   const prev = JSON.parse(fs.readFileSync(stampFile, 'utf8'));
   if (JSON.stringify(prev.build) !== JSON.stringify(stamp.build) || JSON.stringify(prev.matrix) !== JSON.stringify(stamp.matrix)) {
     console.error('Cannot resume: the build or the matrix changed since this sweep started. Run it again without --resume.');
     process.exit(2);
   }
   resumed = (prev.resumed || 0) + 1;
+  started = prev.started || started;
 }
-fs.writeFileSync(stampFile, JSON.stringify({ ...stamp, resumed }, null, 2) + '\n');
+fs.writeFileSync(stampFile, JSON.stringify({ ...stamp, resumed, started }, null, 2) + '\n');
 const doneIn = (file) => {
   const done = new Set();
   if (!resume || !fs.existsSync(file)) return done;
@@ -67,7 +101,7 @@ const doneIn = (file) => {
 };
 
 // ---------- app ----------
-if (!args.has('--site-only')) {
+if (!mergeDirs.length && !args.has('--site-only')) {
   const routes = process.env.MT_SWEEP_ROUTES || APP_ROUTES.join(',');
   const r = spawnSync(electron, [root, '--disable-gpu', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], {
     stdio: ['ignore', 'inherit', 'inherit'],
@@ -78,7 +112,7 @@ if (!args.has('--site-only')) {
 }
 
 // ---------- website ----------
-if (!args.has('--app-only')) {
+if (!mergeDirs.length && !args.has('--app-only')) {
   const { LAYOUT_PROBE, FOCUS_BASELINE, FOCUS_STATE, AXE_RUN } = require('../src/shared/sweep-probes.js');
   let chromium;
   try { ({ chromium } = require('playwright')); } catch { console.error('Playwright is needed for the website sweep.'); process.exit(2); }
@@ -176,19 +210,21 @@ for (const f of findings) {
 const byType = {};
 for (const f of findings) byType[`${f.surface} ${f.type}`] = (byType[`${f.surface} ${f.type}`] || 0) + 1;
 const report = {
-  generated: new Date().toISOString(), seconds: Math.round((Date.now() - t0) / 1000), resumed,
+  generated: new Date().toISOString(), seconds: wallSeconds ?? Math.round((Date.now() - t0) / 1000), resumed, parts: mergeDirs.length || 1,
   tuples: { sizes, themes, langs }, surfacesChecked: records.length, findings: findings.length, distinct: distinct.size, byType,
   problems: [...distinct.values()].sort((a, b) => b.where.length - a.where.length)
 };
 fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 const md = [
   '# Every-surface sweep', '',
-  `${records.length} surface checks (${sizes.join(', ')}; ${themes.join(', ')}; ${langs.join(', ')}) in ${report.seconds} s${resumed ? ` (the last part of a run resumed ${resumed} time${resumed > 1 ? 's' : ''} after an interruption)` : ''}.`, '',
+  `${records.length} surface checks (${sizes.join(', ')}; ${themes.join(', ')}; ${langs.join(', ')}) in ${report.seconds} s${mergeDirs.length ? ` of wall-clock time, in ${mergeDirs.length} parts run side by side` : ''}${resumed ? ` (resumed ${resumed} time${resumed > 1 ? 's' : ''} after an interruption)` : ''}.`, '',
   `**${findings.length} findings, ${distinct.size} distinct problems.**`, '',
   '| Where | Findings |', '| --- | ---: |', ...Object.entries(byType).map(([k, v]) => `| ${k} | ${v} |`), '',
   '## Distinct problems', '',
   ...report.problems.slice(0, 200).map((p) => `- **${p.surface} ${p.type} \`${p.id}\`**${p.impact ? ` (${p.impact})` : ''}: ${String(p.detail || '').slice(0, 140)}${p.targets?.length ? ` · \`${p.targets[0]}\`` : ''}${p.by ? ` under \`${p.by}\`` : ''} · ${p.where.length}× (e.g. ${p.where[0]})`)
 ].join('\n');
 fs.writeFileSync(path.join(out, 'summary.md'), md + '\n');
+// A finished run records when it finished, so parts can be merged with honest wall-clock time.
+fs.writeFileSync(stampFile, JSON.stringify({ ...JSON.parse(fs.readFileSync(stampFile, 'utf8')), finished: partsFinished || report.generated }, null, 2) + '\n');
 console.log(`Sweep: ${records.length} surface checks, ${findings.length} findings, ${distinct.size} distinct problems -> ${path.relative(root, out)}/summary.md`);
 process.exit(findings.length ? 1 : 0);
