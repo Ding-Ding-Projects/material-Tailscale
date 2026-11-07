@@ -1,0 +1,34 @@
+{
+  "id": "add-regex-debug",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "00bb35bcba439d36b68c83ed525eb8640c1f014d04e4c919593e093107abb1bf",
+  "captureSha256": {
+    "reference": "5a51298c765f3ef6bc0de430512c691b160547419dbee91a4fb785fec3f11c78",
+    "app": "48968b6eadd3fde287b3f01dd2969fe7ee7d203962dc9089d923337fa804c95c"
+  },
+  "changedPixels": 131344,
+  "totalPixels": 1382400,
+  "changedRatio": 0.095,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/add-regex-debug/diff.webp"
+}

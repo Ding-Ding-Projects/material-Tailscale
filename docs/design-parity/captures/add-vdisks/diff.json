@@ -1,0 +1,34 @@
+{
+  "id": "add-vdisks",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "af79ba540be90975bb27a58af51b3be75e9461f472a413065aec53e3e9ec6c57",
+  "captureSha256": {
+    "reference": "315bcac22f204442747af9e591070dcb808ac06fa153c65475e6b3eca36167eb",
+    "app": "9571ddba0ae72eae3f71506bb58f12e49a41c5ba0262adb5f3f5c3fc985ff608"
+  },
+  "changedPixels": 166890,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1207,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/add-vdisks/diff.webp"
+}

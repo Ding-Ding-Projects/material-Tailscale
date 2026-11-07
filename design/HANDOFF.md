@@ -6,11 +6,15 @@ What is in `design/`, how it is made, and what the next design pass should know.
 
 - `canvas/*.dc.html`: sixteen boards (51 views) generated from the app's own stylesheets, plus
   `Sweep.dc.html`, a report board with the every-surface sweep's before and after score.
+- `additions/*.dc.html`: the second canvas, *Everything added* (6 boards, 14 views): the Features
+  page, virtual disks, the Ollama suite, the regex debugger and the portable companions, with its
+  own `canvas.json`, `assets/` and `assets.json`.
 - `canvas/canvas.json`: where each board sits on the design canvas.
 - `canvas/assets/` and `canvas/assets.json`: the files uploaded to the canvas (the three
   stylesheets and the website hero's dark and light captures) and the address each one has there.
-- `frames/`: contact sheets of the final board frames, four views to a sheet, from the design
-  parity run (dark theme, 1440 by 960, scale 1).
+- `frames/`: contact sheets of the final board frames, four views to a sheet (`additions-*` for
+  the second canvas), made by `node scripts/design-frames.mjs` from the design parity run (dark
+  theme, 1440 by 960, scale 1).
 - `REHEARSAL.md`: how the latest pass was reviewed, what it found and what changed.
 
 The per-screen comparison with the real app (raw captures, side-by-side images and diff records)
@@ -23,9 +27,10 @@ lives in `docs/design-parity/`, listed by the hand-written `docs/design-parity/i
    changed files to the canvas, and put each new address in `canvas/assets.json`. Do the same for
    the hero captures after new screenshots (`shot-dark.webp` and `shot-light.webp` are made from
    `docs/screenshots/{dark,light}-cli-set.png`).
-3. Edit the view specs in `scripts/design-boards.mjs` and run `npm run design:boards`.
+3. Edit the view specs in `scripts/design-boards.mjs` (second canvas: `scripts/lib/board-additions.mjs`)
+   and run `npm run design:boards`, which writes both canvases.
 4. Render every frame with the viewer
-   (`npx electron tools/design-reference --all <folder> --width 1440 --height 960 --scale 1 --themes dark,light`)
+   (`npx electron tools/design-reference [--canvas design/additions] --all <folder> --width 1440 --height 960 --scale 1 --themes dark,light`)
    and read them. The viewer prints any board whose wrapping choices or overflowing tabs differ
    from the app's layout.
 5. Run `npm run design:parity` against a clean build and record any reviewed deviation in the
@@ -34,7 +39,5 @@ lives in `docs/design-parity/`, listed by the hand-written `docs/design-parity/i
 
 ## Open items
 
-- The website hero's crop cuts the captured window's title bar at the right edge (see
-  `REHEARSAL.md`, Unresolved).
-- Screens that need a running Tailscale daemon are compared against the app's setup state; the
-  inventory records each such difference.
+- Screens that need a running Tailscale daemon, Ollama or Windows are compared against the app's
+  honest state on the Linux capture machine; the inventory records each such difference.

@@ -41,11 +41,11 @@ Framing first, then hierarchy and density, then polish. Each finding was read of
    card, and the Taildrop inbox stopped short of Send to. Each now fills its rows with real
    content: two more sample devices, two more locations and files, and the real settings of each
    section (six each) instead of a partial list.
-4. **The website hero was boxed.** A generic illustration sat in the hero and a whole-window
-   screenshot sat in a framed box below it. The hero now holds the real app, cropped to its upper
-   left at a size where its words can be read, running off the band's right and bottom edges; the
-   crop ends in the gap after the second column of controls, so no control is cut. The boxed
-   screenshot is gone.
+4. **The website hero was boxed, then cropped.** A generic illustration sat in the hero and a
+   whole-window screenshot sat in a framed box below it. The first fix cropped the real app to its
+   upper left, which cut the window's title bar and its search button at the right edge. The hero
+   now shows the whole command window (a dedicated 1120 by 760 capture), set into the band and
+   running off its bottom edge only, so every word in it, title bar included, can be read.
 5. **Stock AI icons.** Sparkles marked Automatic (best available) and Suggest the best one. They
    now use an automatic icon and a network-check icon, in the app and on the boards.
 6. **Cut controls without a cue.** The game-server tabs ran past their card mid-word with nothing
@@ -70,12 +70,40 @@ Framing first, then hierarchy and density, then polish. Each finding was read of
 
 ## Unresolved
 
-- The hero crop also cuts the captured window's title bar at the right edge, including its search
-  button. It is the window's own chrome running off the band with the rest of the window; it was
-  kept rather than moving the crop into the controls.
+- None from this pass. The title-bar crop recorded here earlier is fixed (finding 4).
 
 ## Not checked
 
 - The fresh-eye review was a separate pass by the same author on newly rendered frames, not by an
   independent reviewer.
 - The canvas itself was checked in Chromium-based renderers only, and touch input was not tried.
+
+## Second canvas: Everything added (2026-11-07)
+
+The Features page, the virtual disk manager, the Ollama suite, the regex debugger and the two
+portable companions were designed on a second canvas (*Material Tailscale · Everything added*,
+`design/additions/`, 6 boards and 14 views) before they were built, then built to match.
+
+- **Captured.** Every additions frame at 1440 by 960 in dark, read before and after the fixes,
+  and the built screens from the clean build.
+- **Real numbers.** The Features boards count the real inventory; the regex debugger board runs the
+  real step engine (136 steps and 30 backtracks for `^(a+)+b` on "aaaac"); the store board's tag
+  count was corrected to the real catalogue (7,661 tags on 271 pages).
+
+Findings, ranked, and what changed:
+
+1. **The build companion's buttons turned into circles.** Its window reused the app's `outlet`
+   grid, which stretched each child to a third of the window. The window now lays out as a plain
+   column, and the three buttons are the pills on the board.
+2. **"null" on screen.** The debugger's summary row and the harness preflight printed "null" where
+   an optional part was absent. Every new page now appends through a helper that skips empty parts.
+3. **Navigation drawn as choices.** The offline guide's article rows carried radio dots. They are
+   link rows with a chevron.
+4. **A clipped search hint.** "Search conversations" did not fit the conversation list. It reads
+   "Search chats".
+5. **The step view was too small to follow.** The debugger's pattern and text are larger, with
+   labels, and the current token and position stand out.
+
+Not checked: the same author reviewed these frames; the companions were photographed on Linux,
+where the build companion's buttons are off.
+

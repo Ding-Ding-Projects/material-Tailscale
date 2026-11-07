@@ -1,0 +1,34 @@
+{
+  "id": "add-ollama-store",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "360359070d2f530fcb4ab2846f702fbbb02dbd4ef19228e8d7df3b148a03ec64",
+  "captureSha256": {
+    "reference": "6201859a614020059c81dc617a3fae0cf09b9af26071f043f2b6701f9d84a6e8",
+    "app": "18fc088472e464771a669d593d711c9c98c77f79450f6e56dd31a191cd4a659f"
+  },
+  "changedPixels": 156506,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1132,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/add-ollama-store/diff.webp"
+}

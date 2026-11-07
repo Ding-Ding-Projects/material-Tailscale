@@ -1,0 +1,34 @@
+{
+  "id": "add-ollama-chat",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "360359070d2f530fcb4ab2846f702fbbb02dbd4ef19228e8d7df3b148a03ec64",
+  "captureSha256": {
+    "reference": "5d5604516464eaa4a7aae9b1b28a8b4a21179081b7d0c646caf2a6d41fd729be",
+    "app": "719fc1e4ba5c45aade98b932302f8f375ae13e12798a9c5e7e4013a8343bd42e"
+  },
+  "changedPixels": 151146,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1093,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/add-ollama-chat/diff.webp"
+}
