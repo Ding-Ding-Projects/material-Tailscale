@@ -16,6 +16,12 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 - The website deployed through GitHub Pages and returns HTTP 200.
 - Earlier runs v1.0.1 to v1.0.3 failed (long font file names on Windows checkout, missing npm install in the website job, release-notes step); each fix is in the history.
 
+## Minecraft server manager
+
+- Catalogue and exact download resolution checked live for Vanilla, Paper, Folia, Purpur, Fabric, Forge and Bedrock. PaperMC's v2 API is sunset; the app uses the Fill v3 API.
+- Every server tab rendered under Xvfb against a sample registry (overview, console with typed command builder, configuration, players, world generator, schedule).
+- Not run here: downloading and starting a real server jar, the data generator extraction, a generated world, Modrinth installs, SSH and Docker targets.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.

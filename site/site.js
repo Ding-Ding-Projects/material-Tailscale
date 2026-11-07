@@ -1,6 +1,6 @@
 // Material Tailscale website: landing, docs, download, status, changelog,
 // settings and tools. It reuses the desktop app's own UI modules through a
-// browser shim, so every @uh feature works here too.
+// browser shim, so every personalisation and safety feature works here too.
 import './shim.js';
 import { h, icon, clear, transition, fmtDateTime } from '../src/renderer/core/dom.js';
 import * as store from '../src/renderer/core/store.js';

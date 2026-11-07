@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Minecraft world generator</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: radial-gradient(900px 500px at 15% 0%, #183a33 0%, rgba(11,15,26,0) 60%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; gap: 10px; flex-wrap: wrap"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="8"><button type="button" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button></sc-for></div>
+<div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap"><div style="flex: 1; min-width: 280px"><div style="font: 600 12px 'Roboto Flex'; color: #6ce6b6; letter-spacing: .8px; text-transform: uppercase">survival-1 · Paper 1.21.4 · local</div><h1 style="margin: 6px 0 0; font: 800 40px Outfit">World generator</h1></div><button type="button" style="height: 48px; padding: 0 22px; border-radius: 24px; border: 0; background: #6ce6b6; color: #0b0f1a; font: 700 14px Outfit">Generate world</button></div>
+<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px">
+<section style="grid-column: span 7; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 12px"><h2 style="margin: 0; font: 700 18px Outfit; flex: 1">Size of world to generate</h2><span style="font: 600 13px 'JetBrains Mono'; color: #ffc46b">{{size}}</span></div>
+<div style="position: relative; height: 340px; border-radius: 18px; background-color: #0f1322; background-image: linear-gradient(#1d2238 1px, transparent 1px), linear-gradient(90deg, #1d2238 1px, transparent 1px); background-size: 17px 17px; overflow: hidden">
+<div style="{{rect}}"><span style="position: absolute; right: -7px; bottom: -7px; width: 14px; height: 14px; border-radius: 7px; background: #6ce6b6"></span></div>
+<span style="position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px; border-radius: 5px; background: #ffc46b"></span>
+</div>
+<div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+<span>Width</span><span style="display: inline-flex; align-items: center; border: 1px solid #2a3150; border-radius: 22px"><button type="button" onClick="{{lessW}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #e6e8f2">−</button><span style="width: 60px; text-align: center; font: 600 15px 'JetBrains Mono'">{{w}}</span><button type="button" onClick="{{moreW}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #e6e8f2">+</button></span>
+<span>Depth</span><span style="display: inline-flex; align-items: center; border: 1px solid #2a3150; border-radius: 22px"><button type="button" onClick="{{lessD}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #e6e8f2">−</button><span style="width: 60px; text-align: center; font: 600 15px 'JetBrains Mono'">{{d}}</span><button type="button" onClick="{{moreD}}" style="width: 40px; height: 40px; border: 0; background: transparent; color: #e6e8f2">+</button></span>
+<span style="font-size: 12px; color: #9aa3c4">chunks · drag the rectangle to move, the corner to resize, arrows on the keyboard</span>
+</div>
+<div style="font-size: 13px; color: #b7bedb">{{estimate}}</div>
+</section>
+<section style="grid-column: span 5; display: flex; flex-direction: column; gap: 18px">
+<div style="border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font: 700 18px Outfit">World</h2>
+<label style="display: flex; flex-direction: column; gap: 6px"><span style="font-weight: 600">Seed</span><span style="display: flex; gap: 8px"><input value="-4172144997902289642" style="flex: 1; height: 42px; border-radius: 14px; border: 1px solid #2a3150; background: #161b2e; color: #e6e8f2; padding: 0 12px; font: 13px 'JetBrains Mono'"><button type="button" style="height: 42px; padding: 0 14px; border-radius: 14px; border: 1px solid #3a4380; background: transparent; color: #dfe4ff">Random</button></span></label>
+<span style="font-weight: 600">World preset (from this version's jar)</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{presets}}" as="p" hint-placeholder-count="6"><button type="button" onClick="{{p.pick}}" style="{{p.style}}">{{p.label}}</button></sc-for></div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px"><span style="padding: 8px 12px; border-radius: 12px; background: #1b2140">Difficulty: Normal</span><span style="padding: 8px 12px; border-radius: 12px; background: #1b2140">Game mode: Survival</span><span style="padding: 8px 12px; border-radius: 12px; background: #1b2140">Hardcore: off</span><span style="padding: 8px 12px; border-radius: 12px; background: #1b2140">Structures: on</span></div>
+</div>
+<div style="border-radius: 28px; padding: 22px; background: linear-gradient(150deg, #2b2112, #131829); border: 1px solid #3a2e18; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font: 700 18px Outfit">Output</h2>
+<div style="display: flex; border-radius: 22px; background: #0f1322; padding: 4px"><button type="button" onClick="{{pickFolder}}" style="{{folderStyle}}">Folder</button><button type="button" onClick="{{pickZip}}" style="{{zipStyle}}">ZIP</button></div>
+<span style="display: flex; gap: 8px; align-items: center"><span style="flex: 1; font: 12px 'JetBrains Mono'; color: #c9b896">D:\Worlds\survival-1{{ext}}</span><button type="button" style="height: 38px; padding: 0 14px; border-radius: 19px; border: 0; background: #ffc46b; color: #0b0f1a; font: 700 13px 'Roboto Flex'">Browse…</button></span>
+<span style="font-size: 12px; color: #c9b896">Never overwrites. Verified against a file digest manifest before it says done.</span>
+</div>
+</section>
+<section style="grid-column: span 12; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f">
+<h2 style="margin: 0 0 10px; font: 700 18px Outfit">Game rules (53, typed from commands.json)</h2>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px"><sc-for list="{{rules}}" as="r" hint-placeholder-count="8"><div style="padding: 10px 12px; border-radius: 14px; background: #161b2e; display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font: 12px 'JetBrains Mono'">{{r.name}}</span><span style="font: 600 12px 'JetBrains Mono'; color: #6ce6b6">{{r.v}}</span></div></sc-for></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={w:100,d:100,tab:'World generator',preset:'normal',out:'folder'};}
+  renderVals(){
+    const s=this.state;
+    const tabs=['Overview','Console','Configuration','Players','Plugins','Worlds','World generator','Schedule'].map(label=>({label,pick:()=>this.setState({tab:label}),style:'height:38px;padding:0 16px;border-radius:12px;border:1px solid '+(s.tab===label?'#6ce6b6':'#2a3150')+';background:'+(s.tab===label?'#14302a':'transparent')+';color:#e6e8f2;font:600 13px Roboto Flex'}));
+    const presets=['normal','flat','large_biomes','amplified','single_biome_surface','debug_all_block_states'].map(label=>({label,pick:()=>this.setState({preset:label}),style:'height:34px;padding:0 12px;border-radius:12px;border:1px solid '+(s.preset===label?'#a9b8ff':'#2a3150')+';background:'+(s.preset===label?'#33407f':'transparent')+';color:#e6e8f2;font:600 12px JetBrains Mono'}));
+    const px=Math.min(320,s.w*1.7), py=Math.min(320,s.d*1.7);
+    const batches=Math.ceil(s.w/16)*Math.ceil(s.d/16);
+    const rules=[['doDaylightCycle','true'],['keepInventory','false'],['randomTickSpeed','3'],['spawnRadius','10'],['doMobSpawning','true'],['mobGriefing','true'],['playersSleepingPercentage','100'],['maxEntityCramming','24']].map(([name,v])=>({name,v}));
+    const seg=(on)=>'flex:1;height:38px;border-radius:18px;border:0;background:'+(on?'#ffc46b':'transparent')+';color:'+(on?'#0b0f1a':'#c9cfea')+';font:700 13px Roboto Flex';
+    return{tabs,presets,rules,w:s.w,d:s.d,size:`${s.w} × ${s.d} chunks · ${s.w*16} × ${s.d*16} blocks`,estimate:`${s.w*s.d} chunks in ${batches} forceload batches of at most 16 × 16`,
+      rect:`position:absolute;left:calc(50% - ${px/2}px);top:calc(50% - ${py/2}px);width:${px}px;height:${py}px;border:2px solid #6ce6b6;background:rgba(108,230,182,.12);border-radius:6px`,
+      lessW:()=>this.setState({w:Math.max(1,s.w-10)}),moreW:()=>this.setState({w:s.w+10}),lessD:()=>this.setState({d:Math.max(1,s.d-10)}),moreD:()=>this.setState({d:s.d+10}),
+      pickFolder:()=>this.setState({out:'folder'}),pickZip:()=>this.setState({out:'zip'}),folderStyle:seg(s.out==='folder'),zipStyle:seg(s.out==='zip'),ext:s.out==='zip'?'.zip':''};
+  }
+}
+</script>
+</body>
+</html>

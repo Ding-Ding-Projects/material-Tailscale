@@ -43,7 +43,7 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Notifications and centre | yes | yes | ui/overlay.js | features/records/notifications.md | dark-notifications.png |
 | File converter | partial | partial | pages/tools.js | features/tools/file-converter.md | dark-converter.png |
 | Base64 toolkit | yes | yes | pages/tools.js | features/tools/base64.md | dark-base64.png |
-| Minecraft server manager | partial (versions only) | n/a | pages/tools.js | features/tools/minecraft.md | dark-minecraft.png |
+| Minecraft server manager | built; catalogues and download resolution verified live for all seven flavours; running a server and the generator unverified here | n/a | pages/minecraft.js, main/minecraft.js | features/tools/minecraft.md | dark-minecraft.png |
 | Ollama suite | partial (list, pull) | n/a | pages/tools.js | features/tools/ollama.md | dark-ollama.png |
 | Drawing and annotation | yes | yes | pages/tools.js | features/tools/drawing.md | dark-draw.png |
 | Front-screen version and time | yes | yes | ui/shell.js, site.js | — | title bar in every capture |

@@ -10,6 +10,7 @@ const secrets = require('./secrets');
 const history = require('./history');
 const ladder = require('./ladder');
 const tools = require('./tools');
+const mc = require('./minecraft');
 const { COMMANDS, GROUPS, GLOBAL_FLAGS } = require('../shared/cli-catalog');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -133,6 +134,15 @@ handle('tools:archiveData', (opts) => tools.archiveData(opts));
 handle('tools:convertMedia', (opts, job) => tools.convertMedia(opts, progress(job)));
 handle('tools:convertDocument', (opts) => tools.convertDocument(opts));
 handle('tools:grep', (opts) => tools.grep(opts));
+mc.setEmitter((kind, payload) => { if (kind === 'progress') win?.webContents.send('tools:progress', payload); else win?.webContents.send('mc:' + kind, payload); });
+for (const [name, fn] of Object.entries({
+  registry: () => mc.loadRegistry(), catalog: (e, f) => mc.catalog(e, f), resolve: (e, f, v) => mc.resolve(e, f, v), probe: (t) => mc.probeTarget(t), discover: (t) => mc.discover(t),
+  create: (spec, job) => mc.create(spec, job), adopt: (t, item, n) => mc.adopt(t, item, n), acceptEula: (id) => mc.acceptEula(id), start: (id) => mc.start(id), stop: (id, o) => mc.stop(id, o),
+  command: (id, c) => mc.command(id, c), status: (id) => mc.status(id), readFile: (id, rel) => mc.readFile(id, rel), writeFile: (id, rel, t) => mc.writeFile(id, rel, t), update: (id, patch) => mc.updateServer(id, patch),
+  searchExtensions: (o) => mc.searchExtensions(o), installExtension: (id, pid, o, job) => mc.installExtension(id, pid, o, job), listExtensions: (id) => mc.listExtensions(id), toggleExtension: (id, f, file, en) => mc.toggleExtension(id, f, file, en), removeExtension: (id, f, file) => mc.removeExtension(id, f, file),
+  backup: (id, job) => mc.backup(id, job), listBackups: (id) => mc.listBackups(id), restore: (id, file, job) => mc.restore(id, file, job), extractWorldgen: (id, job) => mc.extractWorldgen(id, job), generateWorld: (id, o, job) => mc.generateWorld(id, o, job), cancelGenerate: (job) => mc.cancelGenerate(job),
+  lookupPlayer: (n) => mc.lookupPlayer(n), remove: (id, o) => mc.remove(id, o), followLogs: (id) => mc.followLogs(id)
+})) handle('mc:' + name, fn);
 handle('tools:bundled', () => ({ ffmpeg: tools.ffmpegPath(), sevenZip: tools.sevenZipPath(), ffmpegPresent: !!tools.ffmpegPath() && fs.existsSync(tools.ffmpegPath()), sevenZipPresent: !!tools.sevenZipPath() && fs.existsSync(tools.sevenZipPath()) }));
 handle('history:record', (message, files) => history.record(message, files));
 handle('history:list', (limit) => history.list(limit));
@@ -203,11 +213,14 @@ async function captureAll(dir) {
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {
-      const [dest, arg] = d.split(':');
+      // An entry may name a visible button to press after opening: dest:arg>Button label
+      const [route, press] = d.split('>');
+      const [dest, arg] = route.split(':');
       await wc.executeJavaScript(`window.__mtOpen(${JSON.stringify(dest)}, ${JSON.stringify(arg || undefined)}); true`);
       await wait(900);
+      if (press) { await wc.executeJavaScript(`[...document.querySelectorAll('button')].find((b) => b.offsetParent && b.textContent.trim().endsWith(${JSON.stringify(press)}))?.click(); true`); await wait(1200); }
       const img = await wc.capturePage();
-      fs.writeFileSync(path.join(dir, `${theme}-${d.replace(':', '-')}.png`), img.toPNG());
+      fs.writeFileSync(path.join(dir, `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`), img.toPNG());
     }
   }
   if (process.env.MT_CAPTURE_PALETTE !== '0') {

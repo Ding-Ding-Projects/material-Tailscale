@@ -126,8 +126,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .page-head .titles { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 6px; }
 .page-head p { margin: 0; color: var(--on-2); max-width: 760px; }
 .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
-.span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; } .span-7 { grid-column: span 7; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
-@media (max-width: 1100px) { .span-3, .span-4 { grid-column: span 6; } .span-5, .span-7, .span-6, .span-8 { grid-column: span 12; } }
+.span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; } .span-7 { grid-column: span 7; } .span-8 { grid-column: span 8; } .span-9 { grid-column: span 9; } .span-12 { grid-column: span 12; }
+@media (max-width: 1100px) { .span-3, .span-4 { grid-column: span 6; } .span-3.mc-list { grid-column: span 12; } .span-5, .span-7, .span-6, .span-8, .span-9 { grid-column: span 12; } }
 @media (max-width: 720px) { .span-3, .span-4 { grid-column: span 12; } .rail { flex-basis: 64px; } .rail-item { width: 56px; font-size: 0; } .rail-item .pill { width: 48px; } .titlebar .prov { display: none; } .outlet { padding: 14px; } }
 
 .card { background: var(--surface); border: 1px solid var(--outline-soft); border-radius: var(--r-xl); padding: var(--pad); display: flex; flex-direction: column; gap: 12px; position: relative; min-width: 0; animation: rise var(--dur-l) var(--ease-emph) both; }

@@ -16,6 +16,7 @@ import './pages/tailscale.js';
 import './pages/admin.js';
 import './pages/settings.js';
 import './pages/tools.js';
+import { runMcSchedules } from './pages/minecraft.js';
 import './pages/meta.js';
 
 // ---------- appearance from settings ----------
@@ -190,6 +191,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   applyLocks();
   ts.startPolling();
   runSchedules(); setInterval(runSchedules, 30000);
+  setInterval(() => runMcSchedules().catch(() => {}), 30000);
   window.addEventListener('mt:palette', openPalette);
   window.addEventListener('mt:onboard', onboarding);
   let prevState = null;

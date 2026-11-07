@@ -154,14 +154,14 @@ const VID = ['mp4', 'mkv', 'webm', 'mov', 'avi', 'wmv', 'flv', 'm4v'];
 const ARC = ['zip', '7z', 'tar', 'gz', 'tgz', 'bz2', 'xz', 'rar', 'iso', 'cab'];
 const DOC = ['docx', 'pdf', 'md', 'markdown', 'html', 'htm', 'txt', 'log'];
 export const ADAPTERS = [
-  { cat: 'Structured data / spreadsheets', from: ['json', 'csv'], to: ['json', 'yaml', 'csv', 'md', 'html', 'txt'], engine: 'built in' },
-  { cat: 'Images', from: IMG, to: ['png', 'jpeg', 'webp'], engine: 'built in (Chromium)' },
-  { cat: 'Audio', from: [...AUD, ...VID], to: ['mp3', 'ogg', 'wav', 'flac', 'm4a', 'opus'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
-  { cat: 'Video', from: VID, to: ['mp4', 'webm', 'mkv', 'gif'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
-  { cat: 'Archives', from: ARC, to: ['extract', 'zip', '7z'], engine: '7-Zip (bundled)', tool: 'sevenZip' },
-  { cat: 'Documents / PDF', from: DOC, to: ['pdf', 'html', 'txt'], engine: 'built in (Chromium print, mammoth, pdf.js)' },
-  { cat: 'Code / text', from: ['txt', 'md', 'log', 'hujson', 'js', 'ts', 'py', 'go', 'yaml', 'yml', 'xml', 'ini', 'toml'], to: ['html', 'pdf', 'txt'], engine: 'built in' },
-  { cat: 'Binary encodings', from: ['*'], to: ['base64', 'hex'], engine: 'built in' }
+  { category: 'Structured data / spreadsheets', from: ['json', 'csv'], to: ['json', 'yaml', 'csv', 'md', 'html', 'txt'], engine: 'built in' },
+  { category: 'Images', from: IMG, to: ['png', 'jpeg', 'webp'], engine: 'built in (Chromium)' },
+  { category: 'Audio', from: [...AUD, ...VID], to: ['mp3', 'ogg', 'wav', 'flac', 'm4a', 'opus'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
+  { category: 'Video', from: VID, to: ['mp4', 'webm', 'mkv', 'gif'], engine: 'ffmpeg (bundled)', tool: 'ffmpeg' },
+  { category: 'Archives', from: ARC, to: ['extract', 'zip', '7z'], engine: '7-Zip (bundled)', tool: 'sevenZip' },
+  { category: 'Documents / PDF', from: DOC, to: ['pdf', 'html', 'txt'], engine: 'built in (Chromium print, mammoth, pdf.js)' },
+  { category: 'Code / text', from: ['txt', 'md', 'log', 'hujson', 'js', 'ts', 'py', 'go', 'yaml', 'yml', 'xml', 'ini', 'toml'], to: ['html', 'pdf', 'txt'], engine: 'built in' },
+  { category: 'Binary encodings', from: ['*'], to: ['base64', 'hex'], engine: 'built in' }
 ];
 registerPage('converter', () => {
   let src = null;
@@ -169,7 +169,7 @@ registerPage('converter', () => {
   const info = h('div.small');
   const opts = h('div.stack');
   const catalogue = h('div');
-  const drawCatalogue = () => clear(catalogue).append(h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', ['Category', 'From', 'To', 'Engine', 'Status'].map((c) => h('th', c)))), h('tbody', ADAPTERS.map((a) => { const ok = !a.tool || bundled[a.tool + 'Present']; return h('tr', h('td', a.cat), h('td.small', a.from.join(', ')), h('td.small', a.to.join(', ')), h('td.small', a.engine), h('td', ok ? h('span.badge.ok', pair('ready', '可用')) : h('span.badge.err', pair(`missing ${a.tool} in this installation`, `呢個安裝缺少 ${a.tool}`)))); })))));
+  const drawCatalogue = () => clear(catalogue).append(h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', ['Category', 'From', 'To', 'Engine', 'Status'].map((c) => h('th', c)))), h('tbody', ADAPTERS.map((a) => { const ok = !a.tool || bundled[a.tool + 'Present']; return h('tr', h('td', a.category), h('td.small', a.from.join(', ')), h('td.small', a.to.join(', ')), h('td.small', a.engine), h('td', ok ? h('span.badge.ok', pair('ready', '可用')) : h('span.badge.err', pair(`missing ${a.tool} in this installation`, `呢個安裝缺少 ${a.tool}`)))); })))));
   window.mt.tools.bundled().then((b) => { bundled = b; drawCatalogue(); });
   drawCatalogue();
   const drop = h('div.card.hero', { style: { minHeight: '140px', alignItems: 'center', justifyContent: 'center', borderStyle: 'dashed' }, dataset: { el: 'converter-drop' } }, icon('upload_file'), h('b', pair('Drop a file here, or choose one', '拖檔案到呢度，或者揀一個')), h('button.btn.small', { on: { click: async () => { const p = await window.mt.dialog.open({}); if (p) pick(p[0]); } } }, pair('Choose file…', '揀檔…')));
@@ -189,14 +189,14 @@ registerPage('converter', () => {
     for (const a of ADAPTERS) {
       if (!(a.from.includes(ext) || a.from.includes('*'))) continue;
       const ok = !a.tool || bundled[a.tool + 'Present'];
-      opts.append(h('div.row', h('b', { style: { minWidth: '200px' } }, a.cat), ...a.to.map((to) => h('button.btn.small' + (ok ? '' : '.outline'), { disabled: !ok, title: ok ? a.engine : pair(`${a.tool} is missing from this installation`, `缺少 ${a.tool}`), on: { click: () => convert(a, to) } }, to === 'extract' ? pair('Extract', '解壓') : `→ ${to}`))));
+      opts.append(h('div.row', h('b', { style: { minWidth: '200px' } }, a.category), ...a.to.map((to) => h('button.btn.small' + (ok ? '' : '.outline'), { disabled: !ok, title: ok ? a.engine : pair(`${a.tool} is missing from this installation`, `缺少 ${a.tool}`), on: { click: () => convert(a, to) } }, to === 'extract' ? pair('Extract', '解壓') : `→ ${to}`))));
     }
     if (!opts.childNodes.length) opts.append(h('div.small.muted', pair('No converter handles this type.', '冇轉換器處理呢個類型。')));
   };
   const base = () => src.p.split(/[\\/]/).pop().replace(/\.[^.]+$/, '');
   const convert = async (a, to) => {
     try {
-      if (a.cat === 'Images') {
+      if (a.category === 'Images') {
         const img = new Image(); img.src = `data:image/${src.ext === 'svg' ? 'svg+xml' : src.ext === 'jpg' ? 'jpeg' : src.ext};base64,${src.b64}`; await img.decode();
         const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0);
         const p = await window.mt.dialog.save({ defaultPath: `${base()}.${to === 'jpeg' ? 'jpg' : to}` }); if (p) { await window.mt.fs.writeBytes(p, c.toDataURL('image/' + to, 0.92).split(',')[1]); toast(pair('Converted.', '已轉換。'), { kind: 'ok' }); }
@@ -204,7 +204,7 @@ registerPage('converter', () => {
       }
       if (a.tool === 'ffmpeg') {
         const out = await window.mt.dialog.save({ defaultPath: `${base()}.${to}` }); if (!out) return;
-        withProgress(pair(`Convert to ${to}`, `轉換做 ${to}`), (job) => window.mt.tools.convertMedia({ input: src.p, output: out, options: { audioOnly: a.cat === 'Audio', crf: a.cat === 'Video' && to !== 'gif' ? 23 : undefined } }, job), { onDone: (r, b) => r?.path && b.append(h('button.btn.small.outline', { on: { click: () => window.mt.shell.showItem(r.path) } }, icon('folder_open'), pair('Show in folder', '喺資料夾顯示'))) });
+        withProgress(pair(`Convert to ${to}`, `轉換做 ${to}`), (job) => window.mt.tools.convertMedia({ input: src.p, output: out, options: { audioOnly: a.category === 'Audio', crf: a.category === 'Video' && to !== 'gif' ? 23 : undefined } }, job), { onDone: (r, b) => r?.path && b.append(h('button.btn.small.outline', { on: { click: () => window.mt.shell.showItem(r.path) } }, icon('folder_open'), pair('Show in folder', '喺資料夾顯示'))) });
         return;
       }
       if (a.tool === 'sevenZip') {
@@ -214,7 +214,7 @@ registerPage('converter', () => {
         withProgress(pair(`Repack as ${to}`, `重新壓縮做 ${to}`), async (job) => { await window.mt.tools.archiveExtract({ file: src.p, dest: tmp[0] }, job); return window.mt.tools.archiveCreate({ files: [tmp[0] + (navigator.platform.startsWith('Win') ? '\\*' : '/*')], dest: out, format: to }, job); });
         return;
       }
-      if (a.cat === 'Documents / PDF' || (a.cat === 'Code / text' && to !== 'txt')) {
+      if (a.category === 'Documents / PDF' || (a.category === 'Code / text' && to !== 'txt')) {
         const out = await window.mt.dialog.save({ defaultPath: `${base()}.${to}` }); if (!out) return;
         withProgress(pair(`Convert to ${to}`, `轉換做 ${to}`), () => window.mt.tools.convertDocument({ input: src.p, output: out }), { onDone: (r, b) => r?.path && b.append(h('button.btn.small.outline', { on: { click: () => window.mt.shell.openPath(r.path) } }, icon('open_in_new'), pair('Open', '開'))) });
         return;
@@ -337,21 +337,3 @@ registerPage('ollama', (ctx) => {
     h('section.card', chat));
 });
 
-// ---------------- Minecraft ----------------
-registerPage('minecraft', () => {
-  const box = h('div.stack');
-  const load = async () => {
-    clear(box).append(h('div.skeleton', { style: { height: '80px' } }));
-    try {
-      const m = await fetch('https://piston-meta.mojang.com/mc/game/version_manifest_v2.json').then((r) => r.json());
-      const kind = segmented([{ value: 'release', label: pair('Releases', '正式版') }, { value: 'snapshot', label: pair('Snapshots', '快照') }, { value: 'old_beta', label: 'Beta' }, { value: 'old_alpha', label: 'Alpha' }], 'release', { label: 'Channel' });
-      const list = h('div.picker-list');
-      const draw = (k) => { clear(list).append(...m.versions.filter((v) => v.type === k).slice(0, 200).map((v) => h('div.pick-row', { style: { cursor: 'default' } }, h('span.ava', icon('grass')), h('span.meta', h('b', v.id), h('span', new Date(v.releaseTime).toLocaleDateString())), v.id === m.latest.release ? h('span.badge.ok', pair('latest', '最新')) : null))); };
-      kind.onChange(draw); draw('release');
-      clear(box).append(h('p', pair(`Latest release ${m.latest.release}, latest snapshot ${m.latest.snapshot}. Version discovery is live from Mojang.`, `最新正式版 ${m.latest.release}，最新快照 ${m.latest.snapshot}。`)), kind.el, list,
-        h('div.card.tonal', h('b', pair('Server creation and the world generator are planned for a later release.', '建立伺服器同世界生成器會喺之後版本加入。')), h('p.small.muted', pair('This release lists every server version honestly; it does not yet download or run a server.', '今個版本只會列出版本，未會下載或者運行伺服器。'))));
-    } catch (e) { clear(box).append(h('div.err-text', pair(`Version list unavailable: ${e.message}`, `攞唔到版本列表：${e.message}`))); }
-  };
-  load();
-  return h('div.page', head(pair('Game servers', '遊戲伺服器'), t('minecraft'), pair('Java Edition version discovery across releases, snapshots, beta and alpha.', 'Java 版本：正式、快照、Beta 同 Alpha。')), h('section.card', box));
-});

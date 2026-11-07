@@ -32,7 +32,7 @@
 - [x] Local Git history with append-only restore
 - [x] Exports in JSON, YAML, CSV, Markdown, HTML and text; VS Code and editor hand-off
 - [x] Notification centre with bulk delete; changelog viewer; offline docs
-- [ ] Unlock ladder grading in the main process with single-use nonces (currently graded in the interface)
+- [x] Unlock ladder grading in the main process with single-use nonces
 
 ## Phase 4: Tools
 - [x] Base64 toolkit with verified round trip
@@ -40,9 +40,9 @@
 - [x] Drawing board with seven pens, eraser, SVG and PNG export, screenshot annotation
 - [x] Ollama model list and pull
 - [x] Minecraft Java version discovery
-- [ ] Bundled converters for documents, audio, video and archives
-- [ ] One-click managed Ollama installer
-- [ ] Minecraft server creator, plugin installer and world generator
+- [x] Bundled converters for documents, audio, video and archives
+- [x] One-click managed Ollama installer
+- [x] Minecraft server creator, plugin installer and world generator (generator run against a real server jar not yet verified in this environment)
 
 ## Phase 5: Release and website
 - [x] Squirrel.Windows packaging, unsigned verification, update banner (first release v1.0.4 published)
