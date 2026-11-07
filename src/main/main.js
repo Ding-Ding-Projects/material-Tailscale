@@ -288,6 +288,9 @@ app.setAppUserModelId('com.dingdingprojects.materialtailscale');
 // The every-surface sweep runs in a throwaway profile: it never touches the user's settings,
 // starts from a known state, and can run beside an open copy of the app.
 if (process.env.MT_SWEEP_DIR) app.setPath('userData', fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'mt-sweep-profile-')));
+// Screenshot, clipping and recording runs may name their own profile folder, so two runs can
+// go side by side; ordinary use never reads this.
+if (process.env.MT_CAPTURE_PROFILE && !process.env.MT_SWEEP_DIR && (process.env.MT_CAPTURE_DIR || process.env.MT_RECORD_DIR)) app.setPath('userData', path.resolve(process.env.MT_CAPTURE_PROFILE));
 const single = app.requestSingleInstanceLock();
 if (!single) app.quit();
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
