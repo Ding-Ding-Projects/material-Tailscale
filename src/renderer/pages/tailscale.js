@@ -208,7 +208,7 @@ registerPage('exit', () => {
 // ---------------- Routes ----------------
 registerPage('routes', () => {
   const self = ts.self();
-  const routes = chips(self?.PrimaryRoutes || [], { kind: 'cidrs', label: pair('Advertised subnet routes', '宣告嘅子網路由'), suggestions: ['192.168.0.0/24', '192.168.1.0/24', '10.0.0.0/24', '172.16.0.0/12'] });
+  const routes = chips(self?.PrimaryRoutes || [], { kind: 'cidrs', label: pair('Advertised subnet routes', '宣告嘅子網路由'), suggestions: ['198.51.100.0/24', '203.0.113.0/24', '192.0.2.0/24'] });
   const accept = switchCtl(false, { label: pair('Accept routes', '接受路由'), triState: true });
   const snat = switchCtl(undefined, { label: 'SNAT', triState: true });
   const stateful = switchCtl(undefined, { label: pair('Stateful filtering', '有狀態過濾'), triState: true });

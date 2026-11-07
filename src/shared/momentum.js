@@ -1,0 +1,30 @@
+// One related next step per command, shown when Momentum is on. Each entry
+// names the command to open next and why. No streaks, scores or praise.
+module.exports = {
+  up: ['status', 'See who is on your tailnet now.', '睇吓而家邊個喺 tailnet。'],
+  login: ['status', 'Check the device is connected.', '檢查部機連咗未。'],
+  down: ['up', 'Bring Tailscale back up when you are ready.', '準備好就重新連線。'],
+  logout: ['login', 'Sign in again or with another account.', '重新登入或者用另一個帳戶。'],
+  set: ['get', 'Read the preferences back to confirm the change.', '讀返設定確認改咗。'],
+  status: ['netcheck', 'Check the network path and the nearest relay.', '檢查網絡同最近嘅中繼。'],
+  netcheck: ['ping', 'Ping a peer to see whether the path is direct.', 'Ping 一部機睇吓係咪直連。'],
+  ping: ['whois', 'See who owns that address.', '睇吓呢個地址屬於邊個。'],
+  'exit-node-list': ['exit-node-suggest', 'Ask for the recommended exit node.', '問建議嘅出口節點。'],
+  'exit-node-suggest': ['set', 'Use it with set --exit-node.', '用 set --exit-node 揀佢。'],
+  serve: ['serve-status', 'Confirm what is being served.', '確認分享緊乜嘢。'],
+  'serve-off': ['serve-status', 'Confirm nothing is left being served.', '確認冇嘢再分享。'],
+  funnel: ['funnel-status', 'Confirm what is public on the internet.', '確認互聯網上公開咗乜嘢。'],
+  'funnel-off': ['funnel-status', 'Confirm the public share is gone.', '確認公開分享已經冇咗。'],
+  'file-cp': ['file-targets', 'See which devices can receive files.', '睇吓邊部機可以收檔案。'],
+  'file-get': ['file-targets', 'Send something back.', '傳返啲嘢過去。'],
+  cert: ['serve', 'Serve HTTPS with the new certificate.', '用新證書提供 HTTPS。'],
+  'lock-init': ['lock-status', 'Check the lock state and trusted keys.', '檢查鎖狀態同信任嘅鎖匙。'],
+  'lock-add': ['lock-status', 'Check the new key is trusted.', '確認新鎖匙已信任。'],
+  'lock-sign': ['lock-status', 'Check the node is now signed.', '確認部機已簽署。'],
+  'drive-share': ['drive-list', 'See every shared folder.', '睇晒所有分享資料夾。'],
+  'drive-unshare': ['drive-list', 'Confirm the share is gone.', '確認分享已移除。'],
+  'switch': ['whoami', 'Confirm which account is active.', '確認用緊邊個帳戶。'],
+  update: ['version', 'Confirm the installed version.', '確認已安裝版本。'],
+  bugreport: ['netcheck', 'Attach a network check to the report.', '附上網絡檢查。'],
+  'dns-status': ['dns-query', 'Try resolving a name.', '試吓解析一個名。']
+};

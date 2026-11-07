@@ -8,11 +8,11 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const files = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
 const EXCLUDE = [/^vendor\//, /^assets\/fonts\//, /^design\//, /package-lock\.json$/, /api-catalog\.json$/, /\.(png|ico|woff2?|ttf|svg)$/];
-const cat = (f) => (/^test\//.test(f) ? 'Tests' : /\.(css|html)$/.test(f) ? 'Styles and markup' : /\.(md)$/.test(f) ? 'Docs' : /\.(js|mjs|cjs|bat|sh|ps1|yml|json)$/.test(f) ? 'Source' : null);
+const kindOf = (f) => (/^test\//.test(f) ? 'Tests' : /\.(css|html)$/.test(f) ? 'Styles and markup' : /\.(md)$/.test(f) ? 'Docs' : /\.(js|mjs|cjs|bat|sh|ps1|yml|json)$/.test(f) ? 'Source' : null);
 const rows = {};
 for (const f of files) {
   if (EXCLUDE.some((r) => r.test(f))) continue;
-  const c = cat(f); if (!c) continue;
+  const c = kindOf(f); if (!c) continue;
   const text = fs.readFileSync(path.join(root, f), 'utf8');
   const lines = text.split('\n');
   rows[c] ||= { files: 0, total: 0, nonBlank: 0 };

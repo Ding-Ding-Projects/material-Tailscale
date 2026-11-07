@@ -50,7 +50,7 @@ export function dialog({ title, body, actions = [], wide, onClose, emojiChar, in
 
 export function confirmDialog(title, message, { okLabel = t('apply'), danger } = {}) {
   return new Promise((res) => {
-    dialog({ title, body: h('p', message), emojiChar: danger ? '⚠️' : '❓', onClose: (v) => res(!!v), actions: [{ label: t('cancel'), kind: 'outline', value: false }, { label: okLabel, kind: danger ? 'danger' : '', value: true }] });
+    dialog({ title, body: h('p', message), emojiChar: danger ? '⚠️' : '💬', onClose: (v) => res(!!v), actions: [{ label: t('cancel'), kind: 'outline', value: false }, { label: okLabel, kind: danger ? 'danger' : '', value: true }] });
   });
 }
 

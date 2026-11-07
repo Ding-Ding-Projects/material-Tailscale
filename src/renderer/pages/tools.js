@@ -5,7 +5,7 @@ import { registerPage, openDest, openInNewTab } from '../ui/shell.js';
 import { toast, dialog, collapsible } from '../ui/overlay.js';
 import { superConfirm } from '../ui/safety.js';
 import { segmented, stepper, switchCtl, text } from '../ui/controls.js';
-import { workbench } from '../ui/regex.js';
+import { workbench, folderSearch } from '../ui/regex.js';
 import { exportTo, FORMATS } from '../ui/exporter.js';
 import totpLib from '../../shared/totp.js';
 import QRCode from 'qrcode';
@@ -238,7 +238,7 @@ registerPage('converter', () => {
 });
 
 // ---------------- Regex page ----------------
-registerPage('regex', () => h('div.page', head(pair('Patterns', '模式'), t('regex'), pair('Build, test, explain, replace and generate code for regular expressions.', '建立、測試、解釋、替換同產生正則表達式程式碼。')), h('div.card', workbench())));
+registerPage('regex', () => h('div.page', head(pair('Patterns', '模式'), t('regex'), pair('Build, test, explain, replace and generate code for regular expressions.', '建立、測試、解釋、替換同產生正則表達式程式碼。')), h('div.card', workbench({ initial: '(?<host>[a-z0-9-]+)\\s+(?<ip>100(?:\\.\\d{1,3}){3})' })), h('section.card', h('h3', pair('Search inside files (GREP)', '喺檔案入面搜尋（GREP）')), folderSearch())));
 
 // ---------------- Drawing board ----------------
 const PENS = [['pen', 'Pen', 'P', 3], ['marker', 'Marker', 'M', 10], ['highlighter', 'Highlighter', 'H', 18], ['pencil', 'Pencil', 'N', 1.5], ['brush', 'Brush', 'B', 8], ['calligraphy', 'Calligraphy', 'C', 6], ['neon', 'Neon', 'O', 5], ['eraser', 'Eraser', 'E', 20]];

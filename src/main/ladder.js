@@ -56,11 +56,11 @@ async function start(id, rung, { school } = {}) {
   if (rung === 'dimsum') {
     if (school) return { ok: false, skip: true };
     try {
-      const cat = await (await fetch('https://raw.githubusercontent.com/Ding-Ding-Projects/dim-sum-photos/main/catalog/index.json')).json();
+      const catalogue = await (await fetch('https://raw.githubusercontent.com/Ding-Ding-Projects/dim-sum-photos/main/catalog/index.json')).json();
       const rel = await (await fetch('https://api.github.com/repos/Ding-Ding-Projects/dim-sum-photos/releases?per_page=100', { headers: { 'User-Agent': 'MaterialTailscale' } })).json();
       const assets = new Map();
       for (const r of rel) { if (r.draft || !/^catalog-v1(?:-part-\d+)?$/.test(r.tag_name)) continue; for (const a of r.assets || []) if (/\.png$/i.test(a.name)) assets.set(a.name, a.browser_download_url); }
-      const pool = cat.dishes.filter((d) => assets.has(d.image?.path?.split('/').pop()));
+      const pool = catalogue.dishes.filter((d) => assets.has(d.image?.path?.split('/').pop()));
       if (pool.length < 4) return { ok: false, skip: true };
       const pick = [];
       while (pick.length < 4) { const d = pool[crypto.randomInt(pool.length)]; if (!pick.includes(d)) pick.push(d); }

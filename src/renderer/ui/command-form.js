@@ -13,6 +13,8 @@ import { sound, narrate } from '../core/feedback.js';
 import { buildArgs } from '../../shared/cli-catalog.js';
 import { exportMenu } from './exporter.js';
 import { YUE_TITLES } from './cli-yue.js';
+import { helpRequest } from './jobs.js';
+import MOMENTUM from '../../shared/momentum.js';
 
 const PLATFORM = { win32: 'Windows', darwin: 'macOS', linux: 'Linux' };
 
@@ -28,7 +30,7 @@ export function infoBtn(title, explanation, { example, steps } = {}) {
 }
 
 function exampleFor(cmd, spec) {
-  const val = { bool: 'true', int: String(spec.default ?? 3), port: '443', duration: spec.default || '5s', cidrs: '192.168.1.0/24', tags: 'tag:server', enum: spec.options?.find(Boolean) || '', exitnode: 'nas-01', peer: 'nas-01' }[spec.type] ?? 'value';
+  const val = { bool: 'true', int: String(spec.default ?? 3), port: '443', duration: spec.default || '5s', cidrs: '198.51.100.0/24', tags: 'tag:server', enum: spec.options?.find(Boolean) || '', exitnode: 'nas-01', peer: 'nas-01' }[spec.type] ?? 'value';
   return `tailscale ${cmd.path.join(' ')} --${spec.name}=${val}`;
 }
 
@@ -170,12 +172,31 @@ export function commandForm(cmd, { compact, onResult, preset } = {}) {
     h('div.titles', h('div.eyebrow', 'tailscale ' + cmd.path.join(' ')), h('h1', pair(cmd.title, YUE_TITLES[cmd.id])), h('p', cmd.desc),
       h('div.row', cmd.platforms ? h('span.badge.info', cmd.platforms.map((p) => PLATFORM[p]).join(', ') + pair(' only', ' 限定')) : null, cmd.danger ? h('span.badge.' + (cmd.danger === 'hard' ? 'err' : 'warn'), cmd.danger === 'hard' ? pair('Destructive', '危險') : pair('Changes state', '會改狀態')) : null, h('span.badge.info', `${(cmd.flags || []).length} ${pair('flags', '個旗標')}`))), star);
   const reset = h('button.btn.text', { type: 'button', on: { click: () => { for (const [, c] of controls) { c.touched = false; } cards.forEach((c) => c.classList.remove('changed')); const fresh = commandForm(cmd, { compact, onResult }); root.replaceWith(fresh); } } }, icon('restart_alt'), t('reset'));
+  // Guide me: one option at a time with Back, Next and Skip.
+  const grid = h('div.flags-grid.stagger', cards.length ? cards : h('div.empty', icon('bolt'), pair('This command has no options. Just run it.', '呢個指令冇選項，直接執行。')));
+  let gi = -1;
+  const gTitle = h('b'); const gBar = h('div.sc-progress', h('i', { style: { background: 'var(--primary)' } }));
+  const gBack = h('button.btn.small.outline', { type: 'button', on: { click: () => guide(gi - 1) } }, icon('arrow_back'), t('back'));
+  const gSkip = h('button.btn.small.text', { type: 'button', on: { click: () => guide(gi + 1) } }, pair('Skip, keep the default', '跳過，用預設'));
+  const gNext = h('button.btn.small', { type: 'button', on: { click: () => guide(gi + 1) } }, t('next'), icon('arrow_forward'));
+  const gNav = h('div.card.tonal.guide-nav', { hidden: true }, h('div.row', gTitle, h('span.spacer'), h('button.btn.small.text', { type: 'button', on: { click: () => guide(-1) } }, pair('Show all options', '顯示全部選項'))), gBar, h('div.row', gBack, h('span.spacer'), gSkip, gNext));
+  const guide = (i) => {
+    gi = i >= cards.length ? -2 : i;
+    const on = gi >= 0;
+    gNav.hidden = !on && gi !== -2;
+    cards.forEach((c, k) => { c.hidden = on && k !== gi; });
+    grid.classList.toggle('guided', on);
+    if (on) { gTitle.textContent = pair(`Option ${gi + 1} of ${cards.length}`, `第 ${gi + 1} 項，共 ${cards.length} 項`); gBar.firstChild.style.width = `${((gi + 1) / cards.length) * 100}%`; gBack.disabled = gi === 0; cards[gi].querySelector('input,button,select,textarea')?.focus(); }
+    if (gi === -2) { gTitle.textContent = pair('All options reviewed. Check the command and run it.', '全部睇完，檢查指令再執行。'); gBar.firstChild.style.width = '100%'; cards.forEach((c) => { c.hidden = false; }); runBtn.focus(); }
+    guideBtn.setAttribute('aria-pressed', String(on));
+  };
+  const guideBtn = h('button.btn.text', { type: 'button', 'aria-pressed': 'false', hidden: !cards.length, dataset: { el: `cmd-${cmd.id}-guide` }, on: { click: () => guide(gi >= 0 ? -1 : 0) } }, icon('signpost'), pair('Guide me', '一步步帶我'));
   const root = h('div.stack', head,
     h('div.cmd-layout',
-      h('div.flags-grid.stagger', cards.length ? cards : h('div.empty', icon('bolt'), pair('This command has no options. Just run it.', '呢個指令冇選項，直接執行。'))),
+      h('div.stack', gNav, grid),
       h('div.stack.preview',
         h('div.card', h('div.card-head', h('h3', t('pendingCommand')), h('button.icon-btn.sm', { type: 'button', 'aria-label': t('copy'), on: { click: () => { navigator.clipboard.writeText(preview.textContent.trim()); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'))), preview, errBox,
-          h('div.row', runBtn, cancelBtn, reset)),
+          h('div.row', runBtn, cancelBtn, reset, guideBtn)),
         h('div.card', h('h3', t('output')), outBox))));
   return root;
 }
@@ -197,5 +218,10 @@ export function renderResult(box, r, cmd) {
   if (r.stderr) box.append(h('div.out', h('span.err', r.stderr)));
   if (!r.stdout && !r.stderr) box.append(h('div.small.muted', pair('No output.', '冇輸出。')));
   sound(ok ? 'success' : 'error');
-  if (!ok) toast(t('cmdFail', { code: r.code }) + (r.stderr ? ` ${r.stderr.trim().split('\n')[0]}` : ''), { kind: 'err', title: cmd?.title });
+  if (!ok) {
+    toast(t('cmdFail', { code: r.code }) + (r.stderr ? ` ${r.stderr.trim().split('\n')[0]}` : ''), { kind: 'err', title: cmd?.title });
+    box.append(h('div.row', helpRequest(`Running tailscale ${(cmd?.path || []).join(' ')}`, `exit code ${r.code}: ${(r.stderr || r.stdout || '').trim().slice(0, 600)}`)));
+  }
+  const next = ok && store.get('adhdMomentum') && MOMENTUM[cmd?.id];
+  if (next) box.append(h('div.momentum', { role: 'note' }, icon('east'), h('span', pair(next[1], next[2])), h('button.btn.small.tonal', { type: 'button', on: { click: () => window.__mtOpen?.('cli', next[0]) } }, `tailscale ${next[0].replace(/-/g, ' ')}`)));
 }

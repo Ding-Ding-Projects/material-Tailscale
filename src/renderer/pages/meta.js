@@ -31,8 +31,8 @@ registerPage('docs', (ctx) => {
     const { q, re } = search.value();
     let test = (a) => !q || (a.title + a.body).toLowerCase().includes(q.toLowerCase());
     if (re && q) { try { const r = new RegExp(q, 'i'); test = (a) => r.test(a.title + '\n' + a.body); } catch { /* plain */ } }
-    const cats = [...new Set(ARTICLES.map((a) => a.category))];
-    for (const c of cats) {
+    const sections = [...new Set(ARTICLES.map((a) => a.category))];
+    for (const c of sections) {
       const items = ARTICLES.filter((a) => a.category === c && test(a));
       if (!items.length) continue;
       nav.append(h('div.pal-group', c), ...items.map((a) => h('button.menu-item', { 'aria-current': a === cur ? 'page' : null, style: a === cur ? { background: 'var(--primary-cont)' } : null, on: { click: () => { show(a); drawNav(); } } }, icon('article'), a.title)));

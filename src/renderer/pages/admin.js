@@ -185,7 +185,7 @@ function keysView() {
     try {
       const r = await api('POST', '/tailnet/{tailnet}/keys', { body: { description: desc.get() || undefined, expirySeconds: (days.get() || 90) * 86400, capabilities: { devices: { create: { reusable: reusable.get(), ephemeral: ephemeral.get(), preauthorized: pre.get(), tags: tags.get() } } } } });
       const key = r.json.key;
-      dialog({ title: pair('New auth key', '新驗證鎖匙'), emojiChar: '🔑', body: h('div.stack', h('p', pair('Copy it now. Tailscale shows it only once.', '即刻複製，Tailscale 只顯示一次。')), h('div.cmdline', key)), actions: [{ label: t('copy'), run: () => { navigator.clipboard.writeText(key); toast(t('copied'), { kind: 'ok' }); } }] });
+      dialog({ title: pair('New auth key', '新驗證鎖匙'), emojiChar: '🗝️', body: h('div.stack', h('p', pair('Copy it now. Tailscale shows it only once.', '即刻複製，Tailscale 只顯示一次。')), h('div.cmdline', key)), actions: [{ label: t('copy'), run: () => { navigator.clipboard.writeText(key); toast(t('copied'), { kind: 'ok' }); } }] });
       load();
     } catch (e) { toast(e.message, { kind: 'err' }); }
   };

@@ -40,7 +40,7 @@ a{color:#a9b8ff}a:hover{color:#dfe4ff}
 </nav>
 <main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
 <div role="tablist" style="display: flex; gap: 2px; padding: 8px 16px 0; border-bottom: 1px solid #1d2238">
-<div role="tab" aria-selected="true" style="padding: 9px 16px; border-radius: 12px 12px 0 0; background: #161b2e; color: #e6e8f2; font: 600 13px 'Roboto Flex'; border: 1px solid #262c48; border-bottom: 0">◉ Tailnet · swiftie.github</div>
+<div role="tab" aria-selected="true" style="padding: 9px 16px; border-radius: 12px 12px 0 0; background: #161b2e; color: #e6e8f2; font: 600 13px 'Roboto Flex'; border: 1px solid #262c48; border-bottom: 0">◉ Tailnet · example.github</div>
 <div role="tab" aria-selected="false" style="padding: 9px 16px; color: #9aa3c4; font: 500 13px 'Roboto Flex'">Regex builder</div>
 <div role="tab" aria-selected="false" style="padding: 9px 16px; color: #9aa3c4; font: 500 13px 'Roboto Flex'">Authenticator</div>
 <div style="padding: 9px 12px; color: #9aa3c4">＋</div>
@@ -97,7 +97,7 @@ class Component extends DCLogic {
       btnLabel:on?'Disconnect':'Connect',
       btnBg:on?'#6ce6b6':'#a9b8ff',
       toggle:()=>this.setState({on:!on}),
-      peers:[mk('nas-01','100.88.12.4','▤','direct',['tag:server','exit node']),mk('pixel-9','100.71.3.19','▯','relay',['owner']),mk('build-box','100.90.4.2','⚙','direct',['tag:ci','subnet 10.0.0.0/24']),mk('mbp-work','100.64.8.11','▭','direct',['ssh']),mk('pi-garage','100.99.1.7','◉','offline',['tag:iot']),mk('vps-tor','100.80.2.3','☁','direct',['tag:server','funnel'])]
+      peers:[mk('nas-01','100.88.12.4','▤','direct',['tag:server','exit node']),mk('pixel-9','100.71.3.19','▯','relay',['owner']),mk('build-box','100.90.4.2','⚙','direct',['tag:ci','subnet 203.0.113.0/24']),mk('mbp-work','100.64.8.11','▭','direct',['ssh']),mk('pi-garage','100.99.1.7','◉','offline',['tag:iot']),mk('vps-tor','100.80.2.3','☁','direct',['tag:server','funnel'])]
     };
   }
 }

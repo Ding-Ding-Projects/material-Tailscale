@@ -77,7 +77,7 @@ export function chips(values = [], { kind = 'cidrs', label, suggestions = [] } =
   const ev = emitter();
   let list = [...values];
   const validate = { cidrs: (s) => CIDR_RE.test(s), tags: (s) => /^tag:[A-Za-z0-9-]+$/.test(s), keys: (s) => /^(tlpub:|nlpub:)?[0-9a-f]{32,}$/i.test(s) || s.startsWith('tlpub:'), caps: (s) => s.length > 2, any: () => true }[kind] || (() => true);
-  const placeholder = { cidrs: '192.168.1.0/24', tags: 'tag:server', keys: 'tlpub:…', caps: 'example.com/cap/foo' }[kind] || '';
+  const placeholder = { cidrs: '198.51.100.0/24', tags: 'tag:server', keys: 'tlpub:…', caps: 'example.com/cap/foo' }[kind] || '';
   const input = h('input', { placeholder, 'aria-label': label || 'Add item' });
   const box = h('div.chips-editor', { on: { click: () => input.focus() } });
   const err = h('div.err-text', { 'aria-live': 'polite' });
@@ -291,7 +291,7 @@ export function forSpec(spec, { triState, value } = {}) {
     case 'int': return stepper(v, { min: spec.min ?? 0, max: spec.max ?? 1e9, label, allowEmpty: true });
     case 'port': return portStepper(v, { label, allowZero: spec.allowZero });
     case 'duration': return duration(v, { label });
-    case 'cidrs': return chips([], { kind: 'cidrs', label, suggestions: ['192.168.0.0/24', '192.168.1.0/24', '10.0.0.0/24', '172.16.0.0/16', '0.0.0.0/0', '::/0'] });
+    case 'cidrs': return chips([], { kind: 'cidrs', label, suggestions: ['198.51.100.0/24', '203.0.113.0/24', '192.0.2.0/24', '0.0.0.0/0', '::/0'] });
     case 'tags': return chips([], { kind: 'tags', label, suggestions: ['tag:server', 'tag:ci', 'tag:prod', 'tag:dev'] });
     case 'keys': return chips([], { kind: 'keys', label });
     case 'caps': return chips([], { kind: 'caps', label });

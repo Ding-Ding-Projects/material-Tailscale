@@ -22,8 +22,10 @@
 - [x] Accessibility tools menu
 - [x] Command palette with live controls and teleport; context menus with filter and regex everywhere
 - [x] Regex workbench (builder, tester, explainer, replace, code generation, library)
-- [ ] Full RegexBuddy-parity ledger (flavour conversion, debugger trace, benchmarking per engine)
-- [ ] Momentum mode next-step suggestions beyond the setting itself
+- [x] Regex parity ledger, flavour conversion, attempt trace, benchmark and folder search (see docs/features/navigation/regex-builder.md for what is not built)
+- [x] Momentum mode next-step suggestions
+- [x] Guide me: one option at a time on every command form
+- [x] Copy a help request on failed commands
 
 ## Phase 3: Safety and records
 - [x] Two-key super confirmation on every destructive action

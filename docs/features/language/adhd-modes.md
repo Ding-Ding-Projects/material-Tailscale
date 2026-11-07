@@ -2,7 +2,7 @@
 
 ## Behaviour
 
-Five independent switches, all off by default: Focus (dims navigation), Low stimulation (calmer colours, no ambient glow or sounds), Time awareness (clock and session time), One thing at a time (one open section) and Momentum. No streaks, scores or praise; not medical.
+Five independent switches, all off by default: Focus (dims navigation), Low stimulation (calmer colours, no ambient glow or sounds), Time awareness (clock and session time), One thing at a time (one open section) and Momentum (after a command succeeds, one related next command is suggested with a button that opens it, for example `up` suggests `status` and `serve` suggests `serve status`). No streaks, scores or praise; not medical.
 
 ## Configuration
 

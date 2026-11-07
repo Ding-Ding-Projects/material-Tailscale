@@ -20,7 +20,7 @@ test('core commands and flags are present', () => {
 
 test('buildArgs sends only given flags and validates values', () => {
   assert.deepEqual(buildArgs('set', { flags: { ssh: true } }), ['set', '--ssh=true']);
-  assert.deepEqual(buildArgs('set', { flags: { 'advertise-routes': ['10.0.0.0/24', '192.168.1.0/24'] } }), ['set', '--advertise-routes=10.0.0.0/24,192.168.1.0/24']);
+  assert.deepEqual(buildArgs('set', { flags: { 'advertise-routes': ['203.0.113.0/24', '198.51.100.0/24'] } }), ['set', '--advertise-routes=203.0.113.0/24,198.51.100.0/24']);
   assert.throws(() => buildArgs('set', { flags: { 'advertise-routes': ['not-a-cidr'] } }));
   assert.throws(() => buildArgs('set', { flags: { bogus: true } }));
   assert.throws(() => buildArgs('ping', { positionals: [] }));

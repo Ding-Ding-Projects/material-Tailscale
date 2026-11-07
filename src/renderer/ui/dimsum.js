@@ -18,13 +18,13 @@ export async function dimsumCatalog() {
     if (c && Date.now() - c.at < 24 * 3600 * 1000) { mem = c.dishes; return mem; }
   } catch { /* ignore a corrupt cache */ }
   try {
-    const [cat, rel] = await Promise.all([fetch(CATALOG_URL).then((r) => r.json()), fetch(RELEASES_URL).then((r) => r.json())]);
+    const [catalogue, rel] = await Promise.all([fetch(CATALOG_URL).then((r) => r.json()), fetch(RELEASES_URL).then((r) => r.json())]);
     const assets = new Map();
     for (const r of Array.isArray(rel) ? rel : []) {
       if (r.draft || !/^catalog-v1(?:-part-\d+)?$/.test(r.tag_name)) continue;
       for (const a of r.assets || []) if (/\.png$/i.test(a.name)) assets.set(a.name, a.browser_download_url);
     }
-    const dishes = (cat.dishes || []).map((d) => ({ id: d.id, name: d.name, description: d.description, alt: d.image?.alt, photo: assets.get(d.image?.path?.split('/').pop()) || null })).filter((d) => d.name?.en && d.name?.zhHant);
+    const dishes = (catalogue.dishes || []).map((d) => ({ id: d.id, name: d.name, description: d.description, alt: d.image?.alt, photo: assets.get(d.image?.path?.split('/').pop()) || null })).filter((d) => d.name?.en && d.name?.zhHant);
     mem = dishes;
     try { localStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), source: CATALOG_URL, dishes })); } catch { /* quota */ }
     return dishes;

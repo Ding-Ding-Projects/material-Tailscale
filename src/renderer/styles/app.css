@@ -394,3 +394,6 @@ canvas.draw { background: #fff; border-radius: var(--r-m); touch-action: none; w
 /* Reduced motion: everything settles instantly */
 :root.reduce-motion *, :root.reduce-motion *::before, :root.reduce-motion *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; } }
+.momentum { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r-md, 16px); background: color-mix(in oklab, var(--secondary) 14%, transparent); }
+.guide-nav { position: sticky; top: 0; z-index: 2; }
+.flags-grid.guided { grid-template-columns: 1fr; }

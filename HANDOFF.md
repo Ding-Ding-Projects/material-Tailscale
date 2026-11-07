@@ -22,6 +22,10 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 - Every server tab rendered under Xvfb against a sample registry (overview, console with typed command builder, configuration, players, world generator, schedule).
 - Not run here: downloading and starting a real server jar, the data generator extraction, a generated world, Modrinth installs, SSH and Docker targets.
 
+## Public-boundary sweep
+
+- Every tracked text file passes the canonical public-boundary scan. This pass removed a personal nickname used as a sample tailnet name in a design board, private IPv4 example ranges (now RFC 5737 documentation ranges), and identifiers that matched governed words. The nickname remains in the design board's earlier commit (add934c); removing it from history needs a history rewrite, which is not done without the owner's explicit approval.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.

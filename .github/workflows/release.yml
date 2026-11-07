@@ -84,7 +84,7 @@ jobs:
           set +e
           npm run package:win > out/package.log 2>&1
           code=$?
-          cat out/package.log
+          tail -n +1 out/package.log
           if [ "$code" -ne 0 ]; then echo "::error title=package::$(tail -c 2500 out/package.log | tr '\n' ' ')"; exit 1; fi
 
       - name: Count lines
