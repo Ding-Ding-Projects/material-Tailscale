@@ -106,3 +106,48 @@ jobs:
             out/line-counts.md
             out/screenshots/*.png
           if-no-files-found: warn
+
+  install-proof:
+    # Installs the previous release on a clean Windows runner, updates it to
+    # the release just published through Squirrel's own Update.exe, checks the
+    # installed versions, uninstalls, and appends the result to the notes.
+    needs: release
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install previous release, update to the new one, uninstall
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tags = gh release list --limit 2 --json tagName --jq '.[].tagName'
+          $new = $tags[0]; $old = $tags[1]
+          $newVer = $new.TrimStart('v'); $oldVer = $old.TrimStart('v')
+          $result = @()
+          New-Item -ItemType Directory -Force old, new | Out-Null
+          gh release download $old --pattern 'MaterialTailscaleSetup.exe' --dir old
+          gh release download $new --pattern 'RELEASES' --pattern '*.nupkg' --dir new
+          $sig = (Get-AuthenticodeSignature -LiteralPath old\MaterialTailscaleSetup.exe).Status
+          $result += "Previous installer signature status: $sig"
+          Start-Process old\MaterialTailscaleSetup.exe -ArgumentList '--silent' -Wait
+          Start-Sleep -Seconds 15
+          Get-Process MaterialTailscale -ErrorAction SilentlyContinue | Stop-Process -Force
+          $base = Join-Path $env:LOCALAPPDATA 'MaterialTailscale'
+          if (!(Test-Path (Join-Path $base "app-$oldVer\MaterialTailscale.exe"))) { throw "Install of $old did not produce app-$oldVer" }
+          $result += "Installed $old silently: app-$oldVer present"
+          & (Join-Path $base 'Update.exe') "--update=$((Resolve-Path new).Path)" | Out-Null
+          Start-Sleep -Seconds 10
+          if (!(Test-Path (Join-Path $base "app-$newVer\MaterialTailscale.exe"))) { throw "Update to $new did not produce app-$newVer" }
+          $fileVer = (Get-Item (Join-Path $base "app-$newVer\MaterialTailscale.exe")).VersionInfo.ProductVersion
+          $result += "Updated with Update.exe to $new`: app-$newVer present, executable reports $fileVer"
+          Get-Process MaterialTailscale -ErrorAction SilentlyContinue | Stop-Process -Force
+          & (Join-Path $base 'Update.exe') --uninstall | Out-Null
+          Start-Sleep -Seconds 10
+          $result += "Uninstalled with Update.exe --uninstall"
+          $notes = gh release view $new --json body --jq .body
+          $block = "`n`n## Install and update proof (clean Windows runner)`n`n" + (($result | ForEach-Object { "- $_" }) -join "`n") + "`n"
+          Set-Content -Path notes.md -Value ($notes + $block) -Encoding utf8
+          gh release edit $new --notes-file notes.md
+          $result

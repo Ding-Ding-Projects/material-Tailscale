@@ -32,6 +32,10 @@ Captured from the built app by `npm run screenshots` (Electron, both themes). Ta
 | ![Exit nodes, light](docs/screenshots/light-exit.png) | ![Command palette, light](docs/screenshots/light-palette.png) |
 
 All captures: [docs/screenshots](docs/screenshots).
+
+End-to-end recording (command palette, guided `tailscale set`, regex trace, Minecraft server wizard, settings), made by `npm run record` from the built app:
+
+![End-to-end recording](docs/recording/end-to-end.gif)
 </details>
 
 <details>
@@ -53,6 +57,10 @@ Installers are built with Squirrel.Windows (`Setup.exe`, `RELEASES`, full and de
 | `.\build-installer.bat` | Everything above, then the unsigned Squirrel.Windows installer in `out\installer` |
 | `download-dependencies.bat` / `.sh` | Fetches pinned dependencies only |
 | `npm run screenshots` | Drives the built app through every destination and writes PNGs (set `MT_CAPTURE_DIR`) |
+| `npm run record` | Records an end-to-end path through the built app as `docs/recording/end-to-end.gif` |
+| `npm run clip-matrix` | Checks every destination for cut-off text at 100, 125, 150 and 200% scale, in English, Cantonese and both, and at the minimum window size |
+| `npm run gen:postman` | Writes a Postman collection of every admin API operation to `docs/api/` |
+| `npm run wiki` | Builds the GitHub wiki from `docs/` (`-- --push` to publish it) |
 | `npm test` | Catalogue, argument builder, RFC 4226 and RFC 6238 vectors, settings explanations |
 
 All `.bat` scripts accept `/s`, `--silent` or `SILENT=1`.

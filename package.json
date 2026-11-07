@@ -18,7 +18,12 @@
     "package:win": "node scripts/package-win.mjs",
     "count-lines": "node scripts/count-lines.mjs",
     "screenshots": "node scripts/capture.mjs",
-    "gen:api": "node scripts/gen-api-catalog.mjs"
+    "gen:api": "node scripts/gen-api-catalog.mjs",
+    "record": "node scripts/record.mjs",
+    "clip-matrix": "node scripts/clip-matrix.mjs",
+    "gen:postman": "node scripts/gen-postman.mjs",
+    "wiki": "node scripts/sync-wiki.mjs",
+    "check:instructions": "node scripts/check-instructions-lock.mjs"
   },
   "dependencies": {
     "7zip-bin": "^5.2.0",

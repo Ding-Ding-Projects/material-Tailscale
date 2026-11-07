@@ -52,5 +52,8 @@
 - [x] screenshot capture mode in the built app and in the release workflow
 - [x] Website that reuses the app's modules: landing, features, docs, download, changelog, status, tools, settings
 - [x] Social preview from a real capture, Open Graph tags
-- [ ] Screen recording of an end-to-end path committed to the repository
+- [x] Screen recording of an end-to-end path committed to the repository (`docs/recording/end-to-end.gif`)
+- [x] Install and update proof on a clean Windows runner after every release (previous release installed, updated with Update.exe, uninstalled)
+- [x] Postman collection of every admin API operation
+- [x] Wiki generator from docs (publishing blocked from the build machine, see HANDOFF)
 - [ ] Clipping matrix at 125/150/200% scale and every language mode

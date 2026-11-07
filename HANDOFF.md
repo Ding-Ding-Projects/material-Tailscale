@@ -26,6 +26,15 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 
 - Every tracked text file passes the canonical public-boundary scan. This pass removed a personal nickname used as a sample tailnet name in a design board, private IPv4 example ranges (now RFC 5737 documentation ranges), and identifiers that matched governed words. The nickname remains in the design board's earlier commit (add934c); removing it from history needs a history rewrite, which is not done without the owner's explicit approval.
 
+## Tooling added in the gap-closing pass
+
+- `npm run record` produced `docs/recording/end-to-end.gif` (97 frames) from the built app under Xvfb.
+- `npm run clip-matrix` checks cut-off text across scales, languages and the minimum window; first run found buttons shrinking in tight rows and a long timestamp, both fixed in CSS.
+- The release workflow now has an install-proof job: previous release installed silently on a clean runner, updated with Update.exe to the new release, checked, uninstalled, and the result appended to the release notes. Its first real run happens on the next push.
+- `npm run gen:postman` writes a collection covering all 93 admin API operations; a test checks the count and that no token is stored.
+- `npm run wiki` builds 55 wiki pages. Publishing is blocked from the build machine: the wiki repository could not be cloned with the available credentials (it may also need its first page created on GitHub).
+- `npm run check:instructions` compares a SHA-256 of the maintainer's private instructions to `.instructions-lock`; it skips with a reason wherever those instructions are absent.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.

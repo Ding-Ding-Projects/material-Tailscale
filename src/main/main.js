@@ -209,6 +209,12 @@ async function captureAll(dir) {
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   for (let i = 0; i < 100 && !(await wc.executeJavaScript('!!window.__mtReady').catch(() => false)); i++) await wait(100);
   await wc.executeJavaScript("document.querySelector('.scrim')?.remove(); document.querySelector('.dimsum')?.remove(); true");
+  if (process.env.MT_CAPTURE_ZOOM) wc.setZoomFactor(Number(process.env.MT_CAPTURE_ZOOM));
+  if (process.env.MT_CAPTURE_LANG) await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(process.env.MT_CAPTURE_LANG)}); true`);
+  const clipping = [];
+  // Finds visible text that is cut off: horizontal overflow without a scroll
+  // container, or an element that extends past the window's right edge.
+  const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 1 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
   const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,converter,regex,draw,ollama,minecraft,docs,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
@@ -219,6 +225,7 @@ async function captureAll(dir) {
       await wc.executeJavaScript(`window.__mtOpen(${JSON.stringify(dest)}, ${JSON.stringify(arg || undefined)}); true`);
       await wait(900);
       if (press) { await wc.executeJavaScript(`[...document.querySelectorAll('button')].find((b) => b.offsetParent && b.textContent.trim().endsWith(${JSON.stringify(press)}))?.click(); true`); await wait(1200); }
+      if (process.env.MT_CAPTURE_CLIP) { const found = await wc.executeJavaScript(CLIP_PROBE).catch(() => []); if (found.length) clipping.push({ theme, dest: d, found }); }
       const img = await wc.capturePage();
       fs.writeFileSync(path.join(dir, `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`), img.toPNG());
     }
@@ -228,11 +235,41 @@ async function captureAll(dir) {
     await wait(600);
     fs.writeFileSync(path.join(dir, 'light-palette.png'), (await wc.capturePage()).toPNG());
   }
+  if (process.env.MT_CAPTURE_CLIP) fs.writeFileSync(path.join(dir, 'clipping.json'), JSON.stringify(clipping, null, 2));
+  app.quit();
+}
+
+async function recordPath(dir) {
+  // Records an end-to-end path through the real interface as numbered PNG
+  // frames; scripts/record.mjs turns them into an animated GIF.
+  fs.mkdirSync(dir, { recursive: true });
+  const wc = win.webContents;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let i = 0; i < 100 && !(await wc.executeJavaScript('!!window.__mtReady').catch(() => false)); i++) await wait(100);
+  await wc.executeJavaScript("document.querySelector('.scrim')?.remove(); document.querySelector('.dimsum')?.remove(); window.__mtSet('theme', 'dark'); true");
+  let n = 0, rec = true;
+  const loop = (async () => { while (rec) { const img = await wc.capturePage(); fs.writeFileSync(path.join(dir, `f${String(n++).padStart(4, '0')}.png`), img.resize({ width: 960 }).toPNG()); await wait(120); } })();
+  const js = (code) => wc.executeJavaScript(`(async () => { ${code} })(); true`);
+  const press = (label) => js(`[...document.querySelectorAll('button')].find((b) => b.offsetParent && b.textContent.trim().endsWith(${JSON.stringify(label)}))?.click();`);
+  const type = async (selector, text) => { for (let i = 1; i <= text.length; i++) { await js(`const el = document.querySelector(${JSON.stringify(selector)}); el.value = ${JSON.stringify(text.slice(0, i))}; el.dispatchEvent(new Event('input', { bubbles: true }));`); await wait(70); } };
+  const steps = [
+    () => js("window.__mtOpen('home')"), () => wait(1500),
+    () => js("window.dispatchEvent(new CustomEvent('mt:palette'))"), () => wait(600),
+    () => type('input[role=combobox]', 'exit node'), () => wait(1200),
+    () => js("document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); window.__mtOpen('cli', 'set')"), () => wait(1200),
+    () => press('Guide me'), () => wait(1200), () => press('Next'), () => wait(900), () => press('Next'), () => wait(900), () => press('Show all options'), () => wait(1000),
+    () => js("window.__mtOpen('regex')"), () => wait(1200), () => press('Trace the attempts'), () => wait(1200), () => js("window.scrollBy?.(0, 0); document.querySelector('.outlet')?.scrollTo({ top: 900, behavior: 'smooth' })"), () => wait(1500),
+    () => js("window.__mtOpen('minecraft')"), () => wait(1200), () => press('New server'), () => wait(1200), () => press('Paper'), () => wait(900), () => press('Next'), () => wait(3500),
+    () => js("document.querySelector('.scrim')?.remove(); window.__mtOpen('settings', 'appearance')"), () => wait(1500)
+  ];
+  for (const s of steps) await s().catch(() => {});
+  rec = false; await loop;
   app.quit();
 }
 
 app.whenReady().then(() => {
   createWindow();
+  if (process.env.MT_RECORD_DIR) { win.setSize(1440, 900); win.webContents.once('did-finish-load', () => recordPath(process.env.MT_RECORD_DIR)); return; }
   if (process.env.MT_CAPTURE_DIR) { win.setSize(Number(process.env.MT_CAPTURE_W || 1440), Number(process.env.MT_CAPTURE_H || 940)); win.webContents.once('did-finish-load', () => captureAll(process.env.MT_CAPTURE_DIR)); return; }
   createTray();
   watchShared();

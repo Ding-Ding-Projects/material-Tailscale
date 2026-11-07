@@ -145,7 +145,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .divider { height: 1px; background: var(--outline-soft); margin: 4px 0; }
 
 /* ===== Buttons ===== */
-.btn { height: var(--ctl-h); padding: 0 20px; border-radius: var(--r-full); border: 0; background: var(--primary); color: var(--on-primary); font: 700 14px var(--font-display); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; white-space: nowrap; transition: transform var(--dur-s) var(--ease-spring), filter var(--dur-s), border-radius var(--dur-m) var(--ease-emph); position: relative; overflow: hidden; }
+.btn { height: var(--ctl-h); padding: 0 20px; border-radius: var(--r-full); border: 0; background: var(--primary); color: var(--on-primary); font: 700 14px var(--font-display); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; white-space: nowrap; transition: transform var(--dur-s) var(--ease-spring), filter var(--dur-s), border-radius var(--dur-m) var(--ease-emph); position: relative; overflow: hidden; flex-shrink: 0; }
 .btn:hover { filter: brightness(1.08); border-radius: var(--r-m); }
 .btn:active { transform: scale(.96); }
 .btn[disabled] { opacity: .45; cursor: not-allowed; filter: none; transform: none; }
@@ -397,3 +397,4 @@ canvas.draw { background: #fff; border-radius: var(--r-m); touch-action: none; w
 .momentum { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-radius: var(--r-md, 16px); background: color-mix(in oklab, var(--secondary) 14%, transparent); }
 .guide-nav { position: sticky; top: 0; z-index: 2; }
 .flags-grid.guided { grid-template-columns: 1fr; }
+.kpi b { white-space: normal; overflow-wrap: anywhere; }
