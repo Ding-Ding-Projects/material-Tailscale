@@ -140,6 +140,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .muted { color: var(--on-3); } .small { font-size: 12px; }
 .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .row.nowrap { flex-wrap: nowrap; }
+.row.nowrap > b { min-width: 0; overflow-wrap: anywhere; }
 .stack { display: flex; flex-direction: column; gap: 10px; }
 .spacer { flex: 1; }
 .divider { height: 1px; background: var(--outline-soft); margin: 4px 0; }
@@ -197,9 +198,9 @@ textarea.input { height: auto; min-height: 120px; padding: 12px 14px; resize: ve
 .switch[aria-checked="true"] { background: var(--primary); border-color: var(--primary); }
 .switch[aria-checked="true"]::after { left: 26px; width: 22px; height: 22px; background: var(--on-primary); }
 .switch:active::after { width: 26px; }
-.switch-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
-.switch-row .txt { flex: 1; min-width: 0; }
-.switch-row .txt b { display: block; font-weight: 600; }
+.switch-row { display: flex; align-items: center; gap: 10px 14px; padding: 10px 0; flex-wrap: wrap; }
+.switch-row .txt { flex: 1 1 220px; min-width: 0; }
+.switch-row .txt b { display: block; font-weight: 600; overflow-wrap: anywhere; }
 
 .seg { display: inline-flex; border-radius: var(--r-full); border: 1px solid var(--outline); overflow: hidden; flex-wrap: wrap; max-width: 100%; }
 .seg button { min-height: calc(var(--ctl-h) - 6px); padding: 0 16px; border: 0; background: transparent; color: var(--on-2); cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: background var(--dur-m) var(--ease-emph), color var(--dur-m); border-right: 1px solid var(--outline); }

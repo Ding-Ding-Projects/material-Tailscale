@@ -16,6 +16,7 @@ import { readAloud } from '../src/renderer/core/feedback.js';
 import { logoSvg } from '../src/renderer/ui/logo.js';
 import { ARTICLES } from '../src/renderer/docs-bundle.js';
 import { SETTINGS_INDEX } from '../src/renderer/pages/settings-index.js';
+import { runSchedules } from '../src/renderer/core/schedules.js';
 import { COMMANDS } from '../src/shared/cli-catalog.js';
 import '../src/renderer/pages/settings.js';
 import '../src/renderer/pages/tools.js';
@@ -152,6 +153,7 @@ store.on(() => applySettings());
     h('span', pair('Not affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.', '同 Tailscale Inc. 冇關係。')));
   document.body.append(h('div.ambient', { 'aria-hidden': 'true' }), header, h('div.site-prov.small.muted', { dataset: { el: 'provenance' } }, S.version ? `${pair('Version', '版本')} ${S.version} · ${pair('updated', '更新')} ${fmtDateTime(S.commitTime)}` : ''), outlet, prov);
   applySettings(); applyAppearance(); drawNav(); render();
+  runSchedules(); setInterval(() => runSchedules().catch(() => {}), 30000);
   new MutationObserver(() => applyLocks()).observe(outlet, { childList: true, subtree: true });
   document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'f') { e.preventDefault(); openPalette(); } });
   document.addEventListener('contextmenu', (e) => {

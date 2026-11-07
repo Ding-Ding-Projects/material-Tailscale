@@ -8,11 +8,11 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Funny levels and dialog emojis | yes | yes | core/i18n.js, ui/overlay.js | features/language/funny-levels.md | dark-settings-language.png |
 | Personal vocabulary upload and drop | yes | yes | core/i18n.js, pages/settings.js, app.js | features/language/personal-vocabulary.md | — |
 | School mode (shared record) | yes | yes (per browser) | main.js shared record, pages/settings.js | features/language/school-mode.md | dark-settings-school.png |
-| Narrator and voice pickers | yes | partial (read aloud) | core/feedback.js | features/language/narrator.md | — |
+| Narrator and voice pickers | yes | yes (same settings and voice pickers; speaks the site's own notices) | core/feedback.js | features/language/narrator.md | — |
 | Action sounds | yes | yes | core/feedback.js | features/language/action-sounds.md | — |
-| Scheduled settings | yes | no (site has no schedules runner) | app.js runSchedules | features/language/scheduled-settings.md | dark-settings-schedules.png |
+| Scheduled settings | yes | yes (runs while the page is open) | core/schedules.js | features/language/scheduled-settings.md | dark-settings-schedules.png |
 | Display name | yes | n/a | ui/shell.js | features/language/display-name.md | — |
-| ADHD modes | yes | yes | app.js, styles | features/language/adhd-modes.md | — |
+| ADHD modes, Momentum suggestions | yes | yes (Momentum: app only, it follows commands) | app.js, ui/command-form.js, shared/momentum.js | features/language/adhd-modes.md | — |
 | Dim sum surprise (cannot be turned off) | yes | yes | ui/dimsum.js | features/language/dim-sum-surprise.md | — |
 | Material 3 design, frameless window | yes | yes | styles/app.css, ui/shell.js | features/appearance/material-design.md | all |
 | Motion with reduced path | yes | yes | styles/app.css | features/appearance/motion.md | — |
@@ -26,7 +26,10 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Truthful empty states | yes | yes | all pages | — | dark-home.png |
 | Onboarding wizard | yes | n/a | ui/onboarding.js | features/navigation/onboarding.md | — |
 | Tabs | yes | n/a (site uses pages) | ui/shell.js | features/appearance/window-and-navigation.md | all |
-| Regex builder | yes | yes | ui/regex.js | features/navigation/regex-builder.md | dark-regex.png |
+| Regex builder, flavour conversion, trace, benchmark | yes | yes | ui/regex.js, shared/regex-flavors.js | features/navigation/regex-builder.md | dark-regex.png |
+| Folder search (GREP) | yes | n/a (needs local files) | ui/regex.js, main/tools.js | features/navigation/regex-builder.md | — |
+| Guide me on command forms | yes | n/a | ui/command-form.js | features/tailscale/cli-commands.md | — |
+| Help request on failures | yes | n/a | ui/jobs.js, ui/command-form.js | features/tools/minecraft.md | — |
 | Command palette | yes | yes | ui/palette.js, site.js | features/navigation/command-palette.md | light-palette.png |
 | Context menus with shortcuts | yes | yes | app.js, ui/overlay.js | features/navigation/context-menus.md | — |
 | Rich controls and info buttons | yes | yes | ui/controls.js, ui/command-form.js | features/navigation/rich-controls.md | dark-cli-set.png |
@@ -55,3 +58,6 @@ Per-surface inventory of the shared product feature list. App = desktop app, Sit
 | Social preview | yes | yes | social-preview.png | — | — |
 
 Gaps are tracked as unchecked items in ROADMAP.md.
+| End-to-end recording | yes | n/a | scripts/record.mjs | README.md | docs/recording/end-to-end.gif |
+| Clipping matrix | yes | n/a | scripts/clip-matrix.mjs | README.md | out/clipping (not committed) |
+| Postman collection | n/a | n/a | scripts/gen-postman.mjs | docs/api/ | — |

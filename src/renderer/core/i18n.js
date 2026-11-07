@@ -76,7 +76,7 @@ function raw(key, lang, vars) {
 /** Text in the primary language (bilingual returns "English · 廣東話"). */
 export function t(key, vars) {
   const m = mode();
-  if (m === 'both') return `${raw(key, 'en', vars)} · ${raw(key, 'yue', vars)}`;
+  if (m === 'both') { const a = raw(key, 'en', vars), b = raw(key, 'yue', vars); return a === b ? a : `${a} · ${b}`; }
   return raw(key, m, vars);
 }
 
@@ -92,7 +92,8 @@ export function pair(en, yue) {
   const m = mode();
   if (m === 'en' || !yue) return applyVocab(en);
   if (m === 'yue') return yue;
-  return `${applyVocab(en)} · ${yue}`;
+  const e = applyVocab(en);
+  return e === yue ? e : `${e} · ${yue}`;
 }
 
 export function emoji(e) { return store.get('dialogEmoji') && !schoolOn() ? e + ' ' : ''; }

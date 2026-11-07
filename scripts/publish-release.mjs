@@ -5,9 +5,21 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 const fail = (msg) => { console.log(`::error title=publish-release::${String(msg).replace(/\r?\n/g, '%0A').slice(0, 3000)}`); process.exit(1); };
+// Transient HTTP 403 and 5xx answers from the releases API are retried with
+// back-off; any other failure stops at once.
 const run = (cmd, args, opts = {}) => {
-  try { return execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts }); }
-  catch (e) { fail(`${cmd} ${args.join(' ')} failed: ${e.stderr || e.message}`); }
+  for (let attempt = 1; ; attempt++) {
+    try { return execFileSync(cmd, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts }); }
+    catch (e) {
+      const msg = String(e.stderr || e.message);
+      const transient = cmd === 'gh' && /HTTP (403|5\d\d)/.test(msg) && attempt < 4;
+      if (!transient) fail(`${cmd} ${args.join(' ')} failed after ${attempt} attempt(s): ${msg}`);
+      console.log(`Attempt ${attempt} failed (${msg.match(/HTTP \d+/)?.[0]}); retrying in ${attempt * 30} s`);
+      execFileSync(process.execPath, ['-e', `setTimeout(() => {}, ${attempt * 30000})`]);
+      if (args[0] === 'release' && args[1] === 'create') { let exists = false; try { execFileSync('gh', ['release', 'view', args[2]], { stdio: 'ignore' }); exists = true; } catch { /* not created yet */ }
+        if (exists) return run('gh', ['release', 'upload', args[2], ...args.slice(3, args.indexOf('--title')), '--clobber']); }
+    }
+  }
 };
 const env = process.env;
 const version = env.MT_VERSION;

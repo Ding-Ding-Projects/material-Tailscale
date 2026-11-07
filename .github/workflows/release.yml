@@ -85,7 +85,11 @@ jobs:
           npm run package:win > out/package.log 2>&1
           code=$?
           tail -n +1 out/package.log
-          if [ "$code" -ne 0 ]; then echo "::error title=package::$(tail -c 2500 out/package.log | tr '\n' ' ')"; exit 1; fi
+          if [ "$code" -ne 0 ]; then
+            echo "::error title=package (first errors)::$(grep -n -i -m 12 -E 'error|exception|failed|denied|not found' out/package.log | cut -c1-300 | tr '\n' ' ' | head -c 3000)"
+            echo "::error title=package (end of log)::$(tail -c 1500 out/package.log | tr '\n' ' ')"
+            exit 1
+          fi
 
       - name: Count lines
         shell: bash

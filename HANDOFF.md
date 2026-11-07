@@ -12,6 +12,9 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 
 ## Release proof
 
+- v1.0.11 · Classic Siu Mai · 燒賣 (commit a788bb7): 12 assets, notes pass the public-boundary scan, and the new install-proof job passed on a clean runner: v1.0.7 installed silently (NotSigned), updated to v1.0.11 with Update.exe (executable reports 1.0.11), uninstalled.
+- v1.0.8 and v1.0.9 failed at `gh release create` with HTTP 403 "Resource not accessible by integration"; v1.0.10 failed while building the Squirrel package (only a truncated .NET stack was visible). The next run succeeded unchanged, so both look transient. The publish step now retries 403 and 5xx answers with back-off, and the package step reports the first error lines as well as the end of the log.
+
 - v1.0.4 · Crab Roe Har Gow · 蟹籽蝦餃 published by the release workflow on commit 227d6aa: MaterialTailscaleSetup.exe (139 MB, unsigned), RELEASES, MaterialTailscale-1.0.4-full.nupkg and screenshots.zip (73 PNGs captured on the Windows runner). Notes carry line counts and measured timing (00:03:31).
 - The website deployed through GitHub Pages and returns HTTP 200.
 - Earlier runs v1.0.1 to v1.0.3 failed (long font file names on Windows checkout, missing npm install in the website job, release-notes step); each fix is in the history.
@@ -29,7 +32,7 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 ## Tooling added in the gap-closing pass
 
 - `npm run record` produced `docs/recording/end-to-end.gif` (97 frames) from the built app under Xvfb.
-- `npm run clip-matrix` checks cut-off text across scales, languages and the minimum window; first run found buttons shrinking in tight rows and a long timestamp, both fixed in CSS.
+- `npm run clip-matrix` checks cut-off text across scales, languages and the minimum window. The full matrix (100, 125, 150 and 200% in English, Cantonese and both, plus 960 by 640) now reports 0 clipped elements after fixing buttons shrinking in tight rows, a long timestamp, bilingual setting labels squeezed by tri-state controls, and duplicated bilingual labels such as "Tailnet · Tailnet".
 - The release workflow now has an install-proof job: previous release installed silently on a clean runner, updated with Update.exe to the new release, checked, uninstalled, and the result appended to the release notes. Its first real run happens on the next push.
 - `npm run gen:postman` writes a collection covering all 93 admin API operations; a test checks the count and that no token is stored.
 - `npm run wiki` builds 55 wiki pages. Publishing is blocked from the build machine: the wiki repository could not be cloned with the available credentials (it may also need its first page created on GitHub).
@@ -49,3 +52,6 @@ See unchecked items in `ROADMAP.md`.
 ## Blockers
 
 - The build session could not inspect self-hosted runners (proxy refused the Actions API), so the workflow uses GitHub-hosted `windows-latest`.
+- Wiki publishing: the wiki repository could not be cloned with the session's credentials. Run `npm run wiki -- --push` from a machine with access after creating the wiki's first page on GitHub.
+- Live status registration for the build session was not possible: no ingest credential for the maintainer's status service was available to the session.
+- A real Tailscale daemon was not run on the build machine; running a downloaded daemon needs the owner's permission.
