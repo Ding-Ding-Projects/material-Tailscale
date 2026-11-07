@@ -4,6 +4,8 @@
 
 Create, adopt and run Minecraft servers from one page (Tools > Minecraft servers).
 
+The page header counts your servers and how many are running, from each server's real status; a target that does not answer within a few seconds is counted as not answering rather than guessed. With no servers yet, the page shows a first-run card with the three steps (choose an edition, flavour and version; choose where it runs; read and accept the EULA yourself and start) and the New server and Discover and adopt buttons. With servers, the first one opens automatically.
+
 - **New server wizard**: four steps. Pick Java Edition (Vanilla, Paper, Purpur, Folia, Fabric, Forge) or Bedrock Edition; pick any version from the official catalogue with channel filters (releases, snapshots, pre-releases, beta, alpha, previews) and a regex search; pick where it runs (this computer, Docker on this computer, an SSH host, or Docker on an SSH host) and check the target; then set the name, port and memory. Catalogues show when they were retrieved and fall back to the last copy when offline, labelled as such.
 - **Downloads are verified**: the exact build is resolved from the publisher (Mojang SHA-1, PaperMC Fill v3 SHA-256, Purpur MD5, Forge SHA-1, Modrinth SHA-512). A download without a published checksum is labelled as unverified rather than called verified. The Java runtime the version needs is fetched from Adoptium with its checksum.
 - **Discover and adopt** looks for existing server folders and containers on a target. Nothing is taken over until you choose Adopt for one item.

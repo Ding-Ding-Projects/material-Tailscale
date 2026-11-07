@@ -14,6 +14,7 @@ import { regexField } from '../ui/regex.js';
 import { exportTo, FORMATS, openInEditor } from '../ui/exporter.js';
 import { logoSvg } from '../ui/logo.js';
 import { celebrate } from '../ui/celebrate.js';
+import { checkForUpdates } from '../ui/updates.js';
 
 function provLine(key) {
   const p = store.provenance(key);
@@ -197,7 +198,7 @@ registerPage('settings', (ctx) => {
     if (sec === 'locks') content.append(locksSection());
     if (sec === 'vocabulary') content.append(vocabSection());
     if (sec === 'data') content.append(dataSection());
-    if (sec === 'about') content.append(h('div.row', h('button.btn.outline', { on: { click: () => openDest('about') } }, icon('info'), t('about')), h('button.btn.outline', { on: { click: async () => toast(String(await window.mt.update.check()), {}) } }, icon('system_update'), pair('Check for updates', '檢查更新')), h('button.btn.outline', { on: { click: () => { store.set('onboarded', false); store.set('onboardStep', 0); window.dispatchEvent(new CustomEvent('mt:onboard')); } } }, icon('rocket_launch'), pair('Run the setup wizard again', '再行一次設定精靈'))));
+    if (sec === 'about') content.append(h('div.row', h('button.btn.outline', { on: { click: () => openDest('about') } }, icon('info'), t('about')), h('button.btn.outline', { on: { click: () => checkForUpdates() } }, icon('system_update'), pair('Check for updates', '檢查更新')), h('button.btn.outline', { on: { click: () => { store.set('onboarded', false); store.set('onboardStep', 0); window.dispatchEvent(new CustomEvent('mt:onboard')); } } }, icon('rocket_launch'), pair('Run the setup wizard again', '再行一次設定精靈'))));
     if (sec === 'language') content.append(h('div.card.tonal', { dataset: { el: 'set-dimsum' } }, h('div.switch-row', h('div.txt', h('b', pair('Dim sum surprise', '點心驚喜')), h('span.small.muted', pair('A 1-in-10 chance of a dim sum dish at launch.', '開程式有十分一機會見到一款點心。'))), dimSwitch())));
   };
   draw();

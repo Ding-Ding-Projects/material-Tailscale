@@ -54,6 +54,17 @@ First complete build of Material Tailscale: Electron app, website, docs, release
 - Bug fixed: Chromium remembers zoom per origin. After the clipping matrix ran at 150%, the v1.0.12 screenshots were captured at 150% zoom. Capture mode now always sets the zoom (default 100%), and `docs/screenshots/capture-manifest.json` records the viewport, scale, zoom, motion and hash of each capture.
 - Not done: populated tailnet states in the captures (needs a daemon); the dedicated build GUI companion executable.
 
+## Final polish pass
+
+- Screens: Home without Tailscale and Minecraft without servers now show full-width first-run cards that match their boards (`home-setup`, the new `minecraft-setup` view). About is a hero with a working update check, a build table (version, code name, commit, source state, builder, runtime, installer) and a licences table. Status uses dot markers, folds the searched paths behind a count, and adds This device and Health when the daemon answers. The changelog lists every published release and shows unreleased work as unreleased.
+- Bugs fixed:
+  - About printed the text "null" when a build had no code-name photo (a native `append` of `null`).
+  - Help requests copied from errors said "App version: unknown", because nothing set the version at boot.
+  - The changelog read the heading "Unreleased: Midnight Mesh 2" as version 2, and could not read code names that contain " · ". The parser now lives in `scripts/lib/changelog.mjs` with tests.
+  - Settings > Check for updates showed a raw status string; checks now report in the current language, and a copy without the Windows installer says it does not update itself.
+- Release packaging: release runs 13 and 14 failed in "Package Squirrel.Windows installer". Each release had re-uploaded every earlier package, so Squirrel's GitHub sync downloaded the same file name from several releases at once and hit "The process cannot access the file ... because it is being used by another process", then fell back to a URL that returns 404. Packaging now seeds only the previous release's `RELEASES` and newest full package, builds one delta, and trims `RELEASES` to what the release ships.
+- Canvas: version 10 publishes 15 boards and 49 views with the updated stylesheet.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.

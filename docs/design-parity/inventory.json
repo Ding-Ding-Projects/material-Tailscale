@@ -1128,11 +1128,46 @@
       "diff": "docs/design-parity/captures/minecraft/diff.json",
       "deviations": [
         {
-          "what": "The real app shows the server list without a server.",
+          "what": "The real app shows its first-run setup, recorded separately as minecraft-setup, instead of a server.",
           "reason": "No Minecraft server exists on the capture machine; the design shows a sample server named survival-1.",
           "approved": "Reviewed 2026-11-07: environment limit."
         }
       ]
+    },
+    {
+      "id": "minecraft-setup",
+      "reference": "design/canvas/Minecraft.dc.html",
+      "view": "minecraft-setup",
+      "referenceRoute": "dcref://board/Minecraft.dc.html?view=minecraft-setup&theme=dark",
+      "appRoute": "minecraft",
+      "surface": "app",
+      "state": "No servers yet (first run)",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "setup state (mesh2.css .setup)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/minecraft-setup/reference.webp",
+        "app": "docs/design-parity/captures/minecraft-setup/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/minecraft-setup/side-by-side.webp",
+      "diff": "docs/design-parity/captures/minecraft-setup/diff.json",
+      "deviations": []
     },
     {
       "id": "minecraft-new",

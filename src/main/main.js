@@ -164,7 +164,10 @@ handle('editor:open', (exe, target) => { require('node:child_process').spawn(exe
 handle('clipboard:readImage', () => { const img = clipboard.readImage(); return img.isEmpty() ? null : img.toDataURL(); });
 handle('notify', ({ title, body }) => { if (Notification.isSupported()) new Notification({ title, body }).show(); return true; });
 handle('update:install', () => { autoUpdater.quitAndInstall(); return true; });
-handle('update:check', () => { try { autoUpdater.checkForUpdates(); return 'checking'; } catch (e) { return e.message; } });
+handle('update:check', () => {
+  if (process.platform !== 'win32' || !app.isPackaged) return { state: 'unsupported' };
+  try { autoUpdater.checkForUpdates(); return { state: 'checking' }; } catch (e) { return { state: 'error', message: e.message }; }
+});
 handle('win:minimize', () => win.minimize());
 handle('win:maximize', () => (win.isMaximized() ? win.unmaximize() : win.maximize()));
 handle('win:close', () => win.close());

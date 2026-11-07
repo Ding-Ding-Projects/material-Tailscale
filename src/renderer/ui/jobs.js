@@ -38,9 +38,14 @@ export function withProgress(title, run, { onDone } = {}) {
 }
 
 /** Copyable hand-off for a local coding assistant that names the real situation. */
-export function helpRequest(what, error) {
+export function copyHelpRequest(what, error) {
   const text = `I need help with Material Tailscale.\nWhat I was doing: ${what}\nWhat happened: ${error}\nApp version: ${window.__MT_VERSION__ || 'unknown'}\nPlease diagnose the cause first. Do not delete my data, reinstall over my settings, or force-push anything.`;
-  return h('button.btn.small.outline', { type: 'button', on: { click: () => { navigator.clipboard.writeText(text); toast(pair('A help request was copied. Paste it to your coding assistant.', '已複製求助訊息，可以貼畀你嘅編程助手。'), { kind: 'ok' }); } } }, icon('support'), pair('Copy a help request', '複製求助訊息'));
+  navigator.clipboard.writeText(text);
+  toast(pair('A help request was copied. Paste it to your coding assistant.', '已複製求助訊息，可以貼畀你嘅編程助手。'), { kind: 'ok' });
+}
+
+export function helpRequest(what, error) {
+  return h('button.btn.small.outline', { type: 'button', on: { click: () => copyHelpRequest(what, error) } }, icon('support'), pair('Copy a help request', '複製求助訊息'));
 }
 
 export function installTailscaleButton(label) {

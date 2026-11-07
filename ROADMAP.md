@@ -60,11 +60,14 @@
 
 ## Midnight Mesh 2
 
-- [x] Design canvas boards for every screen family, overlay and the website (15 boards, 48 views)
+- [x] Design canvas boards for every screen family, overlay and the website (15 boards, 49 views)
 - [x] Page hero bands with animated illustrations, two-pane Settings, in-page tabs, setup state with steps
 - [x] Context menus carry live controls (switch, choice, slider, swatch) with keyboard support
 - [x] Animation and transition tab in the per-element appearance editor
 - [x] Design-reference viewer, hand-written parity inventory, side-by-side and diff evidence, negative regression
+- [x] Final polish: Home and Minecraft first-run states follow their boards; About rebuilt (build table, licences, working update check); Status shows dot markers, folded search paths, This device and Health; changelog lists every published release and marks unreleased work
+- [x] Fixed: About printed a stray "null"; help requests said "App version: unknown"; the changelog read "Unreleased: Midnight Mesh 2" as version 2
+- [x] Release packaging ships one full package and one delta per release instead of every historic package (Squirrel's GitHub sync collided on the duplicates and failed releases 13 and 14)
 - [ ] Populated tailnet states in parity captures (needs a Tailscale daemon on the capture machine)
 - [ ] Dedicated build GUI companion (portable executable that drives build.bat and build-installer.bat)
 

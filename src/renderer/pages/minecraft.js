@@ -1,5 +1,6 @@
 import { h, icon, clear, fmtBytes, uid } from '../core/dom.js';
 import { pageHero } from '../ui/hero.js';
+import { ART } from '../../shared/hero-art.js';
 import { mtabs } from '../ui/mtabs.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
@@ -104,19 +105,49 @@ function createWizard(onDone) {
 registerPage('minecraft', (ctx) => {
   const list = h('div.stack');
   const detail = h('div');
+  const stats = h('div.hero-stats', { 'aria-live': 'polite' });
+  const listCard = h('section.card.span-3.mc-list', h('h3', pair('Servers', '伺服器')), list);
+  const detailCol = h('section.span-9', detail);
+  const art = h('div.hero-art'); art.innerHTML = ART.minecraft;
+  const newServer = () => createWizard((id) => { selected = id; load(); });
+  const firstRun = h('section.setup', { dataset: { el: 'mc-first-run' }, style: { gridColumn: '1 / -1' } }, art,
+    h('div.stack',
+      h('h2', pair('Start your first server', '開你第一部伺服器')),
+      h('p', pair('Nothing is installed or started until you confirm each step.', '每一步你確認之前，乜都唔會裝、唔會開。')),
+      h('ol.steps',
+        h('li', pair('Pick Java or Bedrock, a flavour such as Paper or Fabric, and any version from the official catalogues.', '揀 Java 定 Bedrock、Paper 或者 Fabric 之類嘅版本，同官方目錄入面任何版本。')),
+        h('li', pair('Choose where it runs: this computer, Docker, or a host over SSH.', '揀喺邊度運行：本機、Docker，或者經 SSH 嘅主機。')),
+        h('li', pair('Read and accept the Minecraft EULA yourself, then start it and invite friends over your tailnet.', '自己睇同接受 Minecraft EULA，然後開機，經 tailnet 叫朋友入嚟。'))),
+      h('div.row', h('button.btn', { type: 'button', on: { click: newServer } }, icon('add'), pair('New server', '新伺服器')),
+        h('button.btn.outline', { type: 'button', on: { click: () => discoverDialog(load) } }, icon('travel_explore'), pair('Discover and adopt', '搵同接管')))));
   let selected = ctx.arg || null;
+  let gen = 0;
   const load = async () => {
+    const my = ++gen;
     const reg = await window.mt.mc.registry();
+    if (my !== gen) return;
+    const none = !reg.servers.length;
+    listCard.hidden = none; detailCol.hidden = none; firstRun.hidden = !none;
+    if (!selected && reg.servers.length) selected = reg.servers[0].id;
     clear(list);
-    if (!reg.servers.length) list.append(h('div.empty', icon('grass'), pair('No servers yet. Create one, or discover and adopt an existing one.', '未有伺服器。建立一個，或者搵返現有嘅。')));
     for (const s of reg.servers) list.append(h('button.pick-row', { type: 'button', 'aria-checked': String(selected === s.id), dataset: { el: 'mc-server-' + s.id }, on: { click: () => { selected = s.id; load(); } } }, h('span.ava', icon({ local: 'computer', docker: 'deployed_code', ssh: 'terminal', 'ssh-docker': 'cloud' }[s.target.kind])), h('span.meta', h('b', s.name), h('span', `${s.edition} · ${s.flavor} ${s.version} · ${s.target.kind}${s.target.host ? ' ' + s.target.host : ''}`)), h('span.radio-dot')));
     clear(detail);
     if (selected && reg.servers.some((s) => s.id === selected)) detail.append(serverView(reg.servers.find((s) => s.id === selected), load));
+    // Stats come from each server's real status; a target that does not answer in time counts as unknown.
+    const stat = (value, label, tone) => h(`div.stat${tone ? '.' + tone : ''}`, h('b', String(value)), h('span', label));
+    clear(stats).append(stat(reg.servers.length, pair('servers', '部伺服器')), stat(none ? 0 : '…', pair('running', '運行緊')));
+    if (none) return;
+    const answers = await Promise.allSettled(reg.servers.map((s) => Promise.race([window.mt.mc.status(s.id), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))])));
+    if (my !== gen) return;
+    const running = answers.filter((a) => a.status === 'fulfilled' && a.value?.state === 'running').length;
+    const unknown = answers.filter((a) => a.status === 'rejected').length;
+    clear(stats).append(stat(reg.servers.length, pair('servers', '部伺服器')), stat(running, pair('running', '運行緊'), running ? 'ok' : ''), unknown ? stat(unknown, pair('not answering', '冇回應'), 'warn') : '');
   };
   load();
-  return h('div.page', head(pair('Game servers', '遊戲伺服器'), t('minecraft'), pair('Create, adopt and run Java and Bedrock servers on this computer, in Docker, or over SSH. Every version from the official catalogues, flavours, plugins and mods, typed configuration, players, worlds, backups, schedules and a world generator.', '喺本機、Docker 或者 SSH 建立同運行 Java 同 Bedrock 伺服器。')),
-    h('div.row', h('button.btn', { dataset: { el: 'mc-new' }, on: { click: () => createWizard((id) => { selected = id; load(); }) } }, icon('add'), pair('New server', '新伺服器')), h('button.btn.outline', { on: { click: () => discoverDialog(load) } }, icon('travel_explore'), pair('Discover and adopt', '搵同接管'))),
-    h('div.grid', h('section.card.span-3.mc-list', h('h3', pair('Servers', '伺服器')), list), h('section.span-9', detail)));
+  return h('div.page', head(pair('Game servers', '遊戲伺服器'), t('minecraft'), pair('Create, adopt and run Java and Bedrock servers on this computer, in Docker, or over SSH. Every version from the official catalogues, flavours, plugins and mods, typed configuration, players, worlds, backups, schedules and a world generator.', '喺本機、Docker 或者 SSH 建立同運行 Java 同 Bedrock 伺服器。'),
+    h('button.btn', { type: 'button', dataset: { el: 'mc-new' }, on: { click: newServer } }, icon('add'), pair('New server', '新伺服器')),
+    h('button.btn.outline', { type: 'button', on: { click: () => discoverDialog(load) } }, icon('travel_explore'), pair('Discover and adopt', '搵同接管')), stats),
+    h('div.grid', firstRun, listCard, detailCol));
 });
 
 function discoverDialog(reload) {

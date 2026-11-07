@@ -1,5 +1,6 @@
 import { h, icon, clear, fmtDateTime } from '../core/dom.js';
-import { pageHero } from '../ui/hero.js';
+import { pageHero, heroStats } from '../ui/hero.js';
+import { checkForUpdates } from '../ui/updates.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import * as ts from '../core/tsdata.js';
@@ -55,16 +56,28 @@ registerPage('changelog', () => {
     const { q, re } = search.value();
     let test = (s) => !q || s.toLowerCase().includes(q.toLowerCase());
     if (re && q) { try { const r = new RegExp(q, 'i'); test = (s) => r.test(s); } catch { /* plain */ } }
-    shown = CHANGELOG.filter((e) => (!from.value || e.date >= from.value) && (!to.value || e.date <= to.value) && test(e.body + e.version));
+    const inRange = (e) => (e.unreleased ? !to.value : (!from.value || e.date >= from.value) && (!to.value || e.date <= to.value));
+    shown = CHANGELOG.filter((e) => inRange(e) && test([e.body, e.version, e.title, e.codeName].join(' ')));
     if (!shown.length) list.append(h('div.empty', icon('event_busy'), pair('No release in this range.', '呢段時間冇版本。')));
-    for (const e of shown) list.append(h('section.card', h('div.row', h('h2', `v${e.version}`), h('span.badge.info', e.date), e.codeName ? h('span.chip', e.codeName) : null, e.sha ? h('a.chip.mono', { href: `https://github.com/Ding-Ding-Projects/material-Tailscale/commit/${e.sha}`, target: '_blank' }, e.sha.slice(0, 7)) : null), renderMarkdown(e.body)));
+    for (const e of shown) {
+      const running = !e.unreleased && e.version === window.__MT_VERSION__?.split(' ')[0];
+      const sub = [e.title, e.codeName, e.date].filter(Boolean).join(' · ');
+      list.append(h('section.card.lift', { dataset: { el: `release-${e.unreleased ? 'unreleased' : e.version}` } },
+        h('div.row', h('span.ic.warm', icon(e.unreleased ? 'construction' : 'ramen_dining')),
+          h('div', { style: { flex: '1', minWidth: '0' } }, h('h2.release-title', e.unreleased ? pair('Unreleased', '未發佈') : `v${e.version}`), sub ? h('div.small.muted', sub) : null),
+          e.unreleased ? h('span.badge.warn', pair('on main, not released yet', '喺 main，未發佈')) : running ? h('span.badge.ok', pair('running now', '用緊呢個')) : null,
+          e.sha ? h('button.chip.mono', { type: 'button', on: { click: () => window.mt.shell.external(`https://github.com/Ding-Ding-Projects/material-Tailscale/commit/${e.sha}`) } }, e.sha.slice(0, 7)) : null),
+        renderMarkdown(e.body)));
+    }
   };
   [from, to].forEach((i) => i.addEventListener('change', draw));
   draw();
-  return h('div.page', head(pair('Releases', '版本'), t('changelog'), pair('Every released version with its date, code name and commit.', '每個版本嘅日期、代號同提交。')),
+  const released = CHANGELOG.filter((e) => !e.unreleased);
+  return h('div.page', head(pair('Releases', '版本'), t('changelog'), pair('Every released version with its date, code name and commit.', '每個版本嘅日期、代號同提交。'),
+    heroStats([{ value: `v${(window.__MT_VERSION__ || '').split(' ')[0] || '?'}`, label: pair('running now', '用緊') }, { value: released.length, label: pair('releases listed', '個版本') }, ...(CHANGELOG.some((e) => e.unreleased) ? [{ value: pair('Yes', '有'), label: pair('unreleased work', '未發佈改動'), tone: 'ok' }] : [])])),
     h('div.card.tonal', h('div.row', search.el, h('label.row', pair('From', '由'), from), h('label.row', pair('To', '至'), to),
-      h('button.btn.small.outline', { on: { click: () => exportTo(FORMATS.find((f) => f.id === 'md'), () => ({ name: `changelog-${from.value || 'start'}-${to.value || 'now'}`, data: shown.map((e) => ({ version: e.version, date: e.date, sha: e.sha, codeName: e.codeName, notes: e.body })) })) } }, icon('download'), t('export')),
-      h('button.btn.small.outline', { on: { click: () => { navigator.clipboard.writeText(shown.map((e) => `## v${e.version} (${e.date}) ${e.sha || ''}\n${e.body}`).join('\n\n')); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'), t('copy')))), list);
+      h('button.btn.small.outline', { on: { click: () => exportTo(FORMATS.find((f) => f.id === 'md'), () => ({ name: `changelog-${from.value || 'start'}-${to.value || 'now'}`, data: shown.map((e) => ({ version: e.unreleased ? 'Unreleased' : e.version, title: e.title || '', date: e.date, sha: e.sha, codeName: e.codeName, notes: e.body })) })) } }, icon('download'), t('export')),
+      h('button.btn.small.outline', { on: { click: () => { navigator.clipboard.writeText(shown.map((e) => `## ${e.unreleased ? `Unreleased: ${e.title}` : `v${e.version} (${e.date}) ${e.sha || ''}`}\n${e.body}`).join('\n\n')); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'), t('copy')))), list);
 });
 
 // ---------------- Local history ----------------
@@ -87,39 +100,95 @@ registerPage('history', () => {
 
 // ---------------- Status ----------------
 registerPage('status', (ctx) => {
-  const box = h('div.stack');
+  const checks = h('div.tbl-wrap');
+  const extra = h('div.grid');
+  const stats = h('div.hero-stats', { 'aria-live': 'polite' });
+  const chip = (name, tone = '') => h('span.ic' + (tone ? '.' + tone : ''), icon(name));
+  const mark = (tone, text) => h('span.state-mark', h(`span.dot-live${tone ? '.' + tone : ''}`, { 'aria-hidden': 'true' }), h('span', text));
+  const stat = (value, label, tone) => h(`div.stat${tone ? '.' + tone : ''}`, h('b', String(value)), h('span', label));
+  let last = null;
   const draw = (d) => {
-    clear(box);
+    last = d;
     const s = d.status;
+    const backend = s?.BackendState;
+    const health = s?.Health || [];
+    clear(stats).append(
+      stat(backend || (d.missing ? pair('not found', '搵唔到') : '—'), pair('backend', '後端'), backend === 'Running' ? 'ok' : d.missing ? 'err' : backend ? 'warn' : ''),
+      stat(`${store.get('statusInterval')} s`, pair('refresh', '更新間隔')),
+      stat(s ? health.length : '—', pair('health warnings', '健康警告'), health.length ? 'warn' : s ? 'ok' : ''));
+    const searched = d.located || [];
     const rows = [
-      [pair('Tailscale program', 'Tailscale 程式'), d.missing ? '🔴 ' + t('notInstalled') : '🟢 ' + pair('found', '搵到'), d.missing ? (d.located || []).join(', ') : ''],
-      [pair('Backend state', '後端狀態'), s ? ({ Running: '🟢', Stopped: '⚪', NeedsLogin: '🟡' }[s.BackendState] || '🔵') + ' ' + s.BackendState : '⚪ —', pair('from tailscale status --json', '來自 tailscale status --json')],
-      [pair('Health warnings', '健康警告'), s?.Health?.length ? `🟡 ${s.Health.length}` : '🟢 0', (s?.Health || []).join(' · ')],
-      [pair('Last status poll', '上次輪詢'), d.lastPoll ? '🟢 ' + fmtDateTime(d.lastPoll) : '⚪ —', ''],
+      [pair('Tailscale program', 'Tailscale 程式'), d.missing ? mark('err', t('notInstalled')) : mark('', pair('found', '搵到')),
+        d.missing && searched.length ? h('details', h('summary', pair(`Searched ${searched.length} places`, `搵過 ${searched.length} 個位置`)), h('div.out.small', searched.join('\n'))) : ''],
+      [pair('Backend state', '後端狀態'), backend ? mark({ Running: '', Stopped: 'idle', NeedsLogin: 'warn', NeedsMachineAuth: 'warn' }[backend] ?? 'warn', backend) : mark('idle', '—'), pair('from tailscale status --json', '來自 tailscale status --json')],
+      [pair('Health warnings', '健康警告'), s ? mark(health.length ? 'warn' : '', String(health.length)) : mark('idle', '—'), health.length ? pair('listed under Health below', '喺下面健康一欄') : ''],
+      [pair('Last status poll', '上次輪詢'), d.lastPoll ? mark('', fmtDateTime(d.lastPoll)) : mark('idle', '—'), d.statusErr && !d.missing ? h('span.err-text', d.statusErr) : ''],
       [pair('MagicDNS suffix', 'MagicDNS 後綴'), s?.MagicDNSSuffix || '—', ''],
       [pair('Tailnet', 'Tailnet'), s?.CurrentTailnet?.Name || '—', ''],
       [pair('Client version', '用戶端版本'), s?.Version || '—', '']
     ];
-    box.append(h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', h('th', pair('Check', '檢查')), h('th', pair('State', '狀態')), h('th', pair('Evidence', '證據')))), h('tbody', rows.map(([a, b, c]) => h('tr', h('td', a), h('td', b), h('td.small.muted', c)))))));
-    if (s?.Health?.length) box.append(h('div.card.tonal', h('h3', pair('Health messages from tailscaled', 'tailscaled 健康訊息')), ...s.Health.map((m) => h('div', '⚠️ ' + m))));
+    clear(checks).append(h('table.tbl', h('thead', h('tr', h('th', pair('Check', '檢查')), h('th', pair('State', '狀態')), h('th', pair('Evidence', '證據')))),
+      h('tbody', rows.map(([a, b, c]) => h('tr', h('td', a), h('td', b), h('td.small.muted', c))))));
+    clear(extra);
+    if (!s) return;
+    const self = s.Self || {};
+    const kv = (k, v) => h('tr', h('th', { scope: 'row' }, k), h('td', v));
+    extra.append(
+      h('section.card.span-6', { dataset: { el: 'status-self' } }, h('div.card-head', chip('laptop'), h('h3', pair('This device', '呢部裝置'))),
+        h('div.tbl-wrap', h('table.tbl', h('tbody',
+          kv('HostName', self.HostName || '—'), kv('DNSName', h('span.mono', self.DNSName || '—')), kv('TailscaleIPs', h('span.mono', (self.TailscaleIPs || []).join(', ') || '—')),
+          kv('OS', self.OS || '—'), kv('Relay', self.Relay || '—'), kv('Online', h(`span.badge.${self.Online ? 'ok' : 'warn'}`, String(!!self.Online))))))),
+      h('section.card.span-6', { dataset: { el: 'status-health' } }, h('div.card-head', chip('health_and_safety', 'alt'), h('h3', pair('Health', '健康'))),
+        health.length ? h('ol.steps.warn', health.map((m) => h('li', m))) : h('div.empty.small', icon('verified'), pair('tailscaled reports no health warnings.', 'tailscaled 冇報告健康警告。'))));
   };
   const off = ts.subscribe(draw);
   ctx.onCleanup(off);
-  return h('div.page', head(pair('Evidence', '證據'), t('status'), pair('What this app can see right now, and where each claim comes from.', '本程式而家睇到嘅嘢，同每項嘅來源。')), box);
+  const exportBtn = h('button.btn.outline', { type: 'button', dataset: { el: 'status-export' }, on: { click: () => exportTo(FORMATS.find((f) => f.id === 'json'), () => ({ name: 'tailscale-status', data: { backend: last?.status?.BackendState || null, missing: !!last?.missing, lastPoll: last?.lastPoll ? new Date(last.lastPoll).toISOString() : null, status: last?.status || null } })) } }, icon('data_object'), pair('Export JSON', '匯出 JSON'));
+  return h('div.page', head(pair('Evidence', '證據'), t('status'), pair('What this app can see right now, and where each claim comes from.', '本程式而家睇到嘅嘢，同每項嘅來源。'), exportBtn, stats),
+    h('section.card', { dataset: { el: 'status-checks' } }, h('div.card-head', h('span.ic', icon('fact_check')), h('h3', pair('Checks', '檢查'))), checks), extra);
 });
 
 registerPage('notifications', () => h('div.page', head(pair('Messages', '訊息'), t('notifications'), pair('Every notification, including dismissed ones. Search, select and delete in bulk.', '所有通知，包括已關閉嘅。可以搜尋同批量刪除。')), h('div.card', notificationCentre())));
 
+const LICENCES = [
+  ['Material Tailscale', 'MIT'], ['Electron', 'MIT'], ['isomorphic-git, marked, qrcode, 7zip-bin', 'MIT'],
+  ['7-Zip', 'GNU LGPL (parts BSD-3-Clause)'], ['FFmpeg (ffmpeg-static)', 'GPL-3.0-or-later'], ['DOMPurify', 'MPL-2.0 or Apache-2.0'],
+  ['pdf.js, jsQR, electron-squirrel-startup', 'Apache-2.0'], ['mammoth', 'BSD-2-Clause'], ['Tailscale OpenAPI document', 'BSD-3-Clause'],
+  ['Outfit, Roboto Flex, JetBrains Mono', 'SIL OFL 1.1'], ['Material Symbols Rounded', 'Apache-2.0']
+];
+
 registerPage('about', () => {
-  const box = h('div.stack');
+  const page = h('div.page');
+  const chip = (name, tone = '') => h('span.ic' + (tone ? '.' + tone : ''), icon(name));
+  const row = (k, v) => h('tr', h('th', { scope: 'row' }, k), h('td', v));
+  const ext = (url, label, ic) => h('button.btn.outline', { type: 'button', on: { click: () => window.mt.shell.external(url) } }, icon(ic), label);
   window.mt.info().then((i) => {
-    const b = i.build;
-    box.append(h('div.row', logoSvg(64), h('div', h('h1', t('appName')), h('div.muted', store.get('displayName') ? pair(`Shown as "${store.get('displayName')}"`, `顯示為「${store.get('displayName')}」`) : ''))),
-      h('div.kpis', h('div.kpi', h('b', `v${i.version}`), h('span', t('version'))), h('div.kpi', h('b', b?.codeName || '—'), h('span', t('codeName'))), h('div.kpi', h('b', b ? fmtDateTime(b.commitTime) : pair('unavailable', '冇資料')), h('span', t('updated'))), h('div.kpi', h('b', b?.commit?.slice(0, 7) || '—'), h('span', pair('commit', '提交'))), h('div.kpi', h('b', `Electron ${i.electron}`), h('span', `${i.platform} ${i.arch}`))),
-      b?.photoUrl ? h('img', { src: b.photoUrl, alt: b.codeName, style: { maxWidth: '360px', borderRadius: '20px' } }) : null,
-      h('p', pair('Material Tailscale is an independent desktop manager for Tailscale. It is not made by or affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.', 'Material Tailscale 係獨立嘅 Tailscale 桌面管理程式，同 Tailscale Inc. 冇關係。')),
-      h('p.small.muted', pair('Installers are unsigned. Windows may warn about an unknown publisher.', '安裝程式冇簽名，Windows 可能會警告。')),
-      h('div.row', h('button.btn.outline', { on: { click: () => window.mt.shell.external('https://github.com/Ding-Ding-Projects/material-Tailscale') } }, icon('code'), 'GitHub'), h('button.btn.outline', { on: { click: () => window.mt.shell.external('https://ding-ding-projects.github.io/material-Tailscale/') } }, icon('public'), pair('Website', '網站')), h('button.btn.outline', { on: { click: () => openDest('changelog') } }, icon('update'), t('changelog'))));
+    const b = i.build || {};
+    const repo = 'https://github.com/Ding-Ding-Projects/material-Tailscale';
+    const local = pair('Not assigned: local build', '未有：本機建置');
+    page.append(
+      pageHero(t('appName'), t('about'), pair('A Material 3 desktop app for every Tailscale feature. Unsigned installers, local everything.', '一個 Material 3 桌面程式，包晒每個 Tailscale 功能。安裝程式冇簽名，乜都喺本機。'),
+        h('button.btn.outline', { type: 'button', dataset: { el: 'about-update' }, on: { click: () => checkForUpdates() } }, icon('system_update'), pair('Check for updates', '檢查更新')),
+        heroStats([{ value: `v${i.version}`, label: t('version') }, { value: b.commitTime ? fmtDateTime(b.commitTime) : pair('unavailable', '冇資料'), label: t('updated') }])),
+      h('div.grid',
+        h('section.card.span-6', { dataset: { el: 'about-build' } }, h('div.card-head', logoSvg(40), h('h3', pair('Build', '建置'))),
+          h('div.tbl-wrap', h('table.tbl', h('tbody',
+            store.get('displayName') ? row(pair('Shown as', '顯示為'), store.get('displayName')) : null,
+            row(t('version'), `v${i.version}`),
+            row(t('codeName'), b.codeName || local),
+            row(pair('Commit', '提交'), b.commit ? h('button.btn.text.small.mono', { type: 'button', on: { click: () => window.mt.shell.external(`${repo}/commit/${b.commit}`) } }, b.commit.slice(0, 7)) : '—'),
+            b.dirtyTree === undefined ? null : row(pair('Source', '原始碼'), b.dirtyTree ? pair('That commit plus uncommitted changes', '嗰個提交加未提交嘅改動') : pair('Exactly that commit', '就係嗰個提交')),
+            row(pair('Built by', '建置者'), b.builtBy || '—'),
+            row(pair('Runtime', '執行環境'), `Electron ${i.electron} · ${i.platform} ${i.arch}`),
+            row(pair('Installer', '安裝程式'), pair('Squirrel.Windows, unsigned', 'Squirrel.Windows，冇簽名'))))),
+          b.photoUrl ? h('img.about-photo', { src: b.photoUrl, alt: b.codeName || '' }) : null),
+        h('section.card.span-6', { dataset: { el: 'about-licences' } }, h('div.card-head', chip('gavel', 'alt'), h('h3', pair('Licences', '授權'))),
+          h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', h('th', pair('Component', '組件')), h('th', pair('Licence', '授權')))), h('tbody', LICENCES.map(([n, l]) => h('tr', h('td', n), h('td.mono.small', l))))))),
+        h('section.card.span-12', { dataset: { el: 'about-notice' } },
+          h('p', { style: { margin: 0 } }, pair('Material Tailscale is an independent desktop manager for Tailscale. It is not made by or affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.', 'Material Tailscale 係獨立嘅 Tailscale 桌面管理程式，同 Tailscale Inc. 冇關係。Tailscale 係 Tailscale Inc. 嘅商標。')),
+          h('p.small.muted', pair('Installers are unsigned. Windows may warn about an unknown publisher.', '安裝程式冇簽名，Windows 可能會警告。')),
+          h('div.row', ext(repo, 'GitHub', 'code'), ext('https://ding-ding-projects.github.io/material-Tailscale/', pair('Website', '網站'), 'public'),
+            h('button.btn.outline', { type: 'button', on: { click: () => openDest('changelog') } }, icon('update'), t('changelog'))))));
   });
-  return h('div.page', h('section.card', box));
+  return page;
 });

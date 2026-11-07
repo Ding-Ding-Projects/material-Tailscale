@@ -179,6 +179,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
 (async () => {
   mountOverlays();
   const info = await window.mt.info();
+  window.__MT_VERSION__ = `${info.version}${info.build?.commit ? ` (${info.build.commit.slice(0, 7)})` : ''} on ${info.platform} ${info.arch}`;
   i18n.setSchool(await window.mt.shared.get().catch(() => ({})));
   window.mt.shared.onChange((rec) => { i18n.setSchool(rec); render(); });
   setInterval(async () => i18n.setSchool(await window.mt.shared.get().catch(() => ({}))), 5000);

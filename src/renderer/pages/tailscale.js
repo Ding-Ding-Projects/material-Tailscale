@@ -28,6 +28,7 @@ function missingCard() {
       h('div.row', h('span.dot-live.err'), h('h2', t('notInstalled'))),
       h('p', t('tsMissing')),
       h('ol.steps',
+        h('li.done', pair('Material Tailscale is installed and running.', 'Material Tailscale 已經裝好兼行緊。')),
         h('li', pair('Install Tailscale with one click, or point Material Tailscale at an existing copy.', '一撳安裝 Tailscale，或者指去現有嘅一份。')),
         h('li', pair('Log in to your tailnet from Accounts.', '喺帳戶頁登入你嘅 tailnet。')),
         h('li', pair('Come back here for peers, traffic, routes and every setting.', '返嚟呢度睇裝置、流量、路由同所有設定。'))),
@@ -56,7 +57,9 @@ registerPage('home', (ctx) => {
     const s = d.status;
     clear(hero);
     hero.classList.toggle('bare', !!d.missing);
-    for (const e of [kpCard, peersHead, peersWrap]) e.hidden = !!d.missing;
+    hero.classList.toggle('span-12', !!d.missing); hero.classList.toggle('span-7', !d.missing);
+    for (const e of [trafficCard, kpCard, peersHead, peersWrap]) e.hidden = !!d.missing;
+    for (const e of firstRun) e.hidden = !d.missing;
     if (d.missing) { hero.append(missingCard()); return; }
     const st = stateOf(s);
     const self = s?.Self;
@@ -93,12 +96,21 @@ registerPage('home', (ctx) => {
     top.forEach((p, i) => peersBox.append(peerCard(p, i)));
   };
   const kpCard = h('section.card.span-12', kp);
+  const trafficCard = h('section.card.span-5', { dataset: { el: 'home-traffic' } }, h('div.card-head', h('h2', pair('Live traffic', '即時流量')), infoBtn(pair('Live traffic', '即時流量'), pair('Bytes per second across all peers, computed from the change in counters between status polls.', '所有裝置每秒位元組，由輪詢之間嘅計數差計出。'))), chart.el);
+  const chip = (name, tone = '') => h('span.ic' + (tone ? '.' + tone : ''), icon(name));
+  const firstRun = [
+    h('section.card.span-6', { dataset: { el: 'home-preview' } }, h('div.card-head', chip('auto_awesome'), h('h3', pair('What you will see here', '你會喺呢度見到乜'))),
+      h('p.muted', pair('Peers with their live path, traffic, exit nodes, routes, sharing, DNS, Tailnet Lock and every CLI command as a form.', '裝置同佢哋嘅即時路徑、流量、出口節點、路由、分享、DNS、Tailnet Lock，仲有每個 CLI 指令嘅表格。'))),
+    h('section.card.span-6', { dataset: { el: 'home-explore' } }, h('div.card-head', chip('explore', 'alt'), h('h3', pair('Prefer to look around first?', '想先周圍睇下？'))),
+      h('p.muted', pair('Settings, tools and every command form work without Tailscale. Each form previews the exact command it would run.', '設定、工具同每個指令表格冇 Tailscale 都用得。每個表格都會預覽佢會行嘅指令。')),
+      h('div.row', h('button.btn.tonal', { dataset: { el: 'home-tour' }, on: { click: () => window.dispatchEvent(new Event('mt:onboard')) } }, icon('tour'), pair('Open the tour', '開導覽')),
+        h('button.btn.text', { on: { click: () => openDest('cli') } }, icon('terminal'), pair('Browse every command', '睇晒所有指令'))))
+  ];
   const peersHead = h('div.span-12.row', h('h2', { style: { flex: 1 } }, t('peers')), h('button.btn.text', { on: { click: () => openDest('peers') } }, pair('All peers', '全部裝置'), icon('arrow_forward')));
   const peersWrap = h('div.span-12', peersBox);
   const off = ts.subscribe(draw);
   ctx.onCleanup(() => { off(); chart.destroy(); });
-  page.append(h('div.grid', hero, h('section.card.span-5', { dataset: { el: 'home-traffic' } }, h('div.card-head', h('h2', pair('Live traffic', '即時流量')), infoBtn(pair('Live traffic', '即時流量'), pair('Bytes per second across all peers, computed from the change in counters between status polls.', '所有裝置每秒位元組，由輪詢之間嘅計數差計出。'))), chart.el),
-    kpCard, peersHead, peersWrap));
+  page.append(h('div.grid', hero, trafficCard, ...firstRun, kpCard, peersHead, peersWrap));
   return page;
 });
 

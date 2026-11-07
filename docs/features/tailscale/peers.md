@@ -6,6 +6,8 @@ The Peers destination lists every device on your tailnet from `tailscale status 
 
 ## Configuration
 
+The Status page (open it from the New tab catalogue or with Ctrl+Shift+F) is the evidence view behind those cards: a table of checks (is the Tailscale program found, the backend state, health warnings, the last poll, MagicDNS suffix, tailnet and client version), each with its state and where the claim comes from. When Tailscale is missing, the places that were searched sit behind a "Searched N places" disclosure. With the daemon running it adds This device (host name, DNS name, Tailscale IPs, OS, relay, online) and Health (every warning tailscaled reports). Export JSON saves the current status.
+
 Settings > Tailscale > Status refresh sets the poll interval (1 to 60 seconds). The search and filter row is collapsible and remembers its state.
 
 ## When something goes wrong

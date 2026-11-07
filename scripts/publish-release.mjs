@@ -32,6 +32,12 @@ if (!setup) fail(`No Setup.exe in out/installer (found: ${files.join(', ') || 'n
 const assets = files.filter((f) => /Setup\.exe$|^RELEASES$|\.nupkg$/i.test(f)).map((f) => path.join(installer, f));
 const lines = fs.existsSync(path.join(out, 'line-counts.md')) ? fs.readFileSync(path.join(out, 'line-counts.md'), 'utf8') : 'Line count unavailable.';
 const subject = run('git', ['log', '-1', '--format=%s']).trim();
+// The changelog's "Unreleased" section is what this release ships, so it becomes the notes' change list.
+const changelog = fs.existsSync('CHANGELOG.md') ? fs.readFileSync('CHANGELOG.md', 'utf8') : '';
+const unreleased = changelog.split(/^## /m).find((c) => /^unreleased\b/i.test(c));
+const changes = unreleased
+  ? [`**${unreleased.split('\n')[0].replace(/^unreleased\b[\s:·–-]*/i, '').trim() || 'Changes'}**`, '', unreleased.split('\n').slice(1).join('\n').trim(), '', `Latest commit: ${subject}`].join('\n')
+  : `- ${subject}`;
 const notes = [
   `## Material Tailscale v${version}`, '',
   env.MT_CODENAME ? `**Code name:** ${env.MT_CODENAME}\n\n![${env.MT_CODENAME}](${env.MT_PHOTO_URL})\n` : 'Code name unavailable: the public dim sum catalogue could not be read.\n',
@@ -40,7 +46,7 @@ const notes = [
   'Download **MaterialTailscaleSetup.exe** below and run it. The installer is **unsigned**, so Windows SmartScreen may warn about an unknown publisher. Installed copies update themselves from this release feed and ask before restarting.', '',
   '### Checks',
   'This release workflow runs no automated test or lint gate. Local checks for this commit are recorded in HANDOFF.md.', '',
-  '### Changes', `- ${subject}`, '',
+  '### Changes', changes, '',
   '### Line counts', lines
 ].join('\n');
 fs.writeFileSync(path.join(out, 'notes.md'), notes);

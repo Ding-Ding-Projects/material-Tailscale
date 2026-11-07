@@ -58,7 +58,7 @@ jobs:
           echo "MT_CODENAME=$(echo "$dish" | node -pe "JSON.parse(require('fs').readFileSync(0)).codeName||''")" >> "$GITHUB_ENV"
           echo "MT_PHOTO_URL=$(echo "$dish" | node -pe "JSON.parse(require('fs').readFileSync(0)).photoUrl||''")" >> "$GITHUB_ENV"
           prev=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' || true)
-          if [ -n "$prev" ]; then echo "MT_REMOTE_RELEASES=https://github.com/${{ github.repository }}" >> "$GITHUB_ENV"; fi
+          if [ -n "$prev" ]; then echo "MT_PREVIOUS_RELEASE=$prev" >> "$GITHUB_ENV"; fi
 
       - name: Generate icons
         run: npm run icons
