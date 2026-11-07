@@ -18,7 +18,26 @@ window.mt = {
     available: async () => true
   },
   authLoad: async () => { const r = JSON.parse(localStorage.getItem('mt.site.secret.authenticator:secrets') || 'null'); return r?.value ? JSON.parse(r.value) : {}; },
-  lockVerify: async (n, a) => { const r = JSON.parse(localStorage.getItem('mt.site.secret.' + n) || 'null'); if (!r) return { ok: false }; const totp = (await import('../src/shared/totp.js')).default; let ok = true; if (r.pin !== undefined) ok = ok && r.pin === a.pin; if (r.password !== undefined) ok = ok && r.password === a.password; if (r.totpSecret) ok = ok && (await totp.verifyAsync(r.totpSecret, a.totp || '')); return { ok }; },
+  lockVerify: async (n, a) => {
+    const r = JSON.parse(localStorage.getItem('mt.site.secret.' + n) || 'null'); if (!r) return { ok: false };
+    const all = JSON.parse(localStorage.getItem('mt.site.lockstate') || '{}'); const st = all[n] || { attempts: 0, until: 0 };
+    if (st.until > Date.now()) return { ok: false, waitMs: st.until - Date.now() };
+    const totp = (await import('../src/shared/totp.js')).default; let ok = true;
+    if (r.pin !== undefined) ok = ok && r.pin === a.pin; if (r.password !== undefined) ok = ok && r.password === a.password; if (r.totpSecret) ok = ok && (await totp.verifyAsync(r.totpSecret, a.totp || ''));
+    if (ok) { delete all[n]; } else { st.attempts++; st.until = Date.now() + (st.attempts < 3 ? 0 : Math.min(3600, 2 ** (st.attempts - 2) * 15) * 1000); all[n] = st; }
+    localStorage.setItem('mt.site.lockstate', JSON.stringify(all)); return ok ? { ok } : { ok, attempts: st.attempts, waitMs: Math.max(0, st.until - Date.now()) };
+  },
+  lockStatus: async (n) => { const st = JSON.parse(localStorage.getItem('mt.site.lockstate') || '{}')[n] || { attempts: 0, until: 0 }; return { attempts: st.attempts, waitMs: Math.max(0, st.until - Date.now()) }; },
+  lockClearState: async (n) => { const all = JSON.parse(localStorage.getItem('mt.site.lockstate') || '{}'); delete all[n]; localStorage.setItem('mt.site.lockstate', JSON.stringify(all)); },
+  ladder: (() => {
+    const pend = new Map(); const passed = new Set();
+    const rnd = (n) => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+    return {
+      start: async (n, rung) => { const id = crypto.randomUUID(); if (rung === 'sums') { const qs = Array.from({ length: 10 }, () => [2 + rnd(18), 2 + rnd(18)]); pend.set(id, { rung, ans: qs.map(([a, b]) => a + b) }); return { ok: true, nonce: id, questions: qs }; } if (rung === 'mole') { const seq = Array.from({ length: 40 }, () => rnd(9)); pend.set(id, { rung, seq, at: Date.now(), hits: new Set() }); return { ok: true, nonce: id, tickMs: 900, seconds: 20, seq }; } return { ok: false, skip: true }; },
+      answer: async (id, p) => { const x = pend.get(id); if (!x) return { ok: false }; if (x.rung === 'sums') { pend.delete(id); const ok = p.every((v, i) => v === x.ans[i]); if (ok) passed.add('sums'); return { ok }; } const el = Date.now() - x.at; if (p.finish) { pend.delete(id); const ok = el >= 20000 && x.hits.size >= 10; if (ok) passed.add('mole'); return { ok, hits: x.hits.size }; } const tick = Math.floor(el / 900); if (x.seq[tick] !== p.hole) return { ok: false, hits: x.hits.size }; x.hits.add(tick); return { ok: true, hits: x.hits.size }; },
+      complete: async (n) => { if (!passed.has('sums') || !passed.has('mole')) return { ok: false }; passed.clear(); const all = JSON.parse(localStorage.getItem('mt.site.lockstate') || '{}'); if (all[n]) all[n].until = 0; localStorage.setItem('mt.site.lockstate', JSON.stringify(all)); return { ok: true }; }
+    };
+  })(),
   history: {
     record: async (message, f) => { const h = hist(); h.unshift({ oid: Math.random().toString(16).slice(2).padEnd(40, '0'), message, time: Date.now(), files: f }); localStorage.setItem('mt.site.history', JSON.stringify(h.slice(0, 200))); },
     list: async () => hist(),
