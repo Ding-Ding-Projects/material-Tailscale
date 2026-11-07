@@ -1,4 +1,5 @@
 import { h, icon, clear, fmtBytes, uid } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage } from '../ui/shell.js';
@@ -18,7 +19,7 @@ const logs = new Map();
 window.mt?.mc?.onLog(({ id, line, stream }) => { const l = logs.get(id) || []; l.push({ line, stream, at: Date.now() }); if (l.length > 3000) l.shift(); logs.set(id, l); window.dispatchEvent(new CustomEvent('mc:log', { detail: { id, line, stream } })); });
 window.mt?.mc?.onState((s) => window.dispatchEvent(new CustomEvent('mc:state', { detail: s })));
 
-const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.titles', h('div.eyebrow', eyebrow), h('h1', title), desc ? h('p', desc) : null), ...right);
+const head = pageHero;
 
 function targetEditor(value = { kind: 'local' }) {
   let tgt = { ...value };

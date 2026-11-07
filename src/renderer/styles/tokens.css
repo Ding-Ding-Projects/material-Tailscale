@@ -1,0 +1,50 @@
+/* Design tokens shared by the app, the website and the design canvas. */
+/* ===== Tokens: Material 3 Expressive, "Midnight Mesh" ===== */
+:root {
+  --seed: #a9b8ff;
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Roboto Flex', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ease-emph: cubic-bezier(.2, 0, 0, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --dur-s: 160ms; --dur-m: 320ms; --dur-l: 560ms;
+  --r-xs: 8px; --r-s: 12px; --r-m: 16px; --r-l: 22px; --r-xl: 28px; --r-full: 999px;
+  --gap: 18px; --pad: 22px; --ctl-h: 44px;
+  --text-scale: 1;
+  color-scheme: dark;
+  --bg: #0b0f1a;
+  --surface: #131829; --surface-2: #161b2e; --surface-3: #1b2140; --surface-hi: #1e2550;
+  --outline: #2a3150; --outline-soft: #1d2238;
+  --on: #e6e8f2; --on-2: #b7bedb; --on-3: #9aa3c4;
+  --primary: oklch(from var(--seed) 0.80 calc(c * 0.9) h);
+  --on-primary: #0b0f1a;
+  --primary-cont: oklch(from var(--seed) 0.36 calc(c * 0.7) h);
+  --secondary: #6ce6b6; --secondary-cont: #123b2f;
+  --tertiary: #ffc46b; --tertiary-cont: #3b2e12;
+  --error: #ffb4ab; --error-cont: #5a1a1a;
+  --glow-1: oklch(from var(--seed) 0.38 0.12 h / .9);
+  --glow-2: #173a33;
+  --shadow: 0 18px 50px rgba(0,0,0,.45);
+}
+:root[data-theme="light"], .theme-light {
+  color-scheme: light;
+  --bg: #f6f6fb; --surface: #ffffff; --surface-2: #f0f1f8; --surface-3: #e7e9f6; --surface-hi: #dde1fb;
+  --outline: #c7cbe0; --outline-soft: #e1e4f0;
+  --on: #141726; --on-2: #3a4060; --on-3: #5b6283;
+  --primary: oklch(from var(--seed) 0.45 calc(c * 1.1) h); --on-primary: #ffffff;
+  --primary-cont: oklch(from var(--seed) 0.90 calc(c * 0.5) h);
+  --secondary: #0b7a57; --secondary-cont: #c9f2e2;
+  --tertiary: #8a5a00; --tertiary-cont: #ffe2b8;
+  --error: #b3261e; --error-cont: #f9dedc;
+  --glow-1: oklch(from var(--seed) 0.9 0.06 h / .9); --glow-2: #dff5ec;
+  --shadow: 0 18px 50px rgba(30,40,90,.15);
+}
+:root[data-contrast="high"] { --on-2: var(--on); --on-3: var(--on); --outline: var(--on-2); }
+:root[data-density="compact"] { --gap: 12px; --pad: 14px; --ctl-h: 36px; }
+:root[data-density="spacious"] { --gap: 24px; --pad: 28px; --ctl-h: 52px; }
+:root.large-targets { --ctl-h: 52px; }
+:root.rainbow { animation: rainbow 12s linear infinite; }
+@keyframes rainbow { from { --seed: #ff8a8a; } 25% { --seed: #ffd36b; } 50% { --seed: #6ce6b6; } 75% { --seed: #8ab4ff; } to { --seed: #ff8a8a; } }
+@property --seed { syntax: '<color>'; inherits: true; initial-value: #a9b8ff; }
+:root.low-stim { --secondary: var(--on-2); --tertiary: var(--on-2); }
+:root.low-stim .ambient { display: none; }

@@ -1,4 +1,5 @@
 import { h, icon, clear, fmtBytes } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage, openDest, openInNewTab } from '../ui/shell.js';
@@ -12,7 +13,7 @@ import QRCode from 'qrcode';
 import { withProgress, helpRequest } from '../ui/jobs.js';
 import jsQR from 'jsqr';
 
-const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.titles', h('div.eyebrow', eyebrow), h('h1', title), desc ? h('p', desc) : null), ...right);
+const head = pageHero;
 
 registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。')),
   h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id))))))));

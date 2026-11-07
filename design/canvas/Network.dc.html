@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Network: DNS and diagnostics</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/6bcf6707cacd4ba68700cb1b804c8a9b">
+<link rel="stylesheet" href="/_blob/099324bcf432c03eac3404a9d5effa98">
+<link rel="stylesheet" href="/_blob/48303520121fb7a507e0a42145327586">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block">
+<style>
+html,body{margin:0;height:auto;overflow:auto;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+</style>
+</helmet>
+<div class="mm2-board theme-{{theme}}" data-board="Network.dc.html">
+<div class="titlebar"><span class="brand"><span class="msr">blur_on</span>Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger"><span class="msr">search</span>Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button><button type="button" class="icon-btn" aria-label="Notifications"><span class="msr">notifications</span></button><button type="button" class="icon-btn" aria-label="Accessibility tools"><span class="msr">accessibility_new</span></button><button type="button" class="win-btn" aria-label="Minimise"><span class="msr">remove</span></button><button type="button" class="win-btn" aria-label="Maximise"><span class="msr">crop_square</span></button><button type="button" class="win-btn close" aria-label="Close"><span class="msr">close</span></button></div>
+<div class="body">
+<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>
+<div class="main">
+<div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button type="button" class="tab" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}"><span class="msr">{{t.icon}}</span><span class="label">{{t.label}}</span></button></sc-for><button type="button" class="tab-new" aria-label="New tab"><span class="msr">add</span></button></div>
+<main class="outlet">
+<sc-if value="{{v.dns}}" hint-placeholder-val="{{ true }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">dns</span>MagicDNS</span><h1>DNS<span class="yue">域名解析</span></h1><p>This device's DNS forwarder, live queries through it, and the tailnet-wide DNS settings in Admin.</p><div class="hero-actions"><button type="button" class="btn outline"><span class="msr">settings</span>Tailnet DNS settings</button></div><div class="hero-stats"><div class="stat ok"><b>On</b><span>MagicDNS</span></div><div class="stat"><b>2</b><span>resolvers</span></div><div class="stat"><b>3</b><span>search domains</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <path class="l" d="M170 46 V80 M170 80 L90 120 M170 80 L170 124 M170 80 L250 120"/>
+    <g class="float"><rect class="n" x="132" y="22" width="76" height="34" rx="12"/></g>
+    <g class="float d2"><rect class="n alt" x="52" y="122" width="76" height="32" rx="12"/></g>
+    <g class="float d3"><rect class="n" x="132" y="126" width="76" height="32" rx="12"/></g>
+    <g class="float"><rect class="n warm" x="212" y="122" width="76" height="32" rx="12"/></g>
+    <circle class="soft pulse" cx="170" cy="80" r="12"/><circle class="solid" cx="170" cy="80" r="6"/></svg></div></section><div class="grid"><section class="card span-6"><div class="card-head"><span class="ic"><span class="msr">dns</span></span><h3>Accept DNS</h3></div><div class="stack"><div class="flag-card"><div class="row nowrap"><button type="button" class="icon-btn" aria-label="About Use the tailnet's DNS"><span class="msr">info</span></button><b style="flex: 1">Use the tailnet's DNS</b><code class="small muted">--accept-dns</code></div><div class="seg" role="radiogroup" aria-label="Accept DNS"><button type="button" role="radio" aria-checked="false">Leave as is</button><button type="button" role="radio" aria-checked="true">On</button><button type="button" role="radio" aria-checked="false">Off</button></div><div class="small muted">Use the DNS configuration from the admin console.</div></div></div></section><section class="card span-6"><div class="card-head"><span class="ic alt"><span class="msr">travel_explore</span></span><h3>DNS query · 查詢</h3></div><div class="stack"><div class="row"><input class="input" aria-label="Name" placeholder="Name" value="home-nas" style="width: 100%"><div class="seg" role="radiogroup" aria-label="Record type"><button type="button" role="radio" aria-checked="true">A</button><button type="button" role="radio" aria-checked="false">AAAA</button><button type="button" role="radio" aria-checked="false">TXT</button><button type="button" role="radio" aria-checked="false">SRV</button></div><button type="button" class="btn"><span class="msr">search</span>Query</button></div><div class="out" style="white-space: pre-wrap">home-nas.example.ts.net.  600  IN  A  100.92.7.18</div></div></section><section class="card span-12"><div class="card-head"><span class="ic"><span class="msr">list</span></span><h3>Resolvers and search domains</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Kind</th><th>Value</th></tr></thead><tbody><tr><td>Resolver</td><td><span class="mono">1.1.1.1</span></td></tr><tr><td>Resolver</td><td><span class="mono">9.9.9.9</span></td></tr><tr><td>Search domain</td><td>example.ts.net</td></tr></tbody></table></div></section></div></div></sc-if>
+<sc-if value="{{v.diagnostics}}" hint-placeholder-val="{{ false }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">monitor_heart</span>Health</span><h1>Diagnostics<span class="yue">診斷</span></h1><p>Network check, ping, bug reports, metrics and debug commands, each with a plain explanation.</p><div class="hero-actions"><button type="button" class="btn"><span class="msr">speed</span>Run network check</button><button type="button" class="btn outline"><span class="msr">bug_report</span>Bug report</button></div><div class="hero-stats"><div class="stat ok"><b>UDP</b><span>works</span></div><div class="stat"><b>tor 11 ms</b><span>nearest DERP</span></div><div class="stat ok"><b>No</b><span>captive portal</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <path class="g" d="M30 120 H80 L100 70 L124 160 L148 50 L172 130 L190 110 H240" />
+    <path class="l alt" d="M30 150 H310"/>
+    <circle class="g spin" cx="272" cy="78" r="38" stroke-dasharray="6 9" opacity=".7"/>
+    <circle class="n warm" cx="272" cy="78" r="18"/><circle class="soft pulse" cx="148" cy="50" r="12"/></svg></div></section><div class="grid"><section class="card span-7"><div class="card-head"><span class="ic"><span class="msr">speed</span></span><h3>Network check · 網絡檢查</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Region</th><th>Latency</th><th></th></tr></thead><tbody><tr><td>Toronto (tor)</td><td>11 ms</td><td><div class="gauge" style="--v: 92; width: 26px; height: 26px"></div></td></tr><tr><td>New York (nyc)</td><td>19 ms</td><td><div class="gauge" style="--v: 80; width: 26px; height: 26px"></div></td></tr><tr><td>Chicago (ord)</td><td>27 ms</td><td><div class="gauge" style="--v: 70; width: 26px; height: 26px"></div></td></tr></tbody></table></div></section><section class="card span-5"><div class="card-head"><span class="ic alt"><span class="msr">network_ping</span></span><h3>Ping</h3></div><div class="stack"><div class="row"><input class="input" aria-label="Peer" placeholder="Peer" value="home-nas" style="width: 100%"><div class="stepper" style="display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--outline); border-radius: 999px; padding: 2px"><button type="button" class="icon-btn sm" aria-label="Decrease count"><span class="msr">remove</span></button><b class="mono" style="min-width: 54px; text-align: center">10</b><button type="button" class="icon-btn sm" aria-label="Increase count"><span class="msr">add</span></button></div></div><div class="switch-row"><div class="txt"><b>Use TSMP</b><span class="small muted">--tsmp</span></div><button type="button" class="switch" role="switch" aria-checked="false" aria-label="Use TSMP"></button></div><div class="out" style="white-space: pre-wrap">pong from home-nas (100.92.7.18) via 192.0.2.10:41641 in 4ms</div></div></section></div></div></sc-if>
+</main>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"view":{"editor":"enum","options":["dns","diagnostics"],"default":"dns"},"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: "dns" }; }
+  renderVals() {
+    const VIEWS = [{"id":"dns","key":"dns","icon":"dns","label":"DNS","dest":"dns"},{"id":"diagnostics","key":"diagnostics","icon":"monitor_heart","label":"Diagnostics","dest":"diagnostics"}];
+    const RAIL = [{"id":"home","icon":"home","label":"Home","sep":false},{"id":"peers","icon":"hub","label":"Peers","sep":false},{"id":"exit","icon":"travel_explore","label":"Exit nodes","sep":false},{"id":"routes","icon":"alt_route","label":"Routes","sep":false},{"id":"serve","icon":"lan","label":"Serve","sep":false},{"id":"taildrop","icon":"move_to_inbox","label":"Taildrop","sep":false},{"id":"dns","icon":"dns","label":"DNS","sep":false},{"id":"lock","icon":"enhanced_encryption","label":"Lock","sep":false},{"id":"drive","icon":"folder_shared","label":"Taildrive","sep":false},{"id":"accounts","icon":"group","label":"Accounts","sep":false},{"id":"diagnostics","icon":"monitor_heart","label":"Diagnostics","sep":false},{"id":"cli","icon":"terminal","label":"Commands","sep":true},{"id":"admin","icon":"admin_panel_settings","label":"Admin","sep":false},{"id":"tools","icon":"construction","label":"Tools","sep":true},{"id":"docs","icon":"menu_book","label":"Docs","sep":false},{"id":"settings","icon":"settings","label":"Settings","sep":true}];
+    const view = this.props.view && VIEWS.some((x) => x.id === this.props.view) && !this.state.picked ? this.props.view : this.state.view;
+    const cur = VIEWS.find((x) => x.id === view) || VIEWS[0];
+    const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
+    return {
+      theme: this.props.theme === 'light' ? 'light' : 'dark',
+      v,
+      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', pick: () => this.setState({ view: x.id, picked: true }) })),
+      rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{ "name": "design-reference", "private": true, "main": "main.js", "description": "Developer tool that renders design/canvas boards offline for design-parity checks." }

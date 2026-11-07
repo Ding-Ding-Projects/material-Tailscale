@@ -14,7 +14,7 @@ fs.mkdirSync(path.join(out, 'styles'), { recursive: true });
 execFileSync(process.execPath, [path.join(root, 'scripts/build-renderer.mjs')], { stdio: 'inherit', cwd: root, env: { ...process.env, MT_SKIP_APP_BUNDLE: '1' } });
 const esbuild = (await import('esbuild')).default;
 await esbuild.build({ entryPoints: [path.join(root, 'site/site.js')], bundle: true, format: 'iife', platform: 'browser', target: 'chrome120', outfile: path.join(out, 'site.js'), external: ['node:crypto'], minify: true, logLevel: 'warning' });
-fs.copyFileSync(path.join(root, 'src/renderer/styles/app.css'), path.join(out, 'styles/app.css'));
+for (const css of ['tokens.css', 'app.css', 'mesh2.css']) fs.copyFileSync(path.join(root, 'src/renderer/styles', css), path.join(out, 'styles', css));
 fs.copyFileSync(path.join(root, 'site/site.css'), path.join(out, 'styles/site.css'));
 fs.copyFileSync(path.join(root, 'site/index.html'), path.join(out, 'index.html'));
 fs.cpSync(path.join(root, 'assets/fonts'), path.join(out, 'fonts'), { recursive: true });

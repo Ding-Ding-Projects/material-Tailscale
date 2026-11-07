@@ -1,4 +1,5 @@
 import { h, icon, clear, fmtDateTime } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import * as ts from '../core/tsdata.js';
@@ -12,7 +13,7 @@ import { renderMarkdown } from '../ui/markdown.js';
 import { ARTICLES, CHANGELOG } from '../docs-bundle.js';
 import { logoSvg } from '../ui/logo.js';
 
-const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.titles', h('div.eyebrow', eyebrow), h('h1', title), desc ? h('p', desc) : null), ...right);
+const head = pageHero;
 
 // ---------------- Offline docs ----------------
 registerPage('docs', (ctx) => {

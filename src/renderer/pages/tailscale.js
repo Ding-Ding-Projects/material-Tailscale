@@ -1,4 +1,6 @@
 import { h, icon, clear, fmtBytes, fmtAgo, debounce } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
+import { ART } from '../../shared/hero-art.js';
 import { t, tl, pair, emoji } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import * as ts from '../core/tsdata.js';
@@ -16,13 +18,21 @@ import { YUE_TITLES, YUE_GROUPS } from '../ui/cli-yue.js';
 import { regexField } from '../ui/regex.js';
 import { installTailscaleButton } from '../ui/jobs.js';
 
-const head = (eyebrow, title, desc, ...right) => h('div.page-head', h('div.titles', h('div.eyebrow', eyebrow), h('h1', title), desc ? h('p', desc) : null), ...right);
+const head = pageHero;
 const cmdBlock = (id, opts) => { const c = findCommand(id); return collapsible(`cmd-${id}`, h('span', pair(c.title, YUE_TITLES[id]), h('code.small.muted', { style: { marginLeft: '8px' } }, 'tailscale ' + c.path.join(' '))), h('div.card', commandForm(c, { compact: true, ...opts })), { startCollapsed: opts?.collapsed }); };
 
 function missingCard() {
-  return h('div.card', { style: { borderColor: 'var(--error)', gridColumn: '1 / -1' } }, h('div.row', icon('error', '.fill'), h('h2', t('notInstalled'))), h('p', t('tsMissing')),
-    h('div.row', installTailscaleButton(), h('button.btn.outline', { on: { click: () => openDest('settings', 'tailscale') } }, icon('folder_open'), pair('Choose its location', '揀佢嘅位置'))),
-    ts.data.located?.length ? h('details', h('summary', pair('Places searched', '搵過嘅位置')), h('div.out', ts.data.located.join('\n'))) : null);
+  const art = h('div.hero-art'); art.innerHTML = ART.network;
+  return h('section.setup', { dataset: { el: 'ts-missing' }, style: { gridColumn: '1 / -1' } }, art,
+    h('div.stack',
+      h('div.row', h('span.dot-live.err'), h('h2', t('notInstalled'))),
+      h('p', t('tsMissing')),
+      h('ol.steps',
+        h('li', pair('Install Tailscale with one click, or point Material Tailscale at an existing copy.', '一撳安裝 Tailscale，或者指去現有嘅一份。')),
+        h('li', pair('Log in to your tailnet from Accounts.', '喺帳戶頁登入你嘅 tailnet。')),
+        h('li', pair('Come back here for peers, traffic, routes and every setting.', '返嚟呢度睇裝置、流量、路由同所有設定。'))),
+      h('div.row', installTailscaleButton(), h('button.btn.outline', { on: { click: () => openDest('settings', 'tailscale') } }, icon('folder_open'), pair('Choose its location', '揀佢嘅位置'))),
+      ts.data.located?.length ? h('details', h('summary', pair('Places searched', '搵過嘅位置')), h('div.out', ts.data.located.join('\n'))) : null));
 }
 
 function stateOf(s) {
@@ -45,6 +55,7 @@ registerPage('home', (ctx) => {
   const draw = (d) => {
     const s = d.status;
     clear(hero);
+    hero.classList.toggle('bare', !!d.missing);
     if (d.missing) { hero.append(missingCard()); return; }
     const st = stateOf(s);
     const self = s?.Self;

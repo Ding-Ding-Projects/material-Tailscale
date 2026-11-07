@@ -1,4 +1,5 @@
 import { h, icon, clear } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
 import { t, pair, schoolOn, schoolName, loadVocabFromText, clearVocab, vocabState } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage, openDest } from '../ui/shell.js';
@@ -174,9 +175,9 @@ registerPage('settings', (ctx) => {
   let sec = SECTIONS.find((s) => s[0] === ctx.arg)?.[0] || (window.mt.site ? 'language' : 'tailscale');
   const content = h('div.stack');
   const search = regexField({ id: 'settings', placeholder: pair('Search settings', '搜尋設定'), onChange: () => draw() });
-  const nav = h('div.row');
+  const nav = h('nav.subnav', { 'aria-label': pair('Settings sections', '設定分類') });
   const draw = () => {
-    clear(nav).append(...SECTIONS.filter(([id]) => !(schoolOn() && ['vocabulary'].includes(id)) && !(window.mt.site && ['tailscale', 'data', 'about'].includes(id))).map(([id, en, yue, ic]) => h('button.chip.choice', { 'aria-pressed': String(id === sec), on: { click: () => { sec = id; search.set(''); draw(); } } }, h('span.msr', { style: { fontSize: '16px' } }, ic), pair(en, yue))));
+    clear(nav).append(...SECTIONS.filter(([id]) => !(schoolOn() && ['vocabulary'].includes(id)) && !(window.mt.site && ['tailscale', 'data', 'about'].includes(id))).map(([id, en, yue, ic]) => h('button.subnav-item', { type: 'button', 'aria-current': String(id === sec), dataset: { el: `set-nav-${id}` }, on: { click: () => { sec = id; search.set(''); draw(); } } }, h('span.msr', { style: { fontSize: '16px' } }, ic), pair(en, yue))));
     clear(content);
     const { q, re } = search.value();
     if (q) {
@@ -200,7 +201,7 @@ registerPage('settings', (ctx) => {
     if (sec === 'language') content.append(h('div.card.tonal', { dataset: { el: 'set-dimsum' } }, h('div.switch-row', h('div.txt', h('b', pair('Dim sum surprise', '點心驚喜')), h('span.small.muted', pair('A 1-in-10 chance of a dim sum dish at launch.', '開程式有十分一機會見到一款點心。'))), dimSwitch())));
   };
   draw();
-  return h('div.page', h('div.page-head', h('div.titles', h('div.eyebrow', pair('Preferences', '偏好')), h('h1', t('settings')), h('p', pair('Every setting explains itself and shows where its value came from.', '每個設定都有解釋，同顯示個值從邊度嚟。'))), search.el), h('div.card.tonal', nav), content);
+  return h('div.page', pageHero(pair('Preferences', '偏好'), t('settings'), pair('Every setting explains itself and shows where its value came from.', '每個設定都有解釋，同顯示個值從邊度嚟。'), search.el), h('div.split', nav, h('div.split-main', content)));
 });
 
 function dimSwitch() {

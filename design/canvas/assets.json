@@ -1,0 +1,8 @@
+{
+  "note": "Stylesheets uploaded to the design canvas. Each board links them by these URLs; the design-reference app serves the snapshot files beside this file for the same URLs.",
+  "files": {
+    "/_blob/6bcf6707cacd4ba68700cb1b804c8a9b": "assets/tokens.css",
+    "/_blob/099324bcf432c03eac3404a9d5effa98": "assets/app.css",
+    "/_blob/48303520121fb7a507e0a42145327586": "assets/mesh2.css"
+  }
+}

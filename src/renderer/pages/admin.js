@@ -1,4 +1,5 @@
 import { h, icon, clear, fmtAgo } from '../core/dom.js';
+import { pageHero } from '../ui/hero.js';
 import { t, pair } from '../core/i18n.js';
 import { registerPage, openDest } from '../ui/shell.js';
 import { toast, dialog, collapsible, menu } from '../ui/overlay.js';
@@ -274,7 +275,7 @@ registerPage('admin', (ctx) => {
   const seg = segmented(Object.keys(views).map((k) => ({ value: k, label: pair(k, yue[k]) })), cur, { label: 'Admin area' });
   const show = () => clear(holder).append(views[cur]());
   seg.onChange((v) => { cur = v; show(); });
-  const page = h('div.page', h('div.page-head', h('div.titles', h('div.eyebrow', 'api.tailscale.com'), h('h1', t('admin')), h('p', pair('The whole Tailscale admin API: devices, policy file, keys, DNS, users, settings, webhooks, logs, services, posture, invites, contacts, OAuth apps and organisations. 93 operations, every field a rich control.', '成個 Tailscale 管理 API：93 個操作，每個欄位都有專屬控制項。')))),
+  const page = h('div.page', pageHero('api.tailscale.com', t('admin'), pair('The whole Tailscale admin API: devices, policy file, keys, DNS, users, settings, webhooks, logs, services, posture, invites, contacts, OAuth apps and organisations. 93 operations, every field a rich control.', '成個 Tailscale 管理 API：93 個操作，每個欄位都有專屬控制項。')),
     connectionCard(() => show()), h('div.card.tonal', seg.el), holder);
   show();
   return page;

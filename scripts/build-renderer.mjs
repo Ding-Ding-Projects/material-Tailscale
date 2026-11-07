@@ -40,6 +40,6 @@ if (!process.env.MT_SKIP_APP_BUNDLE) await esbuild.build({
   define: { 'process.env.NODE_ENV': '"production"' }
 });
 fs.copyFileSync(path.join(root, 'src/renderer/index.html'), path.join(dist, 'index.html'));
-fs.copyFileSync(path.join(root, 'src/renderer/styles/app.css'), path.join(dist, 'styles/app.css'));
+for (const css of ['tokens.css', 'app.css', 'mesh2.css']) fs.copyFileSync(path.join(root, 'src/renderer/styles', css), path.join(dist, 'styles', css));
 fs.cpSync(path.join(root, 'assets/fonts'), path.join(dist, 'fonts'), { recursive: true });
 console.log(`Renderer built. ${articles.length} articles, ${changelog.length} changelog entries.`);

@@ -2,64 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Material Tailscale landing page</title>
+<title>Website · landing, docs and download</title>
 <script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/6bcf6707cacd4ba68700cb1b804c8a9b">
+<link rel="stylesheet" href="/_blob/099324bcf432c03eac3404a9d5effa98">
+<link rel="stylesheet" href="/_blob/48303520121fb7a507e0a42145327586">
 </head>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block">
 <style>
-body{margin:0;background:#0b0f1a}
+html,body{margin:0;height:auto;overflow:auto;background:#0b0f1a}
 a{color:#a9b8ff}a:hover{color:#dfe4ff}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@keyframes drift{0%{transform:translate(0,0)}50%{transform:translate(18px,-12px)}100%{transform:translate(0,0)}}
-.rise{animation:rise .7s cubic-bezier(.2,0,0,1) both}
-.drift{animation:drift 9s ease-in-out infinite}
-@media (prefers-reduced-motion: reduce){.rise,.drift{animation:none}}
 </style>
 </helmet>
-<div style="min-height: 1400px; background: radial-gradient(1000px 640px at 80% -5%, #2a2f6b 0%, rgba(11,15,26,0) 60%), radial-gradient(700px 500px at 0% 40%, #173a33 0%, rgba(11,15,26,0) 60%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif">
-<header style="display: flex; align-items: center; gap: 18px; padding: 18px 32px; flex-wrap: wrap; position: sticky; top: 0; background: rgba(11,15,26,.8); border-bottom: 1px solid #1d2238">
-<span style="font: 800 18px Outfit">Material Tailscale</span>
-<nav aria-label="Site" style="display: flex; gap: 6px; flex-wrap: wrap; flex: 1"><sc-for list="{{nav}}" as="n" hint-placeholder-count="7"><button type="button" onClick="{{n.pick}}" style="{{n.style}}">{{n.label}}</button></sc-for></nav>
-<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2d3455; background: #161b2e; color: #c9cfea; font: 500 12px 'Roboto Flex'">Ctrl+Shift+F</button>
-<button type="button" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #2d3455; background: #161b2e; color: #c9cfea; font: 600 12px 'Roboto Flex'">EN · 廣 · Both</button>
-<button type="button" aria-label="Accessibility tools" style="width: 36px; height: 36px; border-radius: 18px; border: 1px solid #2d3455; background: #161b2e; color: #c9cfea">♿</button>
-</header>
-<section style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 40px; display: flex; gap: 40px; flex-wrap: wrap; align-items: center">
-<div class="rise" style="flex: 1 1 460px">
-<div style="font: 600 13px 'Roboto Flex'; color: #6ce6b6; letter-spacing: 1px; text-transform: uppercase">Landing · docs · downloads · status</div>
-<h1 style="margin: 14px 0; font: 800 64px/1.02 Outfit; letter-spacing: -1px">Every Tailscale switch. One beautiful window.</h1>
-<p style="margin: 0 0 26px; font-size: 18px; color: #b7bedb; max-width: 560px">Peers, exit nodes, subnet routes, Serve, Funnel, Taildrop, Tailnet Lock, Taildrive, DNS, certificates and the full admin API, each with a real control instead of a flag you have to remember.</p>
-<div style="display: flex; gap: 12px; flex-wrap: wrap"><a href="#download" style="height: 56px; padding: 0 28px; border-radius: 28px; background: #6ce6b6; color: #0b0f1a; font: 800 16px Outfit; display: inline-flex; align-items: center; text-decoration: none">Download for Windows · v1.0.N</a><a href="#docs" style="height: 56px; padding: 0 24px; border-radius: 28px; border: 1px solid #3a4380; color: #dfe4ff; font: 600 15px 'Roboto Flex'; display: inline-flex; align-items: center; text-decoration: none">Read the docs</a></div>
-<p style="margin: 14px 0 0; font-size: 12px; color: #9aa3c4">Version and updated-at time are read from the verified release manifest. Unsigned installer; Windows may show an unknown-publisher warning.</p>
+<div class="mm2-board theme-{{theme}}" data-board="Landing.dc.html">
+<header class="site-header" style="display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--outline-soft)"><b style="font: 700 17px var(--font-display); flex: 1">Material Tailscale</b><a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">Home</a><a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">Docs</a><a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">Download</a><a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">Settings</a><button type="button" class="palette-trigger"><span class="msr">search</span>Search <kbd>Ctrl+Shift+F</kbd></button></header><p class="small muted" style="margin: 10px 22px 0">This website is the documentation and download page. It is not the app and cannot run Tailscale.</p>
+<div class="body">
+
+<div class="main">
+<div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="3"><button type="button" class="tab" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}"><span class="msr">{{t.icon}}</span><span class="label">{{t.label}}</span></button></sc-for><button type="button" class="tab-new" aria-label="New tab"><span class="msr">add</span></button></div>
+<main class="outlet">
+<sc-if value="{{v.site_home}}" hint-placeholder-val="{{ true }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">language</span>Material Tailscale for Windows</span><h1>Every Tailscale switch. One beautiful window.<span class="yue">所有 Tailscale 開關，一個靚靚嘅窗口。</span></h1><p>Every Tailscale feature in a modern desktop app: peers, exit nodes, routes, sharing, DNS, Tailnet Lock, every CLI command and the whole admin API. This website is documentation and downloads, not the app itself.</p><div class="hero-actions"><button type="button" class="btn big"><span class="msr">download</span>Download for Windows</button><button type="button" class="btn outline big"><span class="msr">menu_book</span>Read the docs</button></div><div class="hero-stats"><div class="stat"><b>93</b><span>API operations</span></div><div class="stat"><b>73</b><span>commands</span></div><div class="stat"><b>57</b><span>articles</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <path class="l" d="M60 120 L140 60 L230 92 L292 44"/><path class="l alt" d="M140 60 L170 150 L230 92"/><path class="l" d="M60 120 L170 150 L292 140"/>
+    <circle class="soft pulse" cx="170" cy="150" r="22"/>
+    <g class="float"><circle class="n" cx="60" cy="120" r="13"/></g>
+    <g class="float d2"><circle class="n alt" cx="140" cy="60" r="15"/></g>
+    <g class="float d3"><circle class="n" cx="230" cy="92" r="17"/></g>
+    <g class="float"><circle class="n warm" cx="292" cy="44" r="11"/></g>
+    <g class="float d2"><circle class="n alt" cx="292" cy="140" r="12"/></g>
+    <circle class="solid" cx="170" cy="150" r="10"/></svg></div></section><div class="grid"><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">hub</span></span><h3>Peers</h3></div><p class="muted" style="margin: 0">Live path, traffic and quick actions.</p></section><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">travel_explore</span></span><h3>Exit nodes</h3></div><p class="muted" style="margin: 0">Mullvad, suggestions and LAN access.</p></section><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">lan</span></span><h3>Serve and Funnel</h3></div><p class="muted" style="margin: 0">Share local services safely.</p></section><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">enhanced_encryption</span></span><h3>Tailnet Lock</h3></div><p class="muted" style="margin: 0">Keys, signatures and recovery.</p></section><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">terminal</span></span><h3>Every command</h3></div><p class="muted" style="margin: 0">Each flag a rich control.</p></section><section class="card lift span-4"><div class="card-head"><span class="ic"><span class="msr">admin_panel_settings</span></span><h3>Admin API</h3></div><p class="muted" style="margin: 0">93 operations as forms.</p></section></div></div></sc-if>
+<sc-if value="{{v.site_docs}}" hint-placeholder-val="{{ false }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">menu_book</span>Offline</span><h1>Docs<span class="yue">說明文件</span></h1><p>57 articles bundled into the app. Links between articles open here.</p><div class="hero-stats"><div class="stat"><b>57</b><span>articles</span></div><div class="stat ok"><b>Offline</b><span>always</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <g class="float d3"><rect class="n" x="96" y="40" width="150" height="120" rx="16" opacity=".6" transform="rotate(-8 170 100)"/></g>
+    <g class="float d2"><rect class="n alt" x="96" y="40" width="150" height="120" rx="16" transform="rotate(4 170 100)"/></g>
+    <g class="float"><rect class="n" x="96" y="40" width="150" height="120" rx="16"/></g>
+    <path class="g" d="M118 70 h90 M118 92 h106 M118 114 h70 M118 136 h88" opacity=".7"/>
+    <circle class="soft pulse" cx="246" cy="40" r="14"/><circle class="solid warm" cx="246" cy="40" r="7"/></svg></div></section><div class="card"><div class="input-wrap" style="flex: 1; min-width: 220px"><span class="msr">search</span><input aria-label="Search titles and article text" placeholder="Search titles and article text"><button type="button" class="icon-btn sm" aria-label="Regex mode"><span class="msr">regular_expression</span></button><button type="button" class="icon-btn sm" aria-label="Regex builder"><span class="msr">construction</span></button></div></div><div class="split"><nav class="subnav" aria-label="Articles"><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Material Tailscale documentation</button><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Completeness inventory</button><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Accessibility tools</button><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Per-element appearance editor</button><button type="button" class="subnav-item" aria-current="true"><span class="msr">article</span>Peers and live status</button><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Exit nodes</button><button type="button" class="subnav-item" aria-current="false"><span class="msr">article</span>Minecraft servers</button></nav><div class="split-main"><article class="card md"><h1>Peers and live status</h1><p>Every device on your tailnet appears as a card with its live path (direct, relayed or idle), traffic, tags and quick actions.</p><h2>Behaviour</h2><ul><li>Cards or a sortable table, with filters and a regex search.</li><li>Right-click a peer for every action, with shortcuts shown.</li></ul><h2>Suggested articles</h2><p><a href="#">Exit nodes</a> · <a href="#">Taildrop</a></p></article></div></div></div></sc-if>
+<sc-if value="{{v.site_download}}" hint-placeholder-val="{{ false }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">download</span>Releases</span><h1>Download<span class="yue">下載</span></h1><p>Unsigned Squirrel installer with automatic updates. Windows may warn about an unknown publisher.</p><div class="hero-actions"><button type="button" class="btn big"><span class="msr">download</span>MaterialTailscaleSetup.exe</button></div><div class="hero-stats"><div class="stat"><b>v1.0.12</b><span>latest</span></div><div class="stat warn"><b>Unsigned</b><span>installer</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <g class="float d3"><rect class="n" x="96" y="40" width="150" height="120" rx="16" opacity=".6" transform="rotate(-8 170 100)"/></g>
+    <g class="float d2"><rect class="n alt" x="96" y="40" width="150" height="120" rx="16" transform="rotate(4 170 100)"/></g>
+    <g class="float"><rect class="n" x="96" y="40" width="150" height="120" rx="16"/></g>
+    <path class="g" d="M118 70 h90 M118 92 h106 M118 114 h70 M118 136 h88" opacity=".7"/>
+    <circle class="soft pulse" cx="246" cy="40" r="14"/><circle class="solid warm" cx="246" cy="40" r="7"/></svg></div></section><div class="grid"><section class="card span-12"><div class="card-head"><span class="ic"><span class="msr">install_desktop</span></span><h3>What you get</h3></div><ol class="steps"><li>Run the installer; it needs no administrator rights.</li><li>The app opens on the welcome wizard.</li><li>Updates download in the background and ask before restarting.</li></ol></section></div></div></sc-if>
+</main>
 </div>
-<div class="drift" style="flex: 1 1 420px; border-radius: 28px; padding: 18px; background: #131829; border: 1px solid #2c3463; box-shadow: 0 30px 80px rgba(0,0,0,.45)">
-<div style="height: 260px; border-radius: 18px; border: 1px dashed #3a4380; display: grid; place-items: center; color: #9aa3c4; text-align: center; padding: 20px">Real screenshot of the built app's Home screen, captured by the release pipeline</div>
 </div>
-</section>
-<section id="docs" style="max-width: 1180px; margin: 0 auto; padding: 20px 32px 40px">
-<h2 style="margin: 0 0 18px; font: 800 34px Outfit">Every feature has an article</h2>
-<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
-<sc-for list="{{cards}}" as="c" hint-placeholder-count="9">
-<a href="#docs" class="rise" style="border-radius: 22px; padding: 20px; background: #131829; border: 1px solid #22283f; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 22px">{{c.icon}}</span><span style="font: 700 17px Outfit">{{c.title}}</span><span style="font-size: 13px; color: #9aa3c4">{{c.body}}</span></a>
-</sc-for>
-</div>
-</section>
-<section style="max-width: 1180px; margin: 0 auto; padding: 20px 32px 80px; display: flex; gap: 16px; flex-wrap: wrap">
-<div style="flex: 1 1 340px; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f"><h3 style="margin: 0 0 10px; font: 700 18px Outfit">Make it yours</h3><p style="margin: 0; color: #b7bedb; font-size: 14px">English, Cantonese or both, two funny-level sliders, a personal vocabulary drop zone, School mode, ADHD modes, narrator and a full appearance editor work right here on the site, not just in the app.</p></div>
-<div style="flex: 1 1 340px; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f"><h3 style="margin: 0 0 10px; font: 700 18px Outfit">Tools on the page</h3><p style="margin: 0; color: #b7bedb; font-size: 14px">Regex builder, Base64 toolkit, authenticator, QR pairing, colour translator and changelog viewer, all local in your browser.</p></div>
-</section>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"view":{"editor":"enum","options":["site-home","site-docs","site-download"],"default":"site-home"},"$preview":{"width":1440,"height":1500}}'>
 class Component extends DCLogic {
-  constructor(p){super(p);this.state={nav:'Home'};}
-  renderVals(){
-    const nav=['Home','Features','Docs','Download','Changelog','Status','Tools','Settings'].map(label=>({label,pick:()=>this.setState({nav:label}),style:'height:36px;padding:0 14px;border-radius:12px;border:0;background:'+(this.state.nav===label?'#33407f':'transparent')+';color:#e6e8f2;font:600 13px Roboto Flex'}));
-    const cards=[['◎','Peers & status','Live peer grid with direct or relayed paths, ping and whois.'],['⇱','Exit nodes','Pick, suggest and advertise exit nodes, Mullvad included.'],['⇄','Serve & Funnel','Share local services to your tailnet or the internet.'],['⇣','Taildrop','Send and receive files between devices.'],['⚿','Tailnet Lock','Sign nodes, manage trusted keys, read the lock log.'],['◇','MagicDNS','Nameservers, split DNS, search paths and live queries.'],['☰','Admin API','Devices, keys, ACL policy, users, webhooks, logs.'],['⌘','Every CLI flag','Each tailscale command and flag as a real control.'],['⚙','Settings','Languages, locks, schedules, history and exports.']].map(([icon,title,body])=>({icon,title,body}));
-    return{nav,cards};
+  constructor(p) { super(p); this.state = { view: "site-home" }; }
+  renderVals() {
+    const VIEWS = [{"id":"site-home","key":"site_home","icon":"language","label":"Website · home","dest":"home"},{"id":"site-docs","key":"site_docs","icon":"article","label":"Website · docs","dest":"docs"},{"id":"site-download","key":"site_download","icon":"download","label":"Website · download","dest":"home"}];
+    const RAIL = [{"id":"home","icon":"home","label":"Home","sep":false},{"id":"peers","icon":"hub","label":"Peers","sep":false},{"id":"exit","icon":"travel_explore","label":"Exit nodes","sep":false},{"id":"routes","icon":"alt_route","label":"Routes","sep":false},{"id":"serve","icon":"lan","label":"Serve","sep":false},{"id":"taildrop","icon":"move_to_inbox","label":"Taildrop","sep":false},{"id":"dns","icon":"dns","label":"DNS","sep":false},{"id":"lock","icon":"enhanced_encryption","label":"Lock","sep":false},{"id":"drive","icon":"folder_shared","label":"Taildrive","sep":false},{"id":"accounts","icon":"group","label":"Accounts","sep":false},{"id":"diagnostics","icon":"monitor_heart","label":"Diagnostics","sep":false},{"id":"cli","icon":"terminal","label":"Commands","sep":true},{"id":"admin","icon":"admin_panel_settings","label":"Admin","sep":false},{"id":"tools","icon":"construction","label":"Tools","sep":true},{"id":"docs","icon":"menu_book","label":"Docs","sep":false},{"id":"settings","icon":"settings","label":"Settings","sep":true}];
+    const view = this.props.view && VIEWS.some((x) => x.id === this.props.view) && !this.state.picked ? this.props.view : this.state.view;
+    const cur = VIEWS.find((x) => x.id === view) || VIEWS[0];
+    const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
+    return {
+      theme: this.props.theme === 'light' ? 'light' : 'dark',
+      v,
+      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', pick: () => this.setState({ view: x.id, picked: true }) })),
+      rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
+    };
   }
 }
 </script>

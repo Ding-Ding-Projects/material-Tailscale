@@ -4,63 +4,56 @@
 <meta charset="utf-8">
 <title>Exit nodes and routes</title>
 <script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/6bcf6707cacd4ba68700cb1b804c8a9b">
+<link rel="stylesheet" href="/_blob/099324bcf432c03eac3404a9d5effa98">
+<link rel="stylesheet" href="/_blob/48303520121fb7a507e0a42145327586">
 </head>
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block">
 <style>
-body{margin:0;background:#0b0f1a}
+html,body{margin:0;height:auto;overflow:auto;background:#0b0f1a}
 a{color:#a9b8ff}a:hover{color:#dfe4ff}
-@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.rise{animation:rise .6s cubic-bezier(.2,0,0,1) both}
-@media (prefers-reduced-motion: reduce){.rise{animation:none}}
 </style>
 </helmet>
-<div style="min-height: 960px; background: radial-gradient(900px 500px at 10% 0%, #183a33 0%, rgba(11,15,26,0) 60%), #0b0f1a; color: #e6e8f2; font-family: 'Roboto Flex', system-ui, sans-serif; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
-<div style="display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap">
-<div style="flex: 1; min-width: 280px"><div style="font: 600 12px 'Roboto Flex'; color: #6ce6b6; letter-spacing: .8px; text-transform: uppercase">Routing</div><h1 style="margin: 6px 0 0; font: 800 40px Outfit; letter-spacing: -.4px">Exit nodes &amp; subnet routes</h1></div>
-<button type="button" style="height: 48px; padding: 0 22px; border-radius: 24px; border: 0; background: #6ce6b6; color: #0b0f1a; font: 700 14px Outfit">Suggest best exit node</button>
+<div class="mm2-board theme-{{theme}}" data-board="ExitNodes.dc.html">
+<div class="titlebar"><span class="brand"><span class="msr">blur_on</span>Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger"><span class="msr">search</span>Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button><button type="button" class="icon-btn" aria-label="Notifications"><span class="msr">notifications</span></button><button type="button" class="icon-btn" aria-label="Accessibility tools"><span class="msr">accessibility_new</span></button><button type="button" class="win-btn" aria-label="Minimise"><span class="msr">remove</span></button><button type="button" class="win-btn" aria-label="Maximise"><span class="msr">crop_square</span></button><button type="button" class="win-btn close" aria-label="Close"><span class="msr">close</span></button></div>
+<div class="body">
+<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>
+<div class="main">
+<div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="2"><button type="button" class="tab" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}"><span class="msr">{{t.icon}}</span><span class="label">{{t.label}}</span></button></sc-for><button type="button" class="tab-new" aria-label="New tab"><span class="msr">add</span></button></div>
+<main class="outlet">
+<sc-if value="{{v.exit}}" hint-placeholder-val="{{ true }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">route</span>Routing</span><h1>Exit nodes<span class="yue">出口節點</span></h1><p>Send internet traffic through another device, a Mullvad location, or let Tailscale pick automatically.</p><div class="hero-actions"><button type="button" class="btn tonal"><span class="msr">auto_awesome</span>Suggest the best one</button></div><div class="hero-stats"><div class="stat ok"><b>home-nas</b><span>in use</span></div><div class="stat"><b>2</b><span>offered</span></div><div class="stat"><b>31</b><span>Mullvad cities</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <circle class="g" cx="120" cy="100" r="62" opacity=".55"/><ellipse class="g" cx="120" cy="100" rx="26" ry="62" opacity=".45"/><path class="g" d="M58 100 H182 M66 70 H174 M66 130 H174" opacity=".35"/>
+    <path class="l" d="M150 64 C 210 10, 270 30, 300 70"/><path class="l alt" d="M160 120 C 220 170, 280 160, 306 128"/>
+    <g class="float"><circle class="n warm" cx="300" cy="70" r="12"/></g><g class="float d2"><circle class="n alt" cx="306" cy="128" r="12"/></g>
+    <circle class="soft pulse" cx="150" cy="64" r="14"/><circle class="solid" cx="150" cy="64" r="7"/></svg></div></section><div class="grid"><section class="card span-7"><div class="card-head"><span class="ic"><span class="msr">travel_explore</span></span><h3>Choose an exit node · 揀出口節點</h3></div><div class="stack"><div class="input-wrap" style="flex: 1; min-width: 220px"><span class="msr">search</span><input aria-label="Filter by name, country or city" placeholder="Filter by name, country or city"><button type="button" class="icon-btn sm" aria-label="Regex mode"><span class="msr">regular_expression</span></button><button type="button" class="icon-btn sm" aria-label="Regex builder"><span class="msr">construction</span></button></div><button type="button" class="pick-row" aria-checked="false"><span class="ava"><span class="msr">block</span></span><span class="meta"><b>None: route traffic normally</b><span>tailscale set --exit-node=</span></span><span class="radio-dot"></span></button><button type="button" class="pick-row" aria-checked="false"><span class="ava"><span class="msr">auto_awesome</span></span><span class="meta"><b>Automatic (best available)</b><span>auto:any</span></span><span class="radio-dot"></span></button><button type="button" class="pick-row" aria-checked="true"><span class="ava"><span class="msr">dns</span></span><span class="meta"><b>home-nas</b><span>100.92.7.18 · direct · 4 ms</span></span><span class="radio-dot"></span></button><button type="button" class="pick-row" aria-checked="false"><span class="ava"><span class="msr">router</span></span><span class="meta"><b>cabin-router</b><span>100.66.8.31 · relayed · 38 ms</span></span><span class="radio-dot"></span></button><div class="switch-row"><div class="txt"><b>Allow local network access</b><span class="small muted">--exit-node-allow-lan-access</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Allow local network access"></button></div></div></section><section class="card span-5"><div class="card-head"><span class="ic warm"><span class="msr">public</span></span><h3>Mullvad locations</h3></div><div class="stack"><div class="seg" role="radiogroup" aria-label="Group by"><button type="button" role="radio" aria-checked="false">Countries</button><button type="button" role="radio" aria-checked="true">Cities</button></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Location</th><th>Load</th><th></th></tr></thead><tbody><tr><td>Toronto · CA</td><td><div class="gauge" style="--v: 34; width: 28px; height: 28px"></div></td><td><button type="button" class="btn small tonal">Use</button></td></tr><tr><td>Tokyo · JP</td><td><div class="gauge" style="--v: 61; width: 28px; height: 28px"></div></td><td><button type="button" class="btn small tonal">Use</button></td></tr><tr><td>Frankfurt · DE</td><td><div class="gauge" style="--v: 22; width: 28px; height: 28px"></div></td><td><button type="button" class="btn small tonal">Use</button></td></tr></tbody></table></div></div></section></div></div></sc-if>
+<sc-if value="{{v.routes}}" hint-placeholder-val="{{ false }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr">alt_route</span>Routing</span><h1>Routes<span class="yue">路由</span></h1><p>Advertise subnets and app connectors, accept routes from peers and see what is approved.</p><div class="hero-actions"><button type="button" class="btn"><span class="msr">add</span>Advertise a subnet</button></div><div class="hero-stats"><div class="stat"><b>2</b><span>advertised</span></div><div class="stat warn"><b>1</b><span>awaiting approval</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <circle class="g" cx="120" cy="100" r="62" opacity=".55"/><ellipse class="g" cx="120" cy="100" rx="26" ry="62" opacity=".45"/><path class="g" d="M58 100 H182 M66 70 H174 M66 130 H174" opacity=".35"/>
+    <path class="l" d="M150 64 C 210 10, 270 30, 300 70"/><path class="l alt" d="M160 120 C 220 170, 280 160, 306 128"/>
+    <g class="float"><circle class="n warm" cx="300" cy="70" r="12"/></g><g class="float d2"><circle class="n alt" cx="306" cy="128" r="12"/></g>
+    <circle class="soft pulse" cx="150" cy="64" r="14"/><circle class="solid" cx="150" cy="64" r="7"/></svg></div></section><div class="grid"><section class="card span-7"><div class="card-head"><span class="ic"><span class="msr">alt_route</span></span><h3>Advertised by this device</h3></div><div class="stack"><div class="chips-editor row"><span class="chip"><span class="mono">198.51.100.0/24</span></span><span class="chip"><span class="mono">203.0.113.0/24</span></span><input class="input" style="flex: 1; min-width: 160px" aria-label="Add a route" placeholder="Add a CIDR, for example 192.0.2.0/24"></div><div class="row"><button type="button" class="chip choice" aria-pressed="false">198.51.100.0/24</button><button type="button" class="chip choice" aria-pressed="false">203.0.113.0/24</button><button type="button" class="chip choice" aria-pressed="false">192.0.2.0/24</button></div><div class="switch-row"><div class="txt"><b>Accept routes from peers</b><span class="small muted">--accept-routes</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="Accept routes from peers"></button></div><div class="switch-row"><div class="txt"><b>SNAT subnet routes</b><span class="small muted">--snat-subnet-routes (Linux)</span></div><button type="button" class="switch" role="switch" aria-checked="true" aria-label="SNAT subnet routes"></button></div></div></section><section class="card span-5"><div class="card-head"><span class="ic alt"><span class="msr">verified</span></span><h3>Approval</h3></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Route</th><th>State</th></tr></thead><tbody><tr><td>198.51.100.0/24</td><td><span class="badge ok">approved</span></td></tr><tr><td>203.0.113.0/24</td><td><span class="badge warn">awaiting approval</span></td></tr></tbody></table></div></section></div></div></sc-if>
+</main>
 </div>
-<div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px">
-<section class="rise" style="grid-column: span 7; border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f; display: flex; flex-direction: column; gap: 10px">
-<h2 style="margin: 0 0 6px; font: 700 18px Outfit">Available exit nodes</h2>
-<sc-for list="{{nodes}}" as="n" hint-placeholder-count="5">
-<button type="button" onClick="{{n.pick}}" style="{{n.row}}">
-<span style="width: 38px; height: 38px; border-radius: 12px; background: #1e2550; display: grid; place-items: center; font-size: 17px">{{n.flag}}</span>
-<span style="flex: 1; text-align: left"><span style="display: block; font: 700 15px Outfit">{{n.name}}</span><span style="display: block; font: 12px 'JetBrains Mono'; color: #9aa3c4">{{n.meta}}</span></span>
-<span style="font: 600 13px 'JetBrains Mono'; color: #c9cfea">{{n.lat}}</span>
-<span style="{{n.radio}}"></span>
-</button>
-</sc-for>
-<label style="display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 14px 16px; border-radius: 18px; background: #161b2e"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span style="flex: 1"><span style="display: block; font-weight: 600">Allow local network access</span><span style="display: block; font-size: 12px; color: #9aa3c4">--exit-node-allow-lan-access · printers and NAS stay reachable</span></span></label>
-</section>
-<section class="rise" style="grid-column: span 5; display: flex; flex-direction: column; gap: 18px">
-<div style="border-radius: 28px; padding: 22px; background: linear-gradient(150deg, #173a33, #131829); border: 1px solid #22413a">
-<h2 style="margin: 0 0 8px; font: 700 18px Outfit">This device</h2>
-<label style="display: flex; align-items: center; gap: 12px; padding: 10px 0"><span style="flex: 1"><span style="display: block; font-weight: 600">Advertise as exit node</span><span style="display: block; font-size: 12px; color: #9aa3c4">Needs approval in the admin console</span></span><button type="button" role="switch" aria-checked="{{adv}}" aria-label="Advertise as exit node" onClick="{{flip}}" style="{{sw}}"><span style="{{knob}}"></span></button></label>
-<div style="font: 600 13px 'Roboto Flex'; margin: 8px 0">Advertised subnet routes</div>
-<div style="display: flex; gap: 8px; flex-wrap: wrap"><span style="padding: 6px 12px; border-radius: 12px; background: #1b2140; font: 12px 'JetBrains Mono'">203.0.113.0/24 ✕</span><span style="padding: 6px 12px; border-radius: 12px; background: #1b2140; font: 12px 'JetBrains Mono'">198.51.100.0/24 ✕</span><button type="button" style="padding: 6px 12px; border-radius: 12px; border: 1px dashed #3a4380; background: transparent; color: #a9b8ff; font: 600 12px 'Roboto Flex'">＋ Add CIDR</button></div>
-<label style="display: flex; align-items: center; gap: 12px; margin-top: 14px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span>Accept routes from other peers</span></label>
-<label style="display: flex; align-items: center; gap: 12px; margin-top: 10px"><input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #6ce6b6"><span>SNAT subnet routes</span></label>
-</div>
-<div style="border-radius: 28px; padding: 22px; background: #131829; border: 1px solid #22283f">
-<h2 style="margin: 0 0 6px; font: 700 18px Outfit">Pending command</h2>
-<code style="display: block; padding: 14px; border-radius: 14px; background: #0b0f1a; color: #6ce6b6; font: 12px/1.6 'JetBrains Mono'; white-space: pre-wrap">tailscale set --exit-node={{sel}} --exit-node-allow-lan-access=true --advertise-routes=203.0.113.0/24,198.51.100.0/24</code>
-<div style="display: flex; gap: 10px; margin-top: 12px"><button type="button" style="flex: 1; height: 44px; border-radius: 22px; border: 0; background: #a9b8ff; color: #0b0f1a; font: 700 14px Outfit">Apply</button><button type="button" style="height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #3a4380; background: transparent; color: #dfe4ff">Copy</button></div>
-</div>
-</section>
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"view":{"editor":"enum","options":["exit","routes"],"default":"exit"},"$preview":{"width":1440,"height":1400}}'>
 class Component extends DCLogic {
-  constructor(p){super(p);this.state={sel:'vps-tor',adv:false};}
-  renderVals(){
-    const list=[['vps-tor','☁','100.80.2.3 · Toronto · direct','12 ms'],['nas-01','▤','100.88.12.4 · home LAN · direct','3 ms'],['mullvad-se-sto','◈','Mullvad · Stockholm','104 ms'],['mullvad-jp-tyo','◈','Mullvad · Tokyo','161 ms'],['None','○','Route traffic normally','']];
-    const nodes=list.map(([name,flag,meta,lat])=>{const a=this.state.sel===name;return{name,flag,meta,lat,pick:()=>this.setState({sel:name}),row:'display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:18px;border:1px solid '+(a?'#6ce6b6':'#22283f')+';background:'+(a?'#14302a':'#161b2e')+';color:inherit;font-family:inherit;transition:all .25s',radio:'width:18px;height:18px;border-radius:9px;border:2px solid '+(a?'#6ce6b6':'#4a5278')+';background:'+(a?'radial-gradient(#6ce6b6 45%,transparent 50%)':'transparent')};});
-    const adv=this.state.adv;
-    return{nodes,sel:this.state.sel==='None'?'':this.state.sel,adv:adv?'true':'false',flip:()=>this.setState({adv:!adv}),sw:'width:52px;height:32px;border-radius:16px;border:2px solid '+(adv?'#6ce6b6':'#4a5278')+';background:'+(adv?'#6ce6b6':'transparent')+';position:relative;transition:all .25s',knob:'position:absolute;top:4px;left:'+(adv?'24px':'4px')+';width:20px;height:20px;border-radius:10px;background:'+(adv?'#0b0f1a':'#9aa3c4')+';transition:left .25s cubic-bezier(.2,0,0,1)'};
+  constructor(p) { super(p); this.state = { view: "exit" }; }
+  renderVals() {
+    const VIEWS = [{"id":"exit","key":"exit","icon":"travel_explore","label":"Exit nodes","dest":"exit"},{"id":"routes","key":"routes","icon":"alt_route","label":"Routes","dest":"routes"}];
+    const RAIL = [{"id":"home","icon":"home","label":"Home","sep":false},{"id":"peers","icon":"hub","label":"Peers","sep":false},{"id":"exit","icon":"travel_explore","label":"Exit nodes","sep":false},{"id":"routes","icon":"alt_route","label":"Routes","sep":false},{"id":"serve","icon":"lan","label":"Serve","sep":false},{"id":"taildrop","icon":"move_to_inbox","label":"Taildrop","sep":false},{"id":"dns","icon":"dns","label":"DNS","sep":false},{"id":"lock","icon":"enhanced_encryption","label":"Lock","sep":false},{"id":"drive","icon":"folder_shared","label":"Taildrive","sep":false},{"id":"accounts","icon":"group","label":"Accounts","sep":false},{"id":"diagnostics","icon":"monitor_heart","label":"Diagnostics","sep":false},{"id":"cli","icon":"terminal","label":"Commands","sep":true},{"id":"admin","icon":"admin_panel_settings","label":"Admin","sep":false},{"id":"tools","icon":"construction","label":"Tools","sep":true},{"id":"docs","icon":"menu_book","label":"Docs","sep":false},{"id":"settings","icon":"settings","label":"Settings","sep":true}];
+    const view = this.props.view && VIEWS.some((x) => x.id === this.props.view) && !this.state.picked ? this.props.view : this.state.view;
+    const cur = VIEWS.find((x) => x.id === view) || VIEWS[0];
+    const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
+    return {
+      theme: this.props.theme === 'light' ? 'light' : 'dark',
+      v,
+      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', pick: () => this.setState({ view: x.id, picked: true }) })),
+      rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
+    };
   }
 }
 </script>

@@ -1,4 +1,5 @@
 // Turns one CLI catalogue entry into a full rich form: one card per flag with
+import { pageHero } from './hero.js';
 // its own info button, a live preview of the exact command, validation, run
 // or stream, and a rendered output panel.
 import { h, icon, clear, uid } from '../core/dom.js';
@@ -168,9 +169,8 @@ export function commandForm(cmd, { compact, onResult, preset } = {}) {
   } } }, icon('star', fav ? '.fill' : ''));
 
   refresh();
-  const head = compact ? null : h('div.page-head',
-    h('div.titles', h('div.eyebrow', 'tailscale ' + cmd.path.join(' ')), h('h1', pair(cmd.title, YUE_TITLES[cmd.id])), h('p', cmd.desc),
-      h('div.row', cmd.platforms ? h('span.badge.info', cmd.platforms.map((p) => PLATFORM[p]).join(', ') + pair(' only', ' 限定')) : null, cmd.danger ? h('span.badge.' + (cmd.danger === 'hard' ? 'err' : 'warn'), cmd.danger === 'hard' ? pair('Destructive', '危險') : pair('Changes state', '會改狀態')) : null, h('span.badge.info', `${(cmd.flags || []).length} ${pair('flags', '個旗標')}`))), star);
+  const head = compact ? null : pageHero('tailscale ' + cmd.path.join(' '), pair(cmd.title, YUE_TITLES[cmd.id]), cmd.desc,
+      h('div.row', cmd.platforms ? h('span.badge.info', cmd.platforms.map((p) => PLATFORM[p]).join(', ') + pair(' only', ' 限定')) : null, cmd.danger ? h('span.badge.' + (cmd.danger === 'hard' ? 'err' : 'warn'), cmd.danger === 'hard' ? pair('Destructive', '危險') : pair('Changes state', '會改狀態')) : null, h('span.badge.info', `${(cmd.flags || []).length} ${pair('flags', '個旗標')}`)), star);
   const reset = h('button.btn.text', { type: 'button', on: { click: () => { for (const [, c] of controls) { c.touched = false; } cards.forEach((c) => c.classList.remove('changed')); const fresh = commandForm(cmd, { compact, onResult }); root.replaceWith(fresh); } } }, icon('restart_alt'), t('reset'));
   // Guide me: one option at a time with Back, Next and Skip.
   const grid = h('div.flags-grid.stagger', cards.length ? cards : h('div.empty', icon('bolt'), pair('This command has no options. Just run it.', '呢個指令冇選項，直接執行。')));

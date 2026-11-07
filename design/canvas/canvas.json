@@ -1,1 +1,176 @@
-{"v": 3, "createdOnFiles": {"v": 1, "at": "2026-11-06T22:40:00Z"}, "title": "Material Tailscale", "launch": {"view": "canvas"}, "pages": [], "boards": {"Main.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 960, "title": "Home \u00b7 tailnet overview", "expand": "fill", "is_interactive": true}, "ExitNodes.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 960, "title": "Exit nodes & routes", "expand": "fill", "is_interactive": true}, "Settings.dc.html": {"x": 0, "y": 1080, "w": 1440, "h": 960, "title": "Settings \u00b7 personalisation", "expand": "fill", "is_interactive": true}, "Landing.dc.html": {"x": 1520, "y": 1080, "w": 1440, "h": 1400, "title": "Website \u00b7 landing page", "expand": "fill", "is_interactive": true}, "WorldGenerator.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 1000, "title": "Minecraft world generator", "expand": "fill", "is_interactive": true}}, "order": ["Main.dc.html", "ExitNodes.dc.html", "Settings.dc.html", "Landing.dc.html", "WorldGenerator.dc.html"], "notes": {"n1": {"x": 0, "y": -300, "text": "Material Tailscale \u00b7 Midnight Mesh", "kind": "title1", "maxW": 2960}}, "designSystems": []}
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-06T22:40:00Z"
+  },
+  "title": "Material Tailscale",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1700,
+      "title": "Home · tailnet overview",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Peers.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1700,
+      "title": "Peers and status",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "ExitNodes.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1400,
+      "title": "Exit nodes and routes",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Sharing.dc.html": {
+      "x": 0,
+      "y": 1820,
+      "w": 1440,
+      "h": 1400,
+      "title": "Sharing: Serve, Taildrop, Taildrive, certificates",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Security.dc.html": {
+      "x": 1520,
+      "y": 1820,
+      "w": 1440,
+      "h": 1300,
+      "title": "Security: Tailnet Lock, accounts, notifications",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Network.dc.html": {
+      "x": 3040,
+      "y": 1820,
+      "w": 1440,
+      "h": 1400,
+      "title": "Network: DNS and diagnostics",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Commands.dc.html": {
+      "x": 0,
+      "y": 3340,
+      "w": 1440,
+      "h": 1400,
+      "title": "Every command, command forms and console",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Admin.dc.html": {
+      "x": 1520,
+      "y": 3340,
+      "w": 1440,
+      "h": 1300,
+      "title": "Admin console",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Tools.dc.html": {
+      "x": 3040,
+      "y": 3340,
+      "w": 1440,
+      "h": 1300,
+      "title": "Tools",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Minecraft.dc.html": {
+      "x": 0,
+      "y": 4860,
+      "w": 1440,
+      "h": 1300,
+      "title": "Minecraft servers",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "WorldGenerator.dc.html": {
+      "x": 1520,
+      "y": 4860,
+      "w": 1440,
+      "h": 1500,
+      "title": "Minecraft world generator",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Settings.dc.html": {
+      "x": 3040,
+      "y": 4860,
+      "w": 1440,
+      "h": 1300,
+      "title": "Settings",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Library.dc.html": {
+      "x": 0,
+      "y": 6480,
+      "w": 1440,
+      "h": 1400,
+      "title": "Docs, changelog, history and about",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Overlays.dc.html": {
+      "x": 1520,
+      "y": 6480,
+      "w": 1440,
+      "h": 1300,
+      "title": "Palette, wizard, menus, editor and dialogs",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Landing.dc.html": {
+      "x": 3040,
+      "y": 6480,
+      "w": 1440,
+      "h": 1500,
+      "title": "Website · landing, docs and download",
+      "expand": "fill",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Peers.dc.html",
+    "ExitNodes.dc.html",
+    "Sharing.dc.html",
+    "Security.dc.html",
+    "Network.dc.html",
+    "Commands.dc.html",
+    "Admin.dc.html",
+    "Tools.dc.html",
+    "Minecraft.dc.html",
+    "WorldGenerator.dc.html",
+    "Settings.dc.html",
+    "Library.dc.html",
+    "Overlays.dc.html",
+    "Landing.dc.html"
+  ],
+  "notes": {
+    "n1": {
+      "x": 0,
+      "y": -300,
+      "text": "Material Tailscale · Midnight Mesh 2",
+      "kind": "title1",
+      "maxW": 4480
+    }
+  },
+  "designSystems": []
+}
