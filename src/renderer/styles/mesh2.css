@@ -47,8 +47,11 @@
    runs off its right and bottom edges; the theme picks the dark or light capture. */
 .hero-band.has-shot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); padding-right: 0; padding-bottom: 0; }
 .hero-band.has-shot > .hero-text { padding-bottom: 28px; }
-.hero-shot { align-self: end; min-width: 0; border-radius: var(--r-l) 0 0 0; overflow: hidden; border: 1px solid var(--outline); border-right: 0; border-bottom: 0; background: var(--surface-2); box-shadow: 0 -12px 40px rgba(0, 0, 0, .28); }
-.hero-shot img { display: block; width: 100%; height: auto; }
+.hero-shot { position: relative; align-self: end; min-width: 0; aspect-ratio: 4 / 3; border-radius: var(--r-l) 0 0 0; overflow: hidden; border: 1px solid var(--outline); border-right: 0; border-bottom: 0; background: var(--surface-2); box-shadow: 0 -12px 40px rgba(0, 0, 0, .28); }
+/* Cropped to the window's upper left at a size where its words can be read, instead of the whole
+   window shrunk until nothing can: the crop ends in the gap after the second column of controls
+   (977 of the capture's 1440 pixels) and below their second row, so no control is cut. */
+.hero-shot img { position: absolute; left: 0; top: 0; width: calc(100% * 1440 / 977); max-width: none; height: auto; }
 .hero-shot .shot-light, :root[data-theme="light"] .hero-shot .shot-dark, .theme-light .hero-shot .shot-dark { display: none; }
 :root[data-theme="light"] .hero-shot .shot-light, .theme-light .hero-shot .shot-light { display: block; }
 @media (max-width: 900px) { .hero-band { grid-template-columns: minmax(0, 1fr) 120px; gap: 16px; padding: 22px; } .hero-art { justify-self: end; align-self: start; max-width: 120px; height: 84px; } }
@@ -97,6 +100,12 @@
 .subnav-item[aria-current="true"] .msr { font-variation-settings: 'FILL' 1; }
 .subnav-item .count { margin-left: auto; font: 600 11px var(--font-mono); color: var(--on-3); }
 .split-main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: var(--gap); }
+/* Docs: the article's own outline beside it on wide windows. */
+.doc-outline { position: sticky; top: 0; flex: 0 0 210px; display: flex; flex-direction: column; gap: 2px; max-height: 75vh; overflow: auto; }
+.doc-outline-item { display: block; width: 100%; text-align: left; border: 0; border-left: 2px solid var(--outline-soft); background: transparent; color: var(--on-2); font: 500 13px / 1.35 var(--font-body); padding: 7px 12px; cursor: pointer; transition: color var(--dur-s), border-color var(--dur-s); }
+.doc-outline-item.sub { padding-left: 24px; font-size: 12.5px; }
+.doc-outline-item:hover { color: var(--on); border-left-color: var(--primary); }
+@media (max-width: 1279px) { .doc-outline { display: none; } }
 @media (max-width: 900px) { .subnav { max-width: none; position: static; flex-direction: row; overflow-x: auto; } .subnav-item { flex: none; } }
 
 /* ===== Setup and empty states ===== */

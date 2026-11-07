@@ -294,6 +294,8 @@ textarea.input { height: auto; min-height: 120px; padding: 12px 14px; resize: ve
 .toasts { position: fixed; right: 16px; bottom: 16px; z-index: 140; display: flex; flex-direction: column-reverse; gap: 10px; width: min(420px, calc(100vw - 32px)); pointer-events: none; }
 .toast { pointer-events: auto; display: flex; gap: 12px; align-items: flex-start; padding: 14px 14px 14px 16px; border-radius: var(--r-l); background: var(--surface-hi); border: 1px solid var(--outline); box-shadow: var(--shadow); animation: toast-in var(--dur-m) var(--ease-spring) both; }
 .toast.out { animation: toast-out var(--dur-s) var(--ease-emph) both; }
+/* With the update banner showing, notices stack above it instead of over it. */
+body:has(> .update-banner) .toasts { bottom: 76px; }
 .toast.err { border-color: var(--error); } .toast.ok { border-color: var(--secondary); } .toast.warn { border-color: var(--tertiary); }
 .toast .body { flex: 1; min-width: 0; } .toast .body b { display: block; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(40px) scale(.96); } }

@@ -20,12 +20,22 @@ const head = pageHero;
 registerPage('docs', (ctx) => {
   const nav = h('div.stack', { style: { minWidth: '240px' } });
   const body = h('article.card', { style: { flex: '999 1 520px', minWidth: 0 } });
+  // On wide windows the article's own headings sit beside it, one click from each section.
+  const outline = h('nav.doc-outline', { 'aria-label': pair('On this page', '本頁內容') });
+  const drawOutline = () => {
+    const heads = [...body.querySelectorAll('.md h2, .md h3')];
+    clear(outline).hidden = heads.length < 2;
+    if (outline.hidden) return;
+    const motion = () => (document.documentElement.classList.contains('reduce-motion') ? 'auto' : 'smooth');
+    outline.append(h('div.pal-group', pair('On this page', '本頁內容')), ...heads.map((hd) => h(`button.doc-outline-item${hd.tagName === 'H3' ? '.sub' : ''}`, { type: 'button', on: { click: () => hd.scrollIntoView({ block: 'start', behavior: motion() }) } }, hd.textContent)));
+  };
   const search = regexField({ id: 'docs', placeholder: pair('Search titles and article text', '搜尋標題同內文'), onChange: () => drawNav() });
   let cur = ARTICLES.find((a) => a.path === ctx.arg) || ARTICLES[0];
   const show = (a) => {
     cur = a; clear(body);
     if (!a) { body.append(h('div.empty', pair('No articles bundled.', '冇文章。'))); return; }
     body.append(renderMarkdown(a.body, { onLink: (href) => { const target = ARTICLES.find((x) => href.endsWith(x.path) || href.endsWith(x.path.split('/').pop())); if (target) { show(target); drawNav(); return true; } return false; } }));
+    drawOutline();
     body.scrollIntoView({ block: 'start' });
   };
   const drawNav = () => {
@@ -41,7 +51,7 @@ registerPage('docs', (ctx) => {
     }
   };
   drawNav(); show(cur);
-  return h('div.page', head(pair('Offline', '離線'), t('docs'), pair(`${ARTICLES.length} articles bundled into the app. Links between articles open here.`, `程式內置 ${ARTICLES.length} 篇文章。`)), search.el, h('div.row', { style: { alignItems: 'flex-start' } }, h('div.card.tonal', { style: { flex: '1 1 260px', maxHeight: '75vh', overflow: 'auto' } }, nav), body));
+  return h('div.page', head(pair('Offline', '離線'), t('docs'), pair(`${ARTICLES.length} articles bundled into the app. Links between articles open here.`, `程式內置 ${ARTICLES.length} 篇文章。`)), search.el, h('div.row', { style: { alignItems: 'flex-start' } }, h('div.card.tonal', { style: { flex: '1 1 260px', maxHeight: '75vh', overflow: 'auto' } }, nav), body, outline));
 });
 
 // ---------------- Changelog ----------------
