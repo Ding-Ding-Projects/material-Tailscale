@@ -314,6 +314,26 @@ async function captureAll(dir) {
       provenance.push({ file, route: d, theme, rendered, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: captureLang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
     }
   }
+  // The website hero: the command form in a smaller window, so the whole window, chrome and all,
+  // reads at hero size. Only the full capture run makes it (a run limited to some routes skips it).
+  if (!process.env.MT_CAPTURE_DESTS) {
+    const [w0, h0] = win.getContentSize();
+    win.setContentSize(1120, 760);
+    await wait(400);
+    for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
+      await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); true`);
+      await openRoute(wc, 'cli:set');
+      let rendered = false;
+      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED).catch(() => false)); i++) await wait(250);
+      await wait(120);
+      const png = (await wc.capturePage()).toPNG();
+      const file = `${theme}-hero.png`;
+      fs.writeFileSync(path.join(dir, file), png);
+      provenance.push({ file, route: 'cli:set', theme, rendered, viewport: { width: 1120, height: 760 }, zoom: wc.getZoomFactor(), language: captureLang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
+    }
+    win.setContentSize(w0, h0);
+    await wait(300);
+  }
   if (process.env.MT_CAPTURE_PALETTE !== '0') {
     await wc.executeJavaScript("window.dispatchEvent(new CustomEvent('mt:palette')); true");
     await wait(600);

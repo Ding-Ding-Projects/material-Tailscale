@@ -101,7 +101,7 @@ const desktopOnly = (id) => () => h('div.page',
 function withShot(band) {
   const alt = pair('Material Tailscale editing tailscale set preferences with rich controls, captured from the built app', '用豐富控制項編輯 tailscale set，由實際程式截圖');
   band.classList.add('has-shot');
-  band.querySelector('.hero-art')?.replaceWith(h('div.hero-shot', ['dark', 'light'].map((th) => h(`img.shot-${th}`, { src: `screenshots/${th}-cli-set.png`, alt, width: 1440, height: 940, loading: 'eager', decoding: 'async' }))));
+  band.querySelector('.hero-art')?.replaceWith(h('div.hero-shot', ['dark', 'light'].map((th) => h(`img.shot-${th}`, { src: `screenshots/${th}-hero.png`, alt, width: 1120, height: 760, loading: 'eager', decoding: 'async' }))));
   return band;
 }
 

@@ -22,7 +22,8 @@ fs.copyFileSync(path.join(root, 'social-preview.png'), path.join(out, 'social-pr
 if (fs.existsSync(path.join(root, 'assets/icon.png'))) fs.copyFileSync(path.join(root, 'assets/icon.png'), path.join(out, 'icon.png'));
 fs.copyFileSync(path.join(root, 'src/shared/api-catalog.json'), path.join(out, 'api-catalog.json'));
 const shotsDir = path.join(root, 'docs/screenshots');
-const shots = fs.existsSync(shotsDir) ? fs.readdirSync(shotsDir).filter((f) => f.endsWith('.png')).sort() : [];
+// The hero captures are the home page's own picture, not gallery entries.
+const shots = fs.existsSync(shotsDir) ? fs.readdirSync(shotsDir).filter((f) => f.endsWith('.png') && !f.endsWith('-hero.png')).sort() : [];
 fs.cpSync(shotsDir, path.join(out, 'screenshots'), { recursive: true });
 const git = (...a) => { try { return execFileSync('git', a, { cwd: root, encoding: 'utf8' }).trim(); } catch { return null; } };
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
