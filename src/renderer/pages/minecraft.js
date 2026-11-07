@@ -1,5 +1,6 @@
 import { h, icon, clear, fmtBytes, uid } from '../core/dom.js';
 import { pageHero } from '../ui/hero.js';
+import { mtabs } from '../ui/mtabs.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage } from '../ui/shell.js';
@@ -137,7 +138,8 @@ function serverView(s, reload) {
   const labels = { overview: pair('Overview', '概覽'), console: pair('Console', '控制台'), config: pair('Configuration', '設定'), players: pair('Players', '玩家'), extensions: s.flavor === 'fabric' || s.flavor === 'forge' ? pair('Mods', '模組') : pair('Plugins', '插件'), worlds: pair('Worlds', '世界'), generator: pair('World generator', '世界生成器'), schedule: pair('Schedule', '排程') };
   let cur = 'overview';
   const holder = h('div');
-  const seg = segmented(tabs.map((k) => ({ value: k, label: labels[k] })), cur, { label: 'Server section' });
+  const icons = { overview: 'dashboard', console: 'terminal', config: 'tune', players: 'group', extensions: 'extension', worlds: 'public', generator: 'landscape', schedule: 'schedule' };
+  const seg = mtabs(tabs.map((k) => ({ value: k, label: labels[k], icon: icons[k] })), cur, { label: pair('Server section', '伺服器分區') });
   seg.onChange((v) => { cur = v; show(); });
   let curEl = null;
   const show = () => { curEl?.cleanup?.(); curEl = ({ overview, console: consoleView, config: configView, players: playersView, extensions: extensionsView, worlds: worldsView, generator: generatorView, schedule: scheduleView }[cur](s, reload)); clear(holder).append(curEl); };
@@ -150,7 +152,7 @@ function overview(s, reload) {
   const eula = h('div');
   const refresh = async () => {
     const x = await window.mt.mc.status(s.id).catch((e) => ({ state: 'error', message: e.message }));
-    clear(st).append(...[h('div.kpi', h('b', { running: '🟢 ' + pair('Running', '運行緊'), stopped: '⚪ ' + pair('Stopped', '停咗'), unreachable: '🟠 ' + pair('Host unreachable', '主機連唔到'), 'not created': '⚪ ' + pair('Not created yet', '未建立') }[x.state] || x.state), h('span', x.state === 'unreachable' ? pair('The connection is lost; the server may still be running.', '連線斷咗，伺服器可能仲運行緊。') : pair('state', '狀態'))),
+    clear(st).append(...[h('div.kpi', h('b.row', h(`span.dot-live${{ running: '', unreachable: '.warn', error: '.err' }[x.state] ?? '.idle'}`), { running: pair('Running', '運行緊'), stopped: pair('Stopped', '停咗'), unreachable: pair('Host unreachable', '主機連唔到'), 'not created': pair('Not created yet', '未建立') }[x.state] || x.state), h('span', x.state === 'unreachable' ? pair('The connection is lost; the server may still be running.', '連線斷咗，伺服器可能仲運行緊。') : pair('state', '狀態'))),
       x.usage?.memoryBytes ? h('div.kpi', h('b', fmtBytes(x.usage.memoryBytes)), h('span', pair('memory', '記憶體'))) : null, x.usage?.memory ? h('div.kpi', h('b', x.usage.memory), h('span', 'Docker')) : null, x.usage?.cpu ? h('div.kpi', h('b', x.usage.cpu), h('span', 'CPU')) : null, x.pid ? h('div.kpi', h('b', String(x.pid)), h('span', 'PID')) : null].filter(Boolean));
   };
   const iv = setInterval(() => { if (!el.isConnected) { el.cleanup(); return; } refresh(); }, 5000); refresh();

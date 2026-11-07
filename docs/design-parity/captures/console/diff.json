@@ -1,0 +1,34 @@
+{
+  "id": "console",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "707f23fa4fe43b7de8d03532c6964affac4e5f855e7f48dc960c7021eb436a57",
+  "captureSha256": {
+    "reference": "a78cbe6710f4cb59d4cc0bbc2c78c741b12cbd8256e04deb0f20e6c94fdd883d",
+    "app": "ecc0d3cc47aad94f53ef7d3ac3357159a265da143649b46d0889b65a1ce9d044"
+  },
+  "changedPixels": 114676,
+  "totalPixels": 1382400,
+  "changedRatio": 0.083,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/console/diff.webp"
+}

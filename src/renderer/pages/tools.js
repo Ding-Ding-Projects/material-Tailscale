@@ -1,5 +1,5 @@
 import { h, icon, clear, fmtBytes } from '../core/dom.js';
-import { pageHero } from '../ui/hero.js';
+import { pageHero, heroStats } from '../ui/hero.js';
 import { t, pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage, openDest, openInNewTab } from '../ui/shell.js';
@@ -15,8 +15,8 @@ import jsQR from 'jsqr';
 
 const head = pageHero;
 
-registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。')),
-  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id))))))));
+registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。'), heroStats([{ value: 8, label: pair('tools', '個工具') }, { value: pair('Offline', '離線'), label: pair('always', '一直'), tone: 'ok' }])),
+  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id)), h('code', { authenticator: pair('TOTP codes', 'TOTP 驗證碼'), base64: pair('Encode and decode', '編碼同解碼'), converter: pair('Documents, media, archives', '文件、媒體、壓縮檔'), regex: pair('Build, test, trace', '建立、測試、追蹤'), draw: pair('Sketch and annotate', '畫圖同標註'), ollama: pair('Local models', '本機模型'), minecraft: pair('Create and run', '建立同運行'), console: pair('Any arguments', '任何參數') }[id])))))));
 
 // ---------------- Authenticator ----------------
 

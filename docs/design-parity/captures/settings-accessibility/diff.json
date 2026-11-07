@@ -1,0 +1,34 @@
+{
+  "id": "settings-accessibility",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "e1c8b429e6063c8a24054e91c751cea8c69f1ebf797668f6e9d5eac0110abc0c",
+  "captureSha256": {
+    "reference": "dc741eddf72dc4f7b92f014dbb083872963c0a26150c21a3f6954b01d7b91ab0",
+    "app": "b403747880d30099135320dfc5607f67011685e07fb9cf42cb942474344af05a"
+  },
+  "changedPixels": 128900,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0932,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/settings-accessibility/diff.webp"
+}

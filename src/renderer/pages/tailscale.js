@@ -123,7 +123,7 @@ export function peerMenu(at, p) {
     { label: pair('Who is', '查身份'), icon: 'person_search', run: async () => { const r = await ts.run('whois', { flags: { json: true }, positionals: [ts.peerIp(p)] }); dialog({ title: ts.peerName(p), wide: true, body: r.json ? jsonTree(r.json, { open: 2 }) : h('div.out', r.stdout || r.stderr) }); } },
     { label: pair('Open Tailscale SSH', '開 Tailscale SSH'), icon: 'terminal', run: () => window.mt.ts.terminal('ssh', { positionals: [ts.peerName(p)] }) },
     { label: pair('Send files', '傳送檔案'), icon: 'send', run: () => openDest('taildrop', ts.peerName(p)) },
-    p.ExitNodeOption ? { label: pair('Use as exit node', '用做出口節點'), icon: 'travel_explore', run: () => setExit(ts.peerName(p)) } : null,
+    p.ExitNodeOption ? { label: pair('Use as exit node', '用做出口節點'), icon: 'travel_explore', live: { kind: 'switch', get: () => !!ts.peers().find((x) => x.ID === p.ID)?.ExitNode, set: (on) => setExit(on ? ts.peerName(p) : '') } } : null,
     { label: pair('Open in a new tab', '喺新分頁開'), icon: 'tab', run: () => openInNewTab('peers', ts.peerName(p)) },
     '-',
     { label: pair('Show raw details', '顯示原始資料'), icon: 'data_object', run: () => dialog({ title: ts.peerName(p), wide: true, body: jsonTree(p, { open: 1 }) }) }

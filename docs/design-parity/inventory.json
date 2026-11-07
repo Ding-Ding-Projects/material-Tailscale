@@ -1,0 +1,1957 @@
+{
+  "note": "Hand-written design-parity inventory. Every view of every board in design/canvas appears exactly once. Regenerate evidence with npm run design:parity; check with npm test.",
+  "screens": [
+    {
+      "id": "home",
+      "reference": "design/canvas/Main.dc.html",
+      "view": "home",
+      "referenceRoute": "dcref://board/Main.dc.html?view=home&theme=dark",
+      "appRoute": "home",
+      "surface": "app",
+      "state": "Connected tailnet with peers (design); setup state in the capture",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/home/reference.webp",
+        "app": "docs/design-parity/captures/home/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/home/side-by-side.webp",
+      "diff": "docs/design-parity/captures/home/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "home-setup",
+      "reference": "design/canvas/Main.dc.html",
+      "view": "home-setup",
+      "referenceRoute": "dcref://board/Main.dc.html?view=home-setup&theme=dark",
+      "appRoute": "home",
+      "surface": "app",
+      "state": "Tailscale not installed",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/home-setup/reference.webp",
+        "app": "docs/design-parity/captures/home-setup/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/home-setup/side-by-side.webp",
+      "diff": "docs/design-parity/captures/home-setup/diff.json",
+      "deviations": []
+    },
+    {
+      "id": "peers",
+      "reference": "design/canvas/Peers.dc.html",
+      "view": "peers",
+      "referenceRoute": "dcref://board/Peers.dc.html?view=peers&theme=dark",
+      "appRoute": "peers",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "chip filters (app.css .chip.choice)",
+          "segmented button (src/renderer/ui/controls.js segmented)",
+          "search field with regex builder (src/renderer/ui/regex.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/peers/reference.webp",
+        "app": "docs/design-parity/captures/peers/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/peers/side-by-side.webp",
+      "diff": "docs/design-parity/captures/peers/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "peers-table",
+      "reference": "design/canvas/Peers.dc.html",
+      "view": "peers-table",
+      "referenceRoute": "dcref://board/Peers.dc.html?view=peers-table&theme=dark",
+      "appRoute": "peers",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "table (app.css .tbl)",
+          "checkbox (native input)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/peers-table/reference.webp",
+        "app": "docs/design-parity/captures/peers-table/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/peers-table/side-by-side.webp",
+      "diff": "docs/design-parity/captures/peers-table/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "status",
+      "reference": "design/canvas/Peers.dc.html",
+      "view": "status",
+      "referenceRoute": "dcref://board/Peers.dc.html?view=status&theme=dark",
+      "appRoute": "status",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/status/reference.webp",
+        "app": "docs/design-parity/captures/status/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/status/side-by-side.webp",
+      "diff": "docs/design-parity/captures/status/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        },
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "exit",
+      "reference": "design/canvas/ExitNodes.dc.html",
+      "view": "exit",
+      "referenceRoute": "dcref://board/ExitNodes.dc.html?view=exit&theme=dark",
+      "appRoute": "exit",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "list item (app.css .pick-row)",
+          "switch (src/renderer/ui/controls.js switchCtl)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/exit/reference.webp",
+        "app": "docs/design-parity/captures/exit/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/exit/side-by-side.webp",
+      "diff": "docs/design-parity/captures/exit/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "routes",
+      "reference": "design/canvas/ExitNodes.dc.html",
+      "view": "routes",
+      "referenceRoute": "dcref://board/ExitNodes.dc.html?view=routes&theme=dark",
+      "appRoute": "routes",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "switch (src/renderer/ui/controls.js switchCtl)",
+          "chips editor (src/renderer/ui/controls.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/routes/reference.webp",
+        "app": "docs/design-parity/captures/routes/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/routes/side-by-side.webp",
+      "diff": "docs/design-parity/captures/routes/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "serve",
+      "reference": "design/canvas/Sharing.dc.html",
+      "view": "serve",
+      "referenceRoute": "dcref://board/Sharing.dc.html?view=serve&theme=dark",
+      "appRoute": "serve",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/serve/reference.webp",
+        "app": "docs/design-parity/captures/serve/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/serve/side-by-side.webp",
+      "diff": "docs/design-parity/captures/serve/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "taildrop",
+      "reference": "design/canvas/Sharing.dc.html",
+      "view": "taildrop",
+      "referenceRoute": "dcref://board/Sharing.dc.html?view=taildrop&theme=dark",
+      "appRoute": "taildrop",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/taildrop/reference.webp",
+        "app": "docs/design-parity/captures/taildrop/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/taildrop/side-by-side.webp",
+      "diff": "docs/design-parity/captures/taildrop/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "drive",
+      "reference": "design/canvas/Sharing.dc.html",
+      "view": "drive",
+      "referenceRoute": "dcref://board/Sharing.dc.html?view=drive&theme=dark",
+      "appRoute": "drive",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/drive/reference.webp",
+        "app": "docs/design-parity/captures/drive/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/drive/side-by-side.webp",
+      "diff": "docs/design-parity/captures/drive/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "certs",
+      "reference": "design/canvas/Sharing.dc.html",
+      "view": "certs",
+      "referenceRoute": "dcref://board/Sharing.dc.html?view=certs&theme=dark",
+      "appRoute": "certs",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/certs/reference.webp",
+        "app": "docs/design-parity/captures/certs/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/certs/side-by-side.webp",
+      "diff": "docs/design-parity/captures/certs/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "lock",
+      "reference": "design/canvas/Security.dc.html",
+      "view": "lock",
+      "referenceRoute": "dcref://board/Security.dc.html?view=lock&theme=dark",
+      "appRoute": "lock",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/lock/reference.webp",
+        "app": "docs/design-parity/captures/lock/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/lock/side-by-side.webp",
+      "diff": "docs/design-parity/captures/lock/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "accounts",
+      "reference": "design/canvas/Security.dc.html",
+      "view": "accounts",
+      "referenceRoute": "dcref://board/Security.dc.html?view=accounts&theme=dark",
+      "appRoute": "accounts",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/accounts/reference.webp",
+        "app": "docs/design-parity/captures/accounts/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/accounts/side-by-side.webp",
+      "diff": "docs/design-parity/captures/accounts/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "reference": "design/canvas/Security.dc.html",
+      "view": "notifications",
+      "referenceRoute": "dcref://board/Security.dc.html?view=notifications&theme=dark",
+      "appRoute": "notifications",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/notifications/reference.webp",
+        "app": "docs/design-parity/captures/notifications/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/notifications/side-by-side.webp",
+      "diff": "docs/design-parity/captures/notifications/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "dns",
+      "reference": "design/canvas/Network.dc.html",
+      "view": "dns",
+      "referenceRoute": "dcref://board/Network.dc.html?view=dns&theme=dark",
+      "appRoute": "dns",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/dns/reference.webp",
+        "app": "docs/design-parity/captures/dns/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/dns/side-by-side.webp",
+      "diff": "docs/design-parity/captures/dns/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "reference": "design/canvas/Network.dc.html",
+      "view": "diagnostics",
+      "referenceRoute": "dcref://board/Network.dc.html?view=diagnostics&theme=dark",
+      "appRoute": "diagnostics",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/diagnostics/reference.webp",
+        "app": "docs/design-parity/captures/diagnostics/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/diagnostics/side-by-side.webp",
+      "diff": "docs/design-parity/captures/diagnostics/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows its Tailscale-not-installed state instead of the populated design.",
+          "reason": "No Tailscale daemon runs on the capture machine, so screens fed by live tailnet data render their genuine setup state; the design shows the same screen with sample devices.",
+          "approved": "Reviewed 2026-11-07: environment limit, not a design defect."
+        }
+      ]
+    },
+    {
+      "id": "cli",
+      "reference": "design/canvas/Commands.dc.html",
+      "view": "cli",
+      "referenceRoute": "dcref://board/Commands.dc.html?view=cli&theme=dark",
+      "appRoute": "cli",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/cli/reference.webp",
+        "app": "docs/design-parity/captures/cli/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/cli/side-by-side.webp",
+      "diff": "docs/design-parity/captures/cli/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "cli-set",
+      "reference": "design/canvas/Commands.dc.html",
+      "view": "cli-set",
+      "referenceRoute": "dcref://board/Commands.dc.html?view=cli-set&theme=dark",
+      "appRoute": "cli:set>Guide me",
+      "surface": "app",
+      "state": "Guide me active",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "segmented button (src/renderer/ui/controls.js segmented)",
+          "text field (app.css .input)",
+          "progress (app.css .sc-progress)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/cli-set/reference.webp",
+        "app": "docs/design-parity/captures/cli-set/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/cli-set/side-by-side.webp",
+      "diff": "docs/design-parity/captures/cli-set/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "console",
+      "reference": "design/canvas/Commands.dc.html",
+      "view": "console",
+      "referenceRoute": "dcref://board/Commands.dc.html?view=console&theme=dark",
+      "appRoute": "console",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/console/reference.webp",
+        "app": "docs/design-parity/captures/console/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/console/side-by-side.webp",
+      "diff": "docs/design-parity/captures/console/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "reference": "design/canvas/Admin.dc.html",
+      "view": "admin",
+      "referenceRoute": "dcref://board/Admin.dc.html?view=admin&theme=dark",
+      "appRoute": "admin",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/admin/reference.webp",
+        "app": "docs/design-parity/captures/admin/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/admin/side-by-side.webp",
+      "diff": "docs/design-parity/captures/admin/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "tools",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=tools&theme=dark",
+      "appRoute": "tools",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/tools/reference.webp",
+        "app": "docs/design-parity/captures/tools/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/tools/side-by-side.webp",
+      "diff": "docs/design-parity/captures/tools/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "authenticator",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "authenticator",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=authenticator&theme=dark",
+      "appRoute": "authenticator",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/authenticator/reference.webp",
+        "app": "docs/design-parity/captures/authenticator/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/authenticator/side-by-side.webp",
+      "diff": "docs/design-parity/captures/authenticator/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "base64",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "base64",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=base64&theme=dark",
+      "appRoute": "base64",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/base64/reference.webp",
+        "app": "docs/design-parity/captures/base64/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/base64/side-by-side.webp",
+      "diff": "docs/design-parity/captures/base64/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "converter",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "converter",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=converter&theme=dark",
+      "appRoute": "converter",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/converter/reference.webp",
+        "app": "docs/design-parity/captures/converter/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/converter/side-by-side.webp",
+      "diff": "docs/design-parity/captures/converter/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "regex",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "regex",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=regex&theme=dark",
+      "appRoute": "regex",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/regex/reference.webp",
+        "app": "docs/design-parity/captures/regex/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/regex/side-by-side.webp",
+      "diff": "docs/design-parity/captures/regex/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "draw",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "draw",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=draw&theme=dark",
+      "appRoute": "draw",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/draw/reference.webp",
+        "app": "docs/design-parity/captures/draw/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/draw/side-by-side.webp",
+      "diff": "docs/design-parity/captures/draw/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "ollama",
+      "reference": "design/canvas/Tools.dc.html",
+      "view": "ollama",
+      "referenceRoute": "dcref://board/Tools.dc.html?view=ollama&theme=dark",
+      "appRoute": "ollama",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/ollama/reference.webp",
+        "app": "docs/design-parity/captures/ollama/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/ollama/side-by-side.webp",
+      "diff": "docs/design-parity/captures/ollama/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "minecraft",
+      "reference": "design/canvas/Minecraft.dc.html",
+      "view": "minecraft",
+      "referenceRoute": "dcref://board/Minecraft.dc.html?view=minecraft&theme=dark",
+      "appRoute": "minecraft",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "tabs (src/renderer/ui/mtabs.js)",
+          "list item (app.css .pick-row)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/minecraft/reference.webp",
+        "app": "docs/design-parity/captures/minecraft/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/minecraft/side-by-side.webp",
+      "diff": "docs/design-parity/captures/minecraft/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows the server list without a server.",
+          "reason": "No Minecraft server exists on the capture machine; the design shows a sample server named survival-1.",
+          "approved": "Reviewed 2026-11-07: environment limit."
+        }
+      ]
+    },
+    {
+      "id": "minecraft-new",
+      "reference": "design/canvas/Minecraft.dc.html",
+      "view": "minecraft-new",
+      "referenceRoute": "dcref://board/Minecraft.dc.html?view=minecraft-new&theme=dark",
+      "appRoute": "minecraft>New server",
+      "surface": "app",
+      "state": "New server wizard, version step",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "dialog (src/renderer/ui/overlay.js dialog)",
+          "list item (app.css .pick-row)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/minecraft-new/reference.webp",
+        "app": "docs/design-parity/captures/minecraft-new/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/minecraft-new/side-by-side.webp",
+      "diff": "docs/design-parity/captures/minecraft-new/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "minecraft-config",
+      "reference": "design/canvas/Minecraft.dc.html",
+      "view": "minecraft-config",
+      "referenceRoute": "dcref://board/Minecraft.dc.html?view=minecraft-config&theme=dark",
+      "appRoute": "minecraft",
+      "surface": "app",
+      "state": "Server configuration tab",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/minecraft-config/reference.webp",
+        "app": "docs/design-parity/captures/minecraft-config/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/minecraft-config/side-by-side.webp",
+      "diff": "docs/design-parity/captures/minecraft-config/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows the server list without a server.",
+          "reason": "No Minecraft server exists on the capture machine; the design shows a sample server named survival-1.",
+          "approved": "Reviewed 2026-11-07: environment limit."
+        }
+      ]
+    },
+    {
+      "id": "worldgen",
+      "reference": "design/canvas/WorldGenerator.dc.html",
+      "view": "worldgen",
+      "referenceRoute": "dcref://board/WorldGenerator.dc.html?view=worldgen&theme=dark",
+      "appRoute": "minecraft",
+      "surface": "app",
+      "state": "World generator tab",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/worldgen/reference.webp",
+        "app": "docs/design-parity/captures/worldgen/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/worldgen/side-by-side.webp",
+      "diff": "docs/design-parity/captures/worldgen/diff.json",
+      "deviations": [
+        {
+          "what": "The real app shows the server list without a server.",
+          "reason": "No Minecraft server exists on the capture machine; the design shows a sample server named survival-1.",
+          "approved": "Reviewed 2026-11-07: environment limit."
+        }
+      ]
+    },
+    {
+      "id": "settings-appearance",
+      "reference": "design/canvas/Settings.dc.html",
+      "view": "settings-appearance",
+      "referenceRoute": "dcref://board/Settings.dc.html?view=settings-appearance&theme=dark",
+      "appRoute": "settings:appearance",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "sub navigation (mesh2.css .subnav)",
+          "segmented button (src/renderer/ui/controls.js segmented)",
+          "switch (src/renderer/ui/controls.js switchCtl)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/settings-appearance/reference.webp",
+        "app": "docs/design-parity/captures/settings-appearance/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/settings-appearance/side-by-side.webp",
+      "diff": "docs/design-parity/captures/settings-appearance/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "settings-language",
+      "reference": "design/canvas/Settings.dc.html",
+      "view": "settings-language",
+      "referenceRoute": "dcref://board/Settings.dc.html?view=settings-language&theme=dark",
+      "appRoute": "settings:language",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/settings-language/reference.webp",
+        "app": "docs/design-parity/captures/settings-language/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/settings-language/side-by-side.webp",
+      "diff": "docs/design-parity/captures/settings-language/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "settings-accessibility",
+      "reference": "design/canvas/Settings.dc.html",
+      "view": "settings-accessibility",
+      "referenceRoute": "dcref://board/Settings.dc.html?view=settings-accessibility&theme=dark",
+      "appRoute": "settings:accessibility",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/settings-accessibility/reference.webp",
+        "app": "docs/design-parity/captures/settings-accessibility/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/settings-accessibility/side-by-side.webp",
+      "diff": "docs/design-parity/captures/settings-accessibility/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "docs",
+      "reference": "design/canvas/Library.dc.html",
+      "view": "docs",
+      "referenceRoute": "dcref://board/Library.dc.html?view=docs&theme=dark",
+      "appRoute": "docs",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/docs/reference.webp",
+        "app": "docs/design-parity/captures/docs/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/docs/side-by-side.webp",
+      "diff": "docs/design-parity/captures/docs/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "changelog",
+      "reference": "design/canvas/Library.dc.html",
+      "view": "changelog",
+      "referenceRoute": "dcref://board/Library.dc.html?view=changelog&theme=dark",
+      "appRoute": "changelog",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/changelog/reference.webp",
+        "app": "docs/design-parity/captures/changelog/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/changelog/side-by-side.webp",
+      "diff": "docs/design-parity/captures/changelog/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "history",
+      "reference": "design/canvas/Library.dc.html",
+      "view": "history",
+      "referenceRoute": "dcref://board/Library.dc.html?view=history&theme=dark",
+      "appRoute": "history",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/history/reference.webp",
+        "app": "docs/design-parity/captures/history/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/history/side-by-side.webp",
+      "diff": "docs/design-parity/captures/history/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "about",
+      "reference": "design/canvas/Library.dc.html",
+      "view": "about",
+      "referenceRoute": "dcref://board/Library.dc.html?view=about&theme=dark",
+      "appRoute": "about",
+      "surface": "app",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/about/reference.webp",
+        "app": "docs/design-parity/captures/about/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/about/side-by-side.webp",
+      "diff": "docs/design-parity/captures/about/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "palette",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "palette",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=palette&theme=dark",
+      "appRoute": "home>overlay@palette#dark",
+      "surface": "app",
+      "state": "Command palette with a query",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "dialog (src/renderer/ui/palette.js)",
+          "list item (app.css .pal-row)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/palette/reference.webp",
+        "app": "docs/design-parity/captures/palette/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/palette/side-by-side.webp",
+      "diff": "docs/design-parity/captures/palette/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "onboarding",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "onboarding",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=onboarding&theme=dark",
+      "appRoute": "home>overlay@onboarding",
+      "surface": "app",
+      "state": "Welcome wizard",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "dialog (src/renderer/ui/onboarding.js)",
+          "stepper progress (app.css .sc-progress)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/onboarding/reference.webp",
+        "app": "docs/design-parity/captures/onboarding/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/onboarding/side-by-side.webp",
+      "diff": "docs/design-parity/captures/onboarding/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "menu",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "menu",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=menu&theme=dark",
+      "appRoute": "settings:appearance>menu@set-theme",
+      "surface": "app",
+      "state": "Context menu with live controls",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "menu (src/renderer/ui/overlay.js menu, liveRow)",
+          "switch (role switch)",
+          "radio group (role radio)",
+          "slider (native range input)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/menu/reference.webp",
+        "app": "docs/design-parity/captures/menu/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/menu/side-by-side.webp",
+      "diff": "docs/design-parity/captures/menu/diff.json",
+      "deviations": [
+        {
+          "what": "The capture opens the menu on a setting card rather than on a peer.",
+          "reason": "No peers exist without a daemon; the setting card menu carries the same live-control rows.",
+          "approved": "Reviewed 2026-11-07."
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "appearance",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=appearance&theme=dark",
+      "appRoute": "settings:appearance>appearance@set-theme#motion",
+      "surface": "app",
+      "state": "Appearance editor, Animation and transition tab",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "floating panel (src/renderer/ui/overlay.js floatPanel)",
+          "tabs (src/renderer/ui/mtabs.js)",
+          "stepper (src/renderer/ui/controls.js stepper)",
+          "segmented button (src/renderer/ui/controls.js segmented)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/appearance/reference.webp",
+        "app": "docs/design-parity/captures/appearance/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/appearance/side-by-side.webp",
+      "diff": "docs/design-parity/captures/appearance/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "confirm",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "confirm",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=confirm&theme=dark",
+      "appRoute": "home>overlay@confirm",
+      "surface": "app",
+      "state": "Super confirmation",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)",
+          "dialog (src/renderer/ui/safety.js superConfirm)",
+          "slider (native range input)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/confirm/reference.webp",
+        "app": "docs/design-parity/captures/confirm/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/confirm/side-by-side.webp",
+      "diff": "docs/design-parity/captures/confirm/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "ladder",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "ladder",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=ladder&theme=dark",
+      "appRoute": "home>overlay@ladder",
+      "surface": "app",
+      "state": "Unlock ladder",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/ladder/reference.webp",
+        "app": "docs/design-parity/captures/ladder/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/ladder/side-by-side.webp",
+      "diff": "docs/design-parity/captures/ladder/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "toasts",
+      "reference": "design/canvas/Overlays.dc.html",
+      "view": "toasts",
+      "referenceRoute": "dcref://board/Overlays.dc.html?view=toasts&theme=dark",
+      "appRoute": "home>overlay@toasts",
+      "surface": "app",
+      "state": "Notices",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/toasts/reference.webp",
+        "app": "docs/design-parity/captures/toasts/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/toasts/side-by-side.webp",
+      "diff": "docs/design-parity/captures/toasts/diff.json",
+      "deviations": [
+        {
+          "what": "Sample text and values differ from the live app.",
+          "reason": "The design uses fictional sample content; the app shows its real local data and copy.",
+          "approved": "Reviewed 2026-11-07: content, not chrome."
+        }
+      ]
+    },
+    {
+      "id": "site-home",
+      "reference": "design/canvas/Landing.dc.html",
+      "view": "site-home",
+      "referenceRoute": "dcref://board/Landing.dc.html?view=site-home&theme=dark",
+      "appRoute": "site#/home",
+      "surface": "site",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/site-home/reference.webp",
+        "app": "docs/design-parity/captures/site-home/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/site-home/side-by-side.webp",
+      "diff": "docs/design-parity/captures/site-home/diff.json",
+      "deviations": [
+        {
+          "what": "Website content differs in detail from the design (feature cards and gallery).",
+          "reason": "The website lists every documentation article and real screenshots; the design summarises them with six feature cards.",
+          "approved": "Reviewed 2026-11-07: intentional, the site shows complete content."
+        }
+      ]
+    },
+    {
+      "id": "site-docs",
+      "reference": "design/canvas/Landing.dc.html",
+      "view": "site-docs",
+      "referenceRoute": "dcref://board/Landing.dc.html?view=site-docs&theme=dark",
+      "appRoute": "site#/docs",
+      "surface": "site",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/site-docs/reference.webp",
+        "app": "docs/design-parity/captures/site-docs/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/site-docs/side-by-side.webp",
+      "diff": "docs/design-parity/captures/site-docs/diff.json",
+      "deviations": [
+        {
+          "what": "Website content differs in detail from the design (feature cards and gallery).",
+          "reason": "The website lists every documentation article and real screenshots; the design summarises them with six feature cards.",
+          "approved": "Reviewed 2026-11-07: intentional, the site shows complete content."
+        }
+      ]
+    },
+    {
+      "id": "site-download",
+      "reference": "design/canvas/Landing.dc.html",
+      "view": "site-download",
+      "referenceRoute": "dcref://board/Landing.dc.html?view=site-download&theme=dark",
+      "appRoute": "site#/download",
+      "surface": "site",
+      "state": "Default view",
+      "tuple": {
+        "theme": "dark",
+        "width": 1440,
+        "height": 960,
+        "scale": 1,
+        "motion": "off"
+      },
+      "m3": {
+        "primitives": [
+          "hero band (src/renderer/ui/hero.js)",
+          "card (app.css .card)",
+          "button (app.css .btn)",
+          "icon button (app.css .icon-btn)",
+          "navigation rail (src/renderer/ui/shell.js)",
+          "browser-style tabs (src/renderer/ui/shell.js)"
+        ],
+        "verdict": "Registered app primitives only; no generic placeholder controls found in the capture."
+      },
+      "captures": {
+        "reference": "docs/design-parity/captures/site-download/reference.webp",
+        "app": "docs/design-parity/captures/site-download/app.webp"
+      },
+      "comparison": "docs/design-parity/captures/site-download/side-by-side.webp",
+      "diff": "docs/design-parity/captures/site-download/diff.json",
+      "deviations": [
+        {
+          "what": "Website content differs in detail from the design (feature cards and gallery).",
+          "reason": "The website lists every documentation article and real screenshots; the design summarises them with six feature cards.",
+          "approved": "Reviewed 2026-11-07: intentional, the site shows complete content."
+        }
+      ]
+    }
+  ]
+}

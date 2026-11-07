@@ -14,7 +14,9 @@ const info = {
   commitTime: git('log', '-1', '--format=%cI'),
   codeName: process.env.MT_CODENAME || null,
   photoUrl: process.env.MT_PHOTO_URL || null,
-  builtBy: process.env.GITHUB_ACTIONS ? 'GitHub Actions' : 'local build'
+  builtBy: process.env.GITHUB_ACTIONS ? 'GitHub Actions' : 'local build',
+  // Uncommitted source changes at build time (a local build of a dirty tree is not a release build).
+  dirtyTree: process.env.GITHUB_ACTIONS ? false : Boolean(git('status', '--porcelain'))
 };
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist', 'build-info.json'), JSON.stringify(info, null, 2));

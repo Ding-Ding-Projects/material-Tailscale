@@ -209,9 +209,14 @@ async function captureAll(dir) {
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   for (let i = 0; i < 100 && !(await wc.executeJavaScript('!!window.__mtReady').catch(() => false)); i++) await wait(100);
   await wc.executeJavaScript("document.querySelector('.scrim')?.remove(); document.querySelector('.dimsum')?.remove(); true");
-  if (process.env.MT_CAPTURE_ZOOM) wc.setZoomFactor(Number(process.env.MT_CAPTURE_ZOOM));
+  // Chromium remembers zoom per origin, so every capture sets it explicitly (default 100%).
+  wc.setZoomFactor(Number(process.env.MT_CAPTURE_ZOOM || 1));
+  await wait(150);
+  if (process.env.MT_CAPTURE_DIAG) console.log(await wc.executeJavaScript('JSON.stringify({ w: innerWidth, h: innerHeight, dpr: devicePixelRatio, fs: getComputedStyle(document.body).fontSize, ts: getComputedStyle(document.documentElement).getPropertyValue("--text-scale") })'));
+  if (process.env.MT_CAPTURE_MOTION) await wc.executeJavaScript(`window.__mtSet('motion', ${JSON.stringify(process.env.MT_CAPTURE_MOTION)}); true`);
   if (process.env.MT_CAPTURE_LANG) await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(process.env.MT_CAPTURE_LANG)}); true`);
   const clipping = [];
+  const provenance = [];
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge.
   const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 6 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ sw: el.scrollWidth, cw: el.clientWidth, text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
@@ -222,20 +227,39 @@ async function captureAll(dir) {
       // An entry may name a visible button to press after opening: dest:arg>Button label
       const [route, press] = d.split('>');
       const [dest, arg] = route.split(':');
+      await wc.executeJavaScript("document.querySelectorAll('.popover, .panel-float, .scrim').forEach((x) => x.remove()); true");
       await wc.executeJavaScript(`window.__mtOpen(${JSON.stringify(dest)}, ${JSON.stringify(arg || undefined)}); true`);
       await wait(900);
-      if (press) { await wc.executeJavaScript(`[...document.querySelectorAll('button')].find((b) => b.offsetParent && b.textContent.trim().endsWith(${JSON.stringify(press)}))?.click(); true`); await wait(1200); }
+      if (press?.startsWith('overlay@')) { const [kind, oarg] = press.slice(8).split('#'); await wc.executeJavaScript(`window.__mtOverlay(${JSON.stringify(kind)}, ${JSON.stringify(oarg || '')})`); await wait(1200); }
+      else if (press?.startsWith('menu@')) { await wc.executeJavaScript(`window.__mtContext(${JSON.stringify(press.slice(5))})`); await wait(900); }
+      else if (press?.startsWith('appearance@')) { const [elId, tab] = press.slice(11).split('#'); await wc.executeJavaScript(`window.__mtAppearance(${JSON.stringify(elId)}, ${JSON.stringify(tab || '')})`); await wait(1200); }
+      else if (press) { await wc.executeJavaScript(`[...document.querySelectorAll('button')].find((b) => { const x = b.textContent.trim(); return b.offsetParent && (x.endsWith(${JSON.stringify(press)}) || x.includes(${JSON.stringify(press + ' · ')})); })?.click(); true`); await wait(1200); }
       if (process.env.MT_CAPTURE_CLIP) { const found = await wc.executeJavaScript(CLIP_PROBE).catch(() => []); if (found.length) clipping.push({ theme, dest: d, found }); }
       const img = await wc.capturePage();
-      fs.writeFileSync(path.join(dir, `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`), img.toPNG());
+      const file = `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`;
+      const png = img.toPNG();
+      fs.writeFileSync(path.join(dir, file), png);
+      const vp = await wc.executeJavaScript('({ width: innerWidth, height: innerHeight, dpr: devicePixelRatio, lang: document.documentElement.lang, motion: document.documentElement.classList.contains("reduce-motion") ? "reduced" : "full" })').catch(() => ({}));
+      provenance.push({ file, route: d, theme, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: vp.lang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
     }
   }
   if (process.env.MT_CAPTURE_PALETTE !== '0') {
     await wc.executeJavaScript("window.dispatchEvent(new CustomEvent('mt:palette')); true");
     await wait(600);
-    fs.writeFileSync(path.join(dir, 'light-palette.png'), (await wc.capturePage()).toPNG());
+    const palPng = (await wc.capturePage()).toPNG();
+    fs.writeFileSync(path.join(dir, 'light-palette.png'), palPng);
+    provenance.push({ file: 'light-palette.png', route: 'palette', theme: 'light', zoom: wc.getZoomFactor(), bytes: palPng.length, sha256: require('node:crypto').createHash('sha256').update(palPng).digest('hex') });
   }
   if (process.env.MT_CAPTURE_CLIP) fs.writeFileSync(path.join(dir, 'clipping.json'), JSON.stringify(clipping, null, 2));
+  // Provenance for every capture: what was built, how it was captured, and each file's hash.
+  const bundle = path.join(__dirname, '..', '..', 'dist', 'app.js');
+  let bundleSha = null; try { bundleSha = require('node:crypto').createHash('sha256').update(fs.readFileSync(bundle)).digest('hex'); } catch { /* packaged app: bundle lives in the asar */ }
+  fs.writeFileSync(path.join(dir, 'capture-manifest.json'), JSON.stringify({
+    app: { version: app.getVersion(), build: (() => { try { return require('../../dist/build-info.json'); } catch { return null; } })(), rendererBundleSha256: bundleSha },
+    method: 'Electron capturePage of the built renderer in capture mode (cloud Linux, Xvfb); sample-free: screens show this machine\'s real state',
+    privacy: 'No account is signed in on the capture machine; no tailnet, token or personal data appears in these captures.',
+    captures: provenance
+  }, null, 2) + '\n');
   app.quit();
 }
 
@@ -246,6 +270,7 @@ async function recordPath(dir) {
   const wc = win.webContents;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   for (let i = 0; i < 100 && !(await wc.executeJavaScript('!!window.__mtReady').catch(() => false)); i++) await wait(100);
+  wc.setZoomFactor(1);
   await wc.executeJavaScript("document.querySelector('.scrim')?.remove(); document.querySelector('.dimsum')?.remove(); window.__mtSet('theme', 'dark'); true");
   let n = 0, rec = true;
   const loop = (async () => { while (rec) { const img = await wc.capturePage(); fs.writeFileSync(path.join(dir, `f${String(n++).padStart(4, '0')}.png`), img.resize({ width: 960 }).toPNG()); await wait(120); } })();
@@ -266,6 +291,9 @@ async function recordPath(dir) {
   rec = false; await loop;
   app.quit();
 }
+
+// Capture mode can pin the device scale so captures share one exact tuple.
+if (process.env.MT_CAPTURE_DIR && process.env.MT_CAPTURE_SCALE) app.commandLine.appendSwitch('force-device-scale-factor', process.env.MT_CAPTURE_SCALE);
 
 app.whenReady().then(() => {
   createWindow();

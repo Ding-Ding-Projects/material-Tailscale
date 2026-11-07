@@ -1,0 +1,34 @@
+{
+  "id": "drive",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "ff76fd3ebaea2c5d889ed0f4011c48e6b824059f00413716a855165a2824e19c",
+  "captureSha256": {
+    "reference": "6fffd7967e029e7ff3b1d47156a707e3101cf425e3276a96d8461e5b22a0b034",
+    "app": "5a8270da92b78cf37fdffbdc50252a4ae7345bf39ee5963654aa91797b0fd678"
+  },
+  "changedPixels": 117035,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0847,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/drive/diff.webp"
+}

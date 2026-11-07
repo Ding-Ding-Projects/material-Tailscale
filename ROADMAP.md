@@ -57,3 +57,14 @@
 - [x] Postman collection of every admin API operation
 - [x] Wiki generator from docs (publishing blocked from the build machine, see HANDOFF)
 - [ ] Clipping matrix at 125/150/200% scale and every language mode
+
+## Midnight Mesh 2
+
+- [x] Design canvas boards for every screen family, overlay and the website (15 boards, 48 views)
+- [x] Page hero bands with animated illustrations, two-pane Settings, in-page tabs, setup state with steps
+- [x] Context menus carry live controls (switch, choice, slider, swatch) with keyboard support
+- [x] Animation and transition tab in the per-element appearance editor
+- [x] Design-reference viewer, hand-written parity inventory, side-by-side and diff evidence, negative regression
+- [ ] Populated tailnet states in parity captures (needs a Tailscale daemon on the capture machine)
+- [ ] Dedicated build GUI companion (portable executable that drives build.bat and build-installer.bat)
+

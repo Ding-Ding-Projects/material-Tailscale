@@ -1,0 +1,34 @@
+{
+  "id": "authenticator",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "853c213bcefa873d69deb115cca9f4ebd6f5c13cb5542240daeeabe4e118e976",
+  "captureSha256": {
+    "reference": "f4d8edf6b1f3450913a3f517801a32f9e34f45f48d1a5ada2c402859d988f067",
+    "app": "7351731d158c1c73913e92ca25e0b295cf926556ca7480716a2ac251eea680a8"
+  },
+  "changedPixels": 147120,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1064,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/authenticator/diff.webp"
+}

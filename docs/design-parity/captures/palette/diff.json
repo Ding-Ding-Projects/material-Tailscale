@@ -1,0 +1,34 @@
+{
+  "id": "palette",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "3b0151d3429f91f7e506a4d06266470e3e74b0aa60dcea3ecca6670bf80a906e",
+  "captureSha256": {
+    "reference": "08ef6ffdd811a44b36dfbc612e70a131503e369d919e7efad192d11ee51cd2ff",
+    "app": "241eea4bf403ee8d8fe4847b63d68436ef27c22161ad4ef8093ac05b2255fabf"
+  },
+  "changedPixels": 57294,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0414,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/palette/diff.webp"
+}

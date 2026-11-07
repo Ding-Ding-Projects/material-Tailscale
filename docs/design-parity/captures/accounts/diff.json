@@ -1,0 +1,34 @@
+{
+  "id": "accounts",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "840b52ba222b2aed7e9c8f69ccca887efba62f30002cf9c755718554e3fd73ca",
+  "captureSha256": {
+    "reference": "363765ec787a747f348f3c62861ff9988130bd09c2dc68e497581ac2cfa9b09d",
+    "app": "59a01041fe1f54e9d3e6c139e8547b9f5846d2fe292606f8c59afbfc023ecfea"
+  },
+  "changedPixels": 126162,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0913,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/accounts/diff.webp"
+}

@@ -1,0 +1,34 @@
+{
+  "id": "toasts",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "3b0151d3429f91f7e506a4d06266470e3e74b0aa60dcea3ecca6670bf80a906e",
+  "captureSha256": {
+    "reference": "dd21cf71dc822da3882258a634b196ff2f807ea310c75bd9ad62629778681e2d",
+    "app": "4201cec093d4ae375b45bbb26402dda7f87fe44fdef889ab731c14209a9ace84"
+  },
+  "changedPixels": 177509,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1284,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/toasts/diff.webp"
+}

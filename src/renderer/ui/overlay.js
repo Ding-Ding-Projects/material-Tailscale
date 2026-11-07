@@ -84,6 +84,40 @@ export function place(el, anchor) {
 }
 
 // ---------------- context menus with filter + regex ----------------
+
+/**
+ * A menu row that carries the live control for a value. live: { kind: 'switch'|'choice'|'range'|'swatch',
+ * get(), set(v), options: [{ value, label }], min, max, step, format(v), disabled: reason, onSwatch() }.
+ * Changes apply immediately through set(), the menu stays open, and the control re-syncs on store changes.
+ */
+export function liveRow(it) {
+  const L = it.live;
+  const ctl = h('span.menu-ctl');
+  const name = it.label;
+  const build = () => {
+    clear(ctl);
+    const v = L.get();
+    if (L.kind === 'switch') {
+      ctl.append(h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(!!v), 'aria-label': name, disabled: !!L.disabled, on: { click: () => { L.set(!L.get()); build(); ctl.querySelector('[role="switch"]')?.focus(); } } }));
+    } else if (L.kind === 'choice') {
+      const g = h('span.seg', { role: 'radiogroup', 'aria-label': name });
+      const pickAt = (k) => { const o = L.options[(k + L.options.length) % L.options.length]; L.set(o.value); build(); ctl.querySelector('[role="radio"][aria-checked="true"]')?.focus(); };
+      L.options.forEach((o, k) => g.append(h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === v), tabindex: o.value === v ? '0' : '-1', disabled: !!L.disabled, on: { click: () => pickAt(k), keydown: (e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); pickAt(k + (e.key === 'ArrowRight' ? 1 : -1)); } } } }, o.label)));
+      ctl.append(g);
+    } else if (L.kind === 'range') {
+      const out = h('output', L.format ? L.format(v) : String(v));
+      const r = h('input', { type: 'range', min: L.min, max: L.max, step: L.step || 1, value: v, 'aria-label': name, 'aria-valuetext': L.format ? L.format(v) : String(v), disabled: !!L.disabled, on: { input: (e) => { const n = Number(e.target.value); L.set(n); out.textContent = L.format ? L.format(n) : String(n); e.target.setAttribute('aria-valuetext', out.textContent); } } });
+      ctl.append(r, out);
+    } else if (L.kind === 'swatch') {
+      ctl.append(h('button.menu-swatch', { type: 'button', 'aria-label': `${name}: ${v}`, style: { background: v }, disabled: !!L.disabled, on: { click: () => L.onSwatch?.() } }));
+    }
+  };
+  ctl.sync = () => { if (!ctl.contains(document.activeElement) || L.kind !== 'range') build(); };
+  build();
+  return h(`div.menu-item.has-ctl${L.disabled ? '' : ''}`, { role: 'none', 'aria-disabled': L.disabled ? 'true' : null, title: L.disabled || null },
+    it.icon ? icon(it.icon) : null, h('span.menu-label', it.label, L.disabled ? h('span.small.muted', ` · ${L.disabled}`) : null), ctl, it.kbd ? h('span.kbd', it.kbd) : null);
+}
+
 export function menu(at, items, { title } = {}) {
   const list = h('div', { role: 'menu', 'aria-label': title || 'Menu' });
   const input = h('input', { placeholder: t('filter'), 'aria-label': t('filter') });
@@ -100,6 +134,7 @@ export function menu(at, items, { title } = {}) {
     for (const it of items) {
       if (it === '-') { if (!q) list.append(h('div.menu-sep')); continue; }
       if (!test(it.label)) continue;
+      if (it.live) { list.append(liveRow(it)); continue; }
       if (it.control) { list.append(h('div', { style: { padding: '6px 10px' } }, it.control())); continue; }
       list.append(h(`button.menu-item${it.danger ? '.danger' : ''}`, { role: 'menuitem', 'aria-keyshortcuts': it.kbd || null, on: { click: () => { pop.close(); it.run(); } } }, it.icon ? icon(it.icon) : null, h('span', it.label), it.kbd ? h('span.kbd', it.kbd) : null));
     }
@@ -109,14 +144,17 @@ export function menu(at, items, { title } = {}) {
     if (e.key === 'ArrowDown') { e.preventDefault(); list.querySelector('.menu-item')?.focus(); }
     if (e.key === 'Enter') { list.querySelector('.menu-item')?.click(); }
   });
+  // Focus stops: plain commands plus each live control (switch, checked radio, slider, swatch).
+  const stops = () => [...list.querySelectorAll('button.menu-item, .menu-ctl [role="switch"], .menu-ctl [role="radio"][aria-checked="true"], .menu-ctl input[type="range"], .menu-ctl .menu-swatch')];
   list.addEventListener('keydown', (e) => {
-    const all = [...list.querySelectorAll('.menu-item')];
+    const all = stops();
     const i = all.indexOf(document.activeElement);
     if (e.key === 'ArrowDown') { e.preventDefault(); all[(i + 1) % all.length]?.focus(); }
     if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) input.focus(); else all[i - 1]?.focus(); }
   });
   render();
-  const pop = popover(at, [h('div.menu-filter', input, reBtn), list]);
+  const unlisten = store.on(() => list.querySelectorAll('.menu-ctl').forEach((c) => c.sync?.()));
+  const pop = popover(at, [h('div.menu-filter', input, reBtn), list], { onClose: unlisten });
   setTimeout(() => input.focus(), 20);
   return pop;
 }

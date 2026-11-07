@@ -1,0 +1,34 @@
+{
+  "id": "draw",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "853c213bcefa873d69deb115cca9f4ebd6f5c13cb5542240daeeabe4e118e976",
+  "captureSha256": {
+    "reference": "ed963da983e4a792a81b18ec4241b7f59f6e16810f35f748e24ea6591fd8613c",
+    "app": "76e245873281bf28993db9cdbba77ae33b868a6cf0f3c7e7fdcb2d5949f15f06"
+  },
+  "changedPixels": 449081,
+  "totalPixels": 1382400,
+  "changedRatio": 0.3249,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/draw/diff.webp"
+}

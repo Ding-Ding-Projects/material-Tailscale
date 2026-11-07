@@ -1,0 +1,34 @@
+{
+  "id": "routes",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "72464c903f571f48be51465a588c29fd7b09411fa95f8d8991ee3a0903d0644b",
+  "captureSha256": {
+    "reference": "2dc1d7a34912964780419dca275dccdfa625e04956363226a6d870c7ec8a78ed",
+    "app": "a787ddf896e691ccf375e7e03dd7106f2434a80f7f4ed6c2e8743ec369f7f170"
+  },
+  "changedPixels": 144783,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1047,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/routes/diff.webp"
+}

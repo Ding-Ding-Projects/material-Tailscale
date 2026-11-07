@@ -1,0 +1,34 @@
+{
+  "id": "settings-appearance",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "e1c8b429e6063c8a24054e91c751cea8c69f1ebf797668f6e9d5eac0110abc0c",
+  "captureSha256": {
+    "reference": "acc273c95b15b0cd6a19ec302bc429199443756a1743b1036f81e88210d6d52d",
+    "app": "a1cc4d5b2733b87c92a21803352b65dc6c6e5cae54d8b0e1072920ef6ac9fd5c"
+  },
+  "changedPixels": 144323,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1044,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/settings-appearance/diff.webp"
+}

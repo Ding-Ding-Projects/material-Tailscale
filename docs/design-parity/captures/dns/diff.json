@@ -1,0 +1,34 @@
+{
+  "id": "dns",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "541ba51d068b283f1fccf994d678227ee7193297fe643cf0fc1e35603a286d80",
+  "captureSha256": {
+    "reference": "475e88f6b82a2b0298a9eeef1276e46dcd6bd2f1353d5ee701d0f31ae6ce6e6d",
+    "app": "fb12353a1a44dc687447150214339335018ba86dba61af7ea5ea7a3841696df2"
+  },
+  "changedPixels": 134027,
+  "totalPixels": 1382400,
+  "changedRatio": 0.097,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/dns/diff.webp"
+}

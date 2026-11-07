@@ -23,7 +23,10 @@
     "clip-matrix": "node scripts/clip-matrix.mjs",
     "gen:postman": "node scripts/gen-postman.mjs",
     "wiki": "node scripts/sync-wiki.mjs",
-    "check:instructions": "node scripts/check-instructions-lock.mjs"
+    "check:instructions": "node scripts/check-instructions-lock.mjs",
+    "design:parity": "node scripts/design-parity.mjs",
+    "design:boards": "node scripts/design-boards.mjs",
+    "design:reference": "electron tools/design-reference"
   },
   "dependencies": {
     "7zip-bin": "^5.2.0",

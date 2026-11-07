@@ -18,6 +18,7 @@ import './pages/settings.js';
 import './pages/tools.js';
 import { runMcSchedules } from './pages/minecraft.js';
 import { runSchedules } from './core/schedules.js';
+import { SETTINGS_INDEX } from './pages/settings-index.js';
 import './pages/meta.js';
 
 // ---------- appearance from settings ----------
@@ -74,6 +75,23 @@ function timeChip() {
 }
 
 // ---------- global context menu on every element ----------
+
+// ---------- live controls for settings inside context menus ----------
+const SET_ICONS = { theme: 'contrast', lang: 'translate', textScale: 'format_size', motion: 'animation', sounds: 'volume_up', narrator: 'record_voice_over', seed: 'palette', density: 'density_medium', contrast: 'tonality', focusRing: 'center_focus_strong', largeTargets: 'touch_app', funnyEn: 'sentiment_very_satisfied', funnyYue: 'sentiment_very_satisfied', adhdFocus: 'center_focus_weak', adhdLowStim: 'blur_on', adhdMomentum: 'east', quietHours: 'bedtime', statusInterval: 'timer' };
+const QUICK = ['theme', 'lang', 'textScale', 'motion', 'sounds', 'seed'];
+function liveFor(key) {
+  const s = SETTINGS_INDEX.find((x) => x.key === key); if (!s) return null;
+  const short = (en, yue) => (store.get('lang') === 'yue' ? yue : en);
+  const locked = i18n.schoolOn() && ['lang', 'funnyEn', 'funnyYue', 'dialogEmoji'].includes(key) ? pair('Set by School mode', '學校模式設定咗') : null;
+  const base = { label: short(s.en, s.yue), icon: SET_ICONS[key] || 'tune' };
+  const get = () => store.get(key); const set = (v) => store.set(key, v, { label: s.en });
+  if (s.type === 'bool') return { ...base, live: { kind: 'switch', get, set, disabled: locked } };
+  if (s.type === 'enum') return { ...base, live: { kind: 'choice', options: s.options.map((o) => ({ value: o[0], label: short(o[1], o[2]) })), get, set, disabled: locked } };
+  if (s.type === 'int' || s.type === 'float') return { ...base, live: { kind: 'range', min: s.min, max: s.max, step: s.type === 'float' ? 0.1 : 1, get, set, format: (v) => (key === 'textScale' ? `${v}%` : String(v)), disabled: locked } };
+  if (s.type === 'color') return { ...base, live: { kind: 'swatch', get, set, onSwatch: () => openDest('settings', s.section) } };
+  return null;
+}
+
 function contextFor(target, at) {
   const el = target.closest('[data-el]');
   const id = el?.dataset.el;
@@ -82,6 +100,9 @@ function contextFor(target, at) {
   if (sel) items.push({ label: t('copy'), icon: 'content_copy', kbd: 'Ctrl+C', run: () => navigator.clipboard.writeText(sel) });
   const field = target.closest('input,textarea');
   if (field) items.push({ label: pair('Paste', '貼上'), icon: 'content_paste', kbd: 'Ctrl+V', run: async () => { field.focus(); document.execCommand('insertText', false, await navigator.clipboard.readText()); } }, { label: pair('Select all', '全選'), icon: 'select_all', kbd: 'Ctrl+A', run: () => field.select() });
+  const setKey = id?.startsWith('set-') ? id.slice(4) : null;
+  const own = setKey ? liveFor(setKey) : null;
+  if (own) items.push(own, '-');
   if (el) {
     items.push({ label: t('editAppearance'), icon: 'palette', run: () => editAppearance(el) }, { label: t('lockElement'), icon: 'lock', run: () => lockWizard(id, el) },
       { label: pair('Lock this element\'s appearance…', '鎖住呢個元素嘅外觀…'), icon: 'format_paint', run: () => lockWizard('appearance:' + id, el) });
@@ -91,7 +112,7 @@ function contextFor(target, at) {
     if (rail) items.push({ label: pair('Open in a new tab', '喺新分頁開'), icon: 'tab', kbd: 'Ctrl+T', run: () => openInNewTab(rail) });
   }
   items.push('-', { label: t('newTab'), icon: 'add', kbd: 'Ctrl+T', run: () => newTabCatalog() }, { label: pair('Command palette', '指令面板'), icon: 'search', kbd: 'Ctrl+Shift+F', run: openPalette },
-    { label: pair('Theme', '主題'), control: () => { const s = h('div.seg', ['dark', 'light', 'system'].map((v) => h('button', { 'aria-checked': String(store.get('theme') === v), role: 'radio', on: { click: () => store.set('theme', v) } }, v))); return s; } },
+    '-', ...QUICK.filter((k) => k !== setKey).map(liveFor).filter(Boolean), '-',
     { label: t('refresh'), icon: 'refresh', kbd: 'Ctrl+R', run: () => { ts.poll(); render(); } });
   menu(at, items);
 }
@@ -181,5 +202,17 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   setTimeout(() => maybeSurprise({ firstRun, busy: () => !!document.querySelector('.scrim,.update-banner') }), 2500);
   window.__mtOpen = (d, a) => openDest(d, a);
   window.__mtSet = (k, v) => store.set(k, v, { record: false });
+  // Capture hooks: open the context menu or the appearance editor for an element by data-el.
+  window.__mtContext = (elId) => { const el = document.querySelector(`[data-el="${CSS.escape(elId)}"]`); if (!el) return false; const r = el.getBoundingClientRect(); contextFor(el, { x: r.left + 24, y: r.top + 24 }); return true; };
+  // Capture hooks for overlays, each opening the real component with neutral sample wording.
+  window.__mtOverlay = async (kind, arg) => {
+    if (kind === 'palette') { openPalette(); await new Promise((r) => setTimeout(r, 80)); const i = document.querySelector('input[role="combobox"]'); if (i && arg) { i.value = arg; i.dispatchEvent(new Event('input', { bubbles: true })); } return true; }
+    if (kind === 'onboarding') { onboarding(); return true; }
+    if (kind === 'confirm') { const { superConfirm } = await import('./ui/safety.js'); superConfirm({ action: pair('Log out of this tailnet', '登出呢個 tailnet'), affects: pair('This device leaves the tailnet until you log in again.', '呢部機會離開 tailnet，直到你再登入。') }); return true; }
+    if (kind === 'ladder') { const { ladder } = await import('./ui/locks.js'); ladder(arg || 'capture-sample'); return true; }
+    if (kind === 'toasts') { toast(pair('Connected to your tailnet.', '已連線到你嘅 tailnet。'), { kind: 'ok' }); toast(pair('tailscale up failed: exit code 1.', 'tailscale up 失敗：結束碼 1。'), { kind: 'err' }); return true; }
+    return false;
+  };
+  window.__mtAppearance = (elId, tab) => { const el = document.querySelector(`[data-el="${CSS.escape(elId)}"]`); if (!el) return false; editAppearance(el); if (tab) setTimeout(() => document.querySelector(`[data-el="mtab-${tab}"]`)?.click(), 50); return true; };
   window.__mtReady = true;
 })();

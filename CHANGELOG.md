@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased: Midnight Mesh 2
+
+- Every screen redesigned on a design canvas, with the boards generated from the app's own stylesheets.
+- Page hero bands with animated illustrations, two-pane Settings, in-page tabs with a sliding indicator, a setup state with steps, live status dots.
+- Context menus show live switches, choices, sliders and swatches for values, and keep the menu open while you adjust them.
+- The appearance editor gains an Animation and transition tab with presets, timing, easing curves, a keyframe timeline, transitions, a reduced-motion fallback and a preview.
+- Design parity evidence for all 48 design views, checked by the tests.
+- Screenshots are captured at 100% zoom again, with a provenance manifest.
+
 ## v1.0.0 · 2026-11-06
 
 - First release of Material Tailscale.

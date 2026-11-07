@@ -153,3 +153,6 @@ button.tab[aria-selected="true"] { background: var(--surface); }
 .card.hero::after { content: ''; position: absolute; z-index: -1; width: 520px; height: 520px; right: -180px; top: -220px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in oklab, var(--primary) 26%, transparent), transparent); }
 .card.hero.bare { background: transparent; border: 0; padding: 0; box-shadow: none; min-height: 0; }
 .card.hero.bare::before, .card.hero.bare::after { content: none; }
+
+/* Segmented controls with many options wrap as a soft block instead of a pill */
+.seg:has(> button:nth-child(5)) { border-radius: var(--r-l); }

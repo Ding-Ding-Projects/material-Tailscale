@@ -1,0 +1,34 @@
+{
+  "id": "minecraft-config",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "1d0beaedbd992864435ece24d26a0629f341110b5850874f0c0b5fa2a754b5bc",
+  "captureSha256": {
+    "reference": "84010e95a48b5455ebce639f30641fd10515884a742347925e909c2ecda7d4fd",
+    "app": "cdd4efc03d60d092ed0455107539b6f92bb22c1f729ddb5566897ce630d8d7f2"
+  },
+  "changedPixels": 131782,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0953,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/minecraft-config/diff.webp"
+}

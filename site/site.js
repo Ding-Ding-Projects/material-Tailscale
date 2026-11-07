@@ -1,4 +1,5 @@
 // Material Tailscale website: landing, docs, download, status, changelog,
+import { pageHero, heroStats } from '../src/renderer/ui/hero.js';
 // settings and tools. It reuses the desktop app's own UI modules through a
 // browser shim, so every personalisation and safety feature works here too.
 import './shim.js';
@@ -78,17 +79,16 @@ const FEATURE_CARDS = [
 
 const LOCAL = {
   home: () => h('div.page',
-    h('section.site-hero', h('div.stack', { style: { flex: '1 1 460px' } },
-      h('div.eyebrow', pair('Landing · docs · downloads · status', '主頁 · 文件 · 下載 · 狀態')),
-      h('h1.site-h1', pair('Every Tailscale switch. One beautiful window.', '每個 Tailscale 開關，一個靚靚視窗。')),
-      h('p.lede', pair('A Material 3 Expressive desktop app for Windows that gives every Tailscale command, flag and admin setting a real control. This website is its landing, documentation, download and status page; the app itself runs on your computer.', 'Windows 上嘅 Material 3 桌面程式，將每個 Tailscale 指令、旗標同管理設定變成真正嘅控制項。呢個網站係主頁、文件、下載同狀態頁；程式喺你部電腦運行。')),
-      download(), h('div.row', h('a.btn.outline', { href: '#/docs' }, icon('menu_book'), pair('Read the docs', '睇文件')), h('a.btn.text', { href: 'https://github.com/Ding-Ding-Projects/material-Tailscale' }, icon('code'), 'GitHub'))),
-      h('figure.site-shot', h('img', { src: 'screenshots/dark-cli-set.png', alt: pair('Material Tailscale editing tailscale set preferences with rich controls, captured from the built app', '用豐富控制項編輯 tailscale set，由實際程式截圖'), loading: 'eager' }))),
+    pageHero(pair('Material Tailscale for Windows', 'Windows 版 Material Tailscale'), pair('Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。'), pair('A Material 3 Expressive desktop app for Windows that gives every Tailscale command, flag and admin setting a real control. This website is its landing, documentation, download and status page; the app itself runs on your computer.', 'Windows 上嘅 Material 3 桌面程式，將每個 Tailscale 指令、旗標同管理設定變成真正嘅控制項。呢個網站係主頁、文件、下載同狀態頁；程式喺你部電腦運行。'),
+      h('a.btn.big', { href: '#/download' }, icon('download'), pair('Download for Windows', '下載 Windows 版')), h('a.btn.outline.big', { href: '#/docs' }, icon('menu_book'), pair('Read the docs', '睇文件')), h('a.btn.text', { href: 'https://github.com/Ding-Ding-Projects/material-Tailscale' }, icon('code'), 'GitHub'),
+      heroStats([{ value: '93', label: pair('API operations', '個 API 操作') }, { value: '73', label: pair('commands', '個指令') }, { value: String(ARTICLES.length), label: pair('articles', '篇文章') }])),
+    download(),
+    h('figure.site-shot', h('img', { src: 'screenshots/dark-cli-set.png', alt: pair('Material Tailscale editing tailscale set preferences with rich controls, captured from the built app', '用豐富控制項編輯 tailscale set，由實際程式截圖'), loading: 'eager' })),
     h('h2', pair('What it covers', '包括乜嘢')), h('div.grid.stagger', FEATURE_CARDS.map(([ic, en, yue, d], i) => h('a.cmd-tile.span-3', { href: '#/features', style: { '--i': i } }, h('span.ico', icon(ic)), h('span', h('b', pair(en, yue)), h('div.small.muted', d))))),
     h('h2', pair('Screens from the real app', '實際程式截圖')), gallery()),
-  features: () => h('div.page', h('div.page-head', h('div.titles', h('div.eyebrow', pair('Everything', '全部')), h('h1', pair('Features', '功能')), h('p', pair('Each feature has its own article.', '每個功能都有自己嘅文章。')))),
+  features: () => h('div.page', pageHero(pair('Everything', '全部'), pair('Features', '功能'), pair('Each feature has its own article.', '每個功能都有自己嘅文章。')),
     h('div.grid.stagger', ARTICLES.map((a, i) => h('a.cmd-tile.span-4', { href: '#/docs/' + encodeURIComponent(a.path), style: { '--i': i } }, h('span.ico', icon('article')), h('span', h('b', a.title), h('div.small.muted', a.category)))))),
-  download: () => h('div.page', h('h1', pair('Download', '下載')), download(), h('div.card', h('h2', pair('Install', '安裝')), h('ol', h('li', pair('Download MaterialTailscaleSetup.exe.', '下載 MaterialTailscaleSetup.exe。')), h('li', pair('Run it. If SmartScreen warns about an unknown publisher, choose More info, then Run anyway. The installer is unsigned.', '執行。SmartScreen 警告時揀「更多資訊」再「仍要執行」，安裝程式冇簽名。')), h('li', pair('Install Tailscale too if you have not. The app finds it automatically.', '如果未裝 Tailscale 都要裝，程式會自動搵到。')))),
+  download: () => h('div.page', pageHero(pair('Releases', '發佈'), pair('Download', '下載'), pair('Unsigned Squirrel installer with automatic updates. Windows may warn about an unknown publisher.', '未簽署嘅 Squirrel 安裝程式，會自動更新。Windows 可能會警告未知發行者。')), download(), h('div.card', h('h2', pair('Install', '安裝')), h('ol', h('li', pair('Download MaterialTailscaleSetup.exe.', '下載 MaterialTailscaleSetup.exe。')), h('li', pair('Run it. If SmartScreen warns about an unknown publisher, choose More info, then Run anyway. The installer is unsigned.', '執行。SmartScreen 警告時揀「更多資訊」再「仍要執行」，安裝程式冇簽名。')), h('li', pair('Install Tailscale too if you have not. The app finds it automatically.', '如果未裝 Tailscale 都要裝，程式會自動搵到。')))),
     h('div.card.tonal', h('h3', pair('Build it yourself', '自己建置')), h('div.cmdline', '.\\build.bat --run'))),
   status: () => h('div.page', h('h1', pair('Status', '狀態')), h('div.tbl-wrap', h('table.tbl', h('tbody',
     h('tr', h('td', pair('Latest release', '最新版本')), h('td', REL ? `🟢 ${REL.tag}` : '⚪ ' + pair('none yet', '未有'))),

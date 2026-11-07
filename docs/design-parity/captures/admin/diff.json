@@ -1,0 +1,34 @@
+{
+  "id": "admin",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "9430c51d8e2724beb9534bd8adc12c4ae3c206f84bb8b012abef700345bb9e3d",
+  "captureSha256": {
+    "reference": "6613df8b0eb041657311e034ac0362585f1bad81b108ea901a6f2edfbc16d44b",
+    "app": "d5b0a3e14e6991db1787a4562884b51b6232c80c2b22670dfcc1a2eb44b7747a"
+  },
+  "changedPixels": 149163,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1079,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/admin/diff.webp"
+}

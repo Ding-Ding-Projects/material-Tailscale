@@ -39,6 +39,7 @@ One article per feature. The app bundles all of them into its offline docs brows
 - [Motion and reduced motion](features/appearance/motion.md)
 - [Live charts](features/appearance/live-charts.md)
 - [Per-element appearance editor](features/appearance/appearance-editor.md)
+- [Design reference and parity](features/appearance/design-reference.md)
 - [Infinite colour picker](features/appearance/color-picker.md)
 - [Logo presets and upload](features/appearance/logo.md)
 - [Accessibility tools](features/appearance/accessibility.md)

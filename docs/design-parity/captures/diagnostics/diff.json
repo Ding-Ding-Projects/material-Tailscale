@@ -1,0 +1,34 @@
+{
+  "id": "diagnostics",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "541ba51d068b283f1fccf994d678227ee7193297fe643cf0fc1e35603a286d80",
+  "captureSha256": {
+    "reference": "ba06e8327a22b977c801b8f3482c71bf7ff34aaa70253ce6eba6d285e351ee61",
+    "app": "380c15710715060cc65201269008449a4ebd72cfc086d68afe688047a2babfea"
+  },
+  "changedPixels": 120627,
+  "totalPixels": 1382400,
+  "changedRatio": 0.0873,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/diagnostics/diff.webp"
+}
