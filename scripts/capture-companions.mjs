@@ -3,6 +3,8 @@
 // home and Features pages, in dark and light. Needs a display (xvfb-run on Linux).
 //   NODE_PATH=$(npm root -g) xvfb-run -a node scripts/capture-companions.mjs <output folder>
 import fs from 'node:fs';
+import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -29,4 +31,9 @@ for (const theme of ['dark', 'light']) {
     await app.close();
   }
 }
+// Provenance: the commit, whether the tree was clean, and each file's hash and tuple.
+const git = (...a) => execFileSync('git', a, { cwd: root, encoding: 'utf8' }).trim();
+const manifest = { tool: 'scripts/capture-companions.mjs', commit: git('rev-parse', 'HEAD'), dirtyTree: git('status', '--porcelain') !== '', capturedAt: new Date().toISOString(), viewport: { width: 1180, height: 820, scale: 1 },
+  captures: shots.map((f) => ({ file: f, theme: f.split('-')[0], sha256: crypto.createHash('sha256').update(fs.readFileSync(path.join(out, f))).digest('hex') })) };
+fs.writeFileSync(path.join(out, 'companion-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
 console.log(`${shots.length} companion captures in ${out}: ${shots.join(', ')}`);

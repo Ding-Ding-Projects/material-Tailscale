@@ -17,6 +17,11 @@
 - **Base64 beside your files**: drop a file to write `report.pdf.base64.txt` next to it, drop that text to get `report.pdf` back, never overwriting, with every variant, strict error offsets, `data:` URLs, safe previews and a history with undo, all verified by a SHA-256 round trip ([how it works](docs/features/tools/base64.md)).
 - **Extensions in any language** add actions to every device and checks to Diagnostics. Each one waits for your permission, sees only what you allow (never keys or tokens), and is stopped after five seconds; four built-in extensions come with the app ([how to write one](docs/features/extensions/writing-extensions.md)).
 
+- **Ollama, all of it**: install, start and stop Ollama; browse every model and tag in the official catalogue with a fit verdict for this computer (and the numbers behind it); download through a cart that has no money in it; chat, create, copy and launch tools against a local model ([article](docs/features/tools/ollama.md)).
+- **Virtual disks on Windows**: create, attach, grow, shrink, compact, convert and merge VHD and VHDX files, attach ISOs, and **Quick pack** dropped files into a new, automatically sized VHDX, checked file by file and never overwriting ([article](docs/features/tools/virtual-disks.md)).
+- **Regex debugger** that steps through every attempt, match and backtrack ([article](docs/features/tools/regex-debugger.md)), and a **Features page** with the honest state of every feature ([inventory](docs/completeness.md)).
+- **Portable companions** in every release: a build window that carries its own source, and the whole website working offline ([article](docs/features/release/companions.md)).
+
 The installer is **unsigned**. Windows SmartScreen may warn about an unknown publisher; choose *More info* then *Run anyway*. Material Tailscale is independent and not affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.
 
 ## Contents
@@ -34,10 +39,13 @@ Captured from the built app by `npm run screenshots` (Electron, both themes). Ta
 | ![Exit nodes, light](docs/screenshots/light-exit.png) | ![Command palette, light](docs/screenshots/light-palette.png) |
 | ![Extensions manager, dark](docs/screenshots/dark-extensions.png) | ![Allowing an extension, dark](docs/screenshots/dark-extensions-overlayext-consent.png) |
 | ![Base64 files converted beside their source, dark](docs/screenshots/dark-base64-overlayb64-demo.png) | ![Base64 toolkit, light](docs/screenshots/light-base64-overlayb64-demo.png) |
+| ![Ollama store with every tag and its fit verdict, dark](docs/screenshots/dark-ollama-store.png) | ![Ollama chat, light](docs/screenshots/light-ollama-chat.png) |
+| ![Virtual disks: create a disk, dark](docs/screenshots/dark-vdisks-create.png) | ![Regex debugger stepping through a backtracking pattern, dark](docs/screenshots/dark-regex-debug.png) |
+| ![Features page, dark](docs/screenshots/dark-features.png) | ![Portable build companion, dark](docs/screenshots/dark-companion-build.png) |
 
 All captures: [docs/screenshots](docs/screenshots).
 
-Design parity: every screen is designed on a design canvas and compared with the real app ([how it works](docs/features/appearance/design-reference.md)).
+Design parity: every screen is designed on a design canvas (two canvases: *Midnight Mesh 2* and *Everything added*) and compared with the real app ([how it works](docs/features/appearance/design-reference.md)).
 
 ![Design reference beside the real app for the Tools page](docs/design-parity/captures/tools/side-by-side.webp)
 

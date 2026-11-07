@@ -41,6 +41,9 @@
 - [x] File converter for data, images and encodings; other categories listed with the missing tool
 - [x] Drawing board with seven pens, eraser, SVG and PNG export, screenshot annotation
 - [x] Ollama model list and pull
+- [x] Full Ollama suite: models, every-tag store with fit verdicts, download cart, chat, create, harnesses with rollback, offline help (pulling and chatting against a running Ollama not tried on the build machine, which has none)
+- [x] Regex debugger with every backtracking step, checked against the browser engine on 32 patterns
+- [ ] Virtual disk manager: built for create, attach, detach, grow, shrink, compact, convert, differencing, merge, ISO and Quick pack, proven per release on a Windows runner; VHD Set creation and checkpoints, metadata, mirroring, change tracking and identity reset still to build
 - [x] Minecraft Java version discovery
 - [x] Bundled converters for documents, audio, video and archives
 - [x] One-click managed Ollama installer
@@ -57,9 +60,14 @@
 - [x] Postman collection of every admin API operation
 - [x] Wiki generator from docs (publishing blocked from the build machine, see HANDOFF)
 - [ ] Clipping matrix at 125/150/200% scale and every language mode
+- [x] Portable build companion (carries its commit's source) and offline website companion, both single unsigned .exe files in every release
+- [x] Wording lock in build.bat and a pre-push hook, with no rules or hash in the repository
+- [ ] Discussions enabled with a rolling progress thread (the build machine cannot change repository settings; progress is on issue #1)
 
 ## Midnight Mesh 2
 
+- [x] Second design canvas "Everything added" (6 boards, 14 views) for Features, virtual disks, Ollama, the regex debugger and the companions, designed before they were built
+- [x] Features page in the app and on the website, drawn from a hand-written inventory with honest states and a completeness test
 - [x] Design canvas boards for every screen family, overlay, the extensions manager and the website (16 boards, 51 views, plus the sweep report board)
 - [x] Page hero bands with animated illustrations, two-pane Settings, in-page tabs, setup state with steps
 - [x] Context menus carry live controls (switch, choice, slider, swatch) with keyboard support

@@ -75,6 +75,14 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - Base64 toolkit, brought to the full shared contract after a new rule asked for same-folder drop conversion: `src/shared/base64.js` (streaming encoder and decoder, strict errors with exact offsets, `data:` URLs, bounded type detection, naming, incremental SHA-256), `src/shared/zip-store.js` (stored ZIP for the website), `src/main/base64-files.js` (conversions beside the source through a hidden partial file that takes its final name by an exclusive link or copy, never overwriting; pause, resume, cancel; SHA-256 round trip), and the page `src/renderer/pages/base64.js` with `ui/base64-jobs.js`, `ui/base64-history.js` and `ui/base64-preview.js`. `test/base64.test.mjs` (18 tests) runs real conversions on disk, including a 96 MB file with live memory under 16 MB; the padding guard was watched failing when padding was dropped on encode and when the missing-padding check was removed. Captures and the sweep open a state with real sample conversions (`base64>overlay@b64-demo`).
 - Design canvas: an Extensions board (manager and permission review), the add-on tile on Tools, extension checks on Diagnostics, and the sweep report board with before and after scores; stylesheets uploaded again.
 
+## Everything added (2026-11-07)
+
+- Designed first on a second canvas, *Material Tailscale · Everything added* (`design/additions/`, 6 boards, 14 views), then built: the Features page (app and website), the Ollama suite (`src/main/ollama.js`, `src/main/ollama-harness.js`, `src/renderer/pages/ollama/`), virtual disks (`src/main/vdisk.js`, `src/main/vdisk/vdisk.ps1`, `src/renderer/pages/vdisks.js`), the regex debugger (`src/shared/regex-debug.js`, `src/renderer/ui/regex-debugger.js`), the portable companions (`companions/`, `scripts/build-companions.mjs`) and the wording lock (`scripts/check-vocabulary.mjs`, `.githooks/pre-push`).
+- Tests added: `test/regex-debug.test.mjs` (32 patterns against the browser engine), `test/ollama.test.mjs` (allowlist, catalogue completeness, fit, cart, harness rollback), `test/vdisk.test.mjs` (request rules, Quick pack naming, never-overwrite and elevation), `test/vocabulary-lock.test.mjs`. Each guard was broken on purpose once and turned red.
+- The real Ollama catalogue was read through the app's reader on 2026-11-07: 270 models, 7,661 tags, all 271 pages.
+- Both companions were built into unsigned portable .exe files on Linux (134 MB and 110 MB) and photographed from the same files; the release builds them on Windows and checks NotSigned.
+- The release adds a `vdisk-proof` job that runs every disk operation on a clean Windows runner and appends the results to the notes.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.
@@ -83,14 +91,18 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - Narrator voices, camera QR scan and tray menu on Windows.
 - Extension actions in a populated device menu and extension checks against a running daemon: the capture machine has no Tailscale daemon, so the menus have no devices and the checks report that status is unavailable. The host, the built-ins and the samples are proven by the tests.
 - The title-bar overlay and Snap layouts on a person's own Windows desktop; the release's install-proof photographs come from a clean CI runner, whose edition may not offer Snap layouts.
+- Ollama pulling, chatting, creating and harness launches against a running Ollama: the build machine has none. The catalogue, fit, allowlist and rollback are proven by tests and by the real catalogue.
+- Virtual disk operations on Windows Home itself: the release proof runs on a Windows Server runner with the same DiskPart, Storage module and VirtDisk routes.
+- Running a build through the build companion and opening the offline website .exe on Windows.
 
 ## Remaining work
 
-See unchecked items in `ROADMAP.md`. The largest is the virtual disk manager added to the shared feature list on 2026-11-07: it creates, partitions, formats, resizes and merges disks and edits boot entries, so it needs a Windows computer to build and prove every operation on; it was not started in this Linux session rather than shipped unrun.
+See unchecked items in `ROADMAP.md`: VHD Set creation and checkpoints, VHDX metadata, mirroring, change tracking and identity reset for the virtual disk manager (VirtDisk-only on Windows Home); other engines in the regex benchmark and editor integration; Discussions (needs a repository settings change the build machine cannot make).
 
 ## Blockers
 
 - The build session could not inspect self-hosted runners (proxy refused the Actions API), so the workflow uses GitHub-hosted `windows-latest`.
 - Wiki publishing: the wiki repository could not be cloned with the session's credentials. Run `npm run wiki -- --push` from a machine with access after creating the wiki's first page on GitHub.
-- Live status registration for the build session was not possible: no ingest credential for the maintainer's status service was available to the session.
+- Live status registration for the build session was not possible: the maintainer's status service takes updates only over SSH from its own host, which a cloud session cannot reach.
+- Discussions: enabling them is a repository settings write, refused through the session's GitHub proxy (HTTP 403), and creating a discussion needs GraphQL, which is also unavailable there. Progress and handoff stay on issue #1; enabling Discussions is one switch in the repository's Settings.
 - A real Tailscale daemon was not run on the build machine; running a downloaded daemon needs the owner's permission.

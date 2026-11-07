@@ -291,11 +291,11 @@
 .msg .who { display: block; font: 600 12px var(--font-body); color: var(--on-2); margin-bottom: 4px; white-space: normal; }
 .composer { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
 .composer textarea { flex: 1 1 320px; min-height: 64px; }
-.rx-tokens { display: flex; flex-wrap: wrap; gap: 2px; font: 600 15px var(--font-mono); }
-.rx-tokens span { padding: 2px 4px; border-radius: 6px; }
+.rx-tokens { display: flex; flex-wrap: wrap; gap: 3px; font: 600 20px var(--font-mono); }
+.rx-tokens span { padding: 2px 6px; border-radius: 8px; }
 .rx-tokens span.now { background: var(--primary); color: var(--on-primary); }
 .rx-tokens span.done { background: color-mix(in oklab, var(--secondary) 28%, transparent); }
-.rx-subject { font: 15px/1.9 var(--font-mono); overflow-wrap: anywhere; }
+.rx-subject { font: 20px/1.9 var(--font-mono); overflow-wrap: anywhere; white-space: pre-wrap; }
 .rx-subject .m { background: color-mix(in oklab, var(--secondary) 30%, transparent); border-radius: 4px; }
 .rx-subject .cur { outline: 2px solid var(--primary); outline-offset: 1px; border-radius: 3px; }
 .rx-step-ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

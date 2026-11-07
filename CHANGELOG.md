@@ -4,6 +4,14 @@ Every push to `main` publishes the next release. A section headed "Unreleased" i
 
 ## Unreleased: Midnight Mesh 2
 
+- Features page in the app and on the website: every feature in the shared list and every Tailscale feature, what it does, how to reach it and its honest state on the app, the website and the repository, with search, a regex builder and folding filters. `docs/completeness.md` is generated from the same inventory, and a test fails when a required feature goes missing or a claim has no evidence.
+- Ollama suite in six sections: Models (install, start and stop, this computer's memory, video memory and disk, details, load, unload, copy, delete), Store (every model and tag in the official catalogue, read in full, with an evidence-backed fit verdict per tag and a download cart with no money in it), Chat (saved conversations, system prompt, settings, stop, regenerate, export, images only for vision models), Create (guided Modelfile, copy), Harnesses (allowlisted launch with preview, snapshot and automatic rollback) and Help. Every request to Ollama goes through an allowlist of its documented local endpoints.
+- Virtual disks (Windows): create, attach, detach, grow, shrink, compact, convert and merge VHD and VHDX files, attach ISO images and VHD Sets, and Quick pack, which turns dropped files and folders into a new, automatically sized VHDX beside them, checks every file with SHA-256 and never overwrites. Each release runs every operation on a clean Windows runner and adds the results to its notes.
+- Regex debugger: step through every attempt, match, failure and backtrack, with a scrubber, a filterable step list and a warning when a pattern backtracks heavily; also in every regex builder as "Step through".
+- Two portable companions in every release, each a single unsigned .exe: a build window with Build, Build and run, and Build installer that carries the complete source of its commit, and the whole website working offline.
+- A wording lock in build.bat and a pre-push hook checks that the maintainer's current private wording rules are present, without storing the rules or their hash in this repository.
+- A second design canvas, "Everything added", designs each of these before it was built; design parity now covers both canvases and the companions.
+- The website hero shows the whole command window; the docs reader has an "On this page" outline.
 - Every screen redesigned on a design canvas, with the boards generated from the app's own stylesheets.
 - Page hero bands with animated illustrations, two-pane Settings, in-page tabs with a sliding indicator, a setup state with steps, live status dots.
 - Context menus show live switches, choices, sliders and swatches for values, and keep the menu open while you adjust them.

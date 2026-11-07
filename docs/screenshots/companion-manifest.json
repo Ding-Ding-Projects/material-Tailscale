@@ -1,0 +1,43 @@
+{
+  "tool": "scripts/capture-companions.mjs",
+  "commit": "dbc0b7ac577e8739a27f0edd28118a4785c4da50",
+  "dirtyTree": true,
+  "capturedAt": "2026-11-07T18:32:45.831Z",
+  "viewport": {
+    "width": 1180,
+    "height": 820,
+    "scale": 1
+  },
+  "captures": [
+    {
+      "file": "dark-companion-build.png",
+      "theme": "dark",
+      "sha256": "a5ea8b26244d7732da742813a72ea07dc57656b8a054824122c6c037a7f5cc9a"
+    },
+    {
+      "file": "dark-companion-site-home.png",
+      "theme": "dark",
+      "sha256": "abdecac393ed0c858b3692039f062ffb7e396a121a0c6876809210c528ddf668"
+    },
+    {
+      "file": "dark-companion-site-features.png",
+      "theme": "dark",
+      "sha256": "a19fa1daa0274a8a53cf4d45070d220cb1c1be8aaf9804bf8fd217b4efd15ba2"
+    },
+    {
+      "file": "light-companion-build.png",
+      "theme": "light",
+      "sha256": "4676561f4caa8ff54a072964dbdecc01f65557a6c6f877fb5d2f73ccf4bafbb0"
+    },
+    {
+      "file": "light-companion-site-home.png",
+      "theme": "light",
+      "sha256": "4aecb645e07f472e3668878e7ca99aa066502c06cdf258b54bed04148e5e6fec"
+    },
+    {
+      "file": "light-companion-site-features.png",
+      "theme": "light",
+      "sha256": "7ddd4ac786b7b9a1a2322372aa9b6d51878d2b40a162870be6a48cda42e37243"
+    }
+  ]
+}
