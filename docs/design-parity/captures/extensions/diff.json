@@ -1,0 +1,34 @@
+{
+  "id": "extensions",
+  "tuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "referenceTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "appTuple": {
+    "theme": "dark",
+    "width": 1440,
+    "height": 960,
+    "scale": 1,
+    "motion": "off"
+  },
+  "boardSha256": "54d10b9845e4522deeac530eae2a1e79f2408aba225ed15a21050dd45e68a869",
+  "captureSha256": {
+    "reference": "8a9917062afe60fbb0996a3d32be6e30034d4e445733ece1f94e847eb034d180",
+    "app": "262afdb38e6697c1756acdace77ab4a44c9f3ba8b12dc13bf1546d4338a134e2"
+  },
+  "changedPixels": 173065,
+  "totalPixels": 1382400,
+  "changedRatio": 0.1252,
+  "threshold": "any channel delta above 40 of 255",
+  "heatmap": "docs/design-parity/captures/extensions/diff.webp"
+}
