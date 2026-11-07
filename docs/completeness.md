@@ -1,6 +1,6 @@
 # Completeness inventory
 
-Generated from `src/shared/feature-inventory.js` by `npm run gen:completeness`; edit the inventory, not this file. The Features page in the app and on the website shows the same rows with search and filters. A state of "built, proof pending" means the check it needs cannot run on the build machine; the note says which.
+Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`; edit the inventory, not this file. The Features page in the app and on the website shows the same rows with search and filters. A state of "built, proof pending" means the check it needs cannot run on the build machine; the note says which.
 
 ## Tailscale
 
@@ -67,7 +67,7 @@ Generated from `src/shared/feature-inventory.js` by `npm run gen:completeness`; 
 | Search inside files | finished | n/a | n/a | `src/renderer/ui/regex.js`, `src/main/tools.js`, [article](features/navigation/regex-builder.md) | The website cannot read your folders. |
 | First-run setup | finished | n/a | n/a | `src/renderer/ui/onboarding.js`, [article](features/navigation/onboarding.md) | The website has nothing to set up. |
 | Progress and recovery where work happens | finished | partly built | n/a | `src/renderer/ui/jobs.js`, `src/renderer/ui/command-form.js`, [article](features/tools/minecraft.md) | The website runs only Base64 jobs, which show progress; it has no failures to hand on. |
-| This features page | finished | finished | n/a | `src/renderer/pages/features.js`, `src/shared/feature-inventory.js`, [article](features/records/features-page.md), [screenshot](screenshots/dark-features.png) |  |
+| This features page | finished | finished | n/a | `src/renderer/pages/features.js`, `src/shared/feature-inventory.mjs`, [article](features/records/features-page.md), [screenshot](screenshots/dark-features.png) |  |
 | Presets for blank editors | finished | finished | n/a | `src/renderer/ui/logo.js`, `src/renderer/ui/appearance.js` |  |
 
 ## Safety and locks

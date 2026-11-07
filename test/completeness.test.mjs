@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { validate, render } from '../scripts/lib/completeness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const inv = await import(pathToFileURL(path.join(root, 'src/shared/feature-inventory.js')).href);
+const inv = await import(pathToFileURL(path.join(root, 'src/shared/feature-inventory.mjs')).href);
 
 // Hand-written on purpose: every feature of the shared list and of Tailscale that this project
 // owes. A rule cannot notice a feature that was never listed, so this list is the check.

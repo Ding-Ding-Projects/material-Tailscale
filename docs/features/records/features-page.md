@@ -20,7 +20,7 @@ many are active, and are remembered on this device.
 
 ## Configuration
 
-None. The rows come from `src/shared/feature-inventory.js`, and `docs/completeness.md` is
+None. The rows come from `src/shared/feature-inventory.mjs`, and `docs/completeness.md` is
 generated from the same file (`npm run gen:completeness`).
 
 ## Failure modes

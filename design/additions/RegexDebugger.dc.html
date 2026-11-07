@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Regex debugger: every backtracking step</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="/_blob/c9a4378267537fcf0cbc749a7df4a299">
+<link rel="stylesheet" href="/_blob/1c3df1672eba2701580821436e464f46">
+<link rel="stylesheet" href="/_blob/54f263dbb5565db5bc24b022a6a28944">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block">
+<style>
+html,body{margin:0;height:auto;overflow:auto;background:#0b0f1a}
+a{color:#a9b8ff}a:hover{color:#dfe4ff}
+</style>
+</helmet>
+<div class="mm2-board theme-{{theme}}" data-board="RegexDebugger.dc.html">
+<div class="titlebar"><span class="brand"><span class="msr" aria-hidden="true">blur_on</span>Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger"><span class="msr" aria-hidden="true">search</span>Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button><button type="button" class="icon-btn" aria-label="Notifications"><span class="msr" aria-hidden="true">notifications</span></button><button type="button" class="icon-btn" aria-label="Accessibility tools"><span class="msr" aria-hidden="true">accessibility_new</span></button><button type="button" class="win-btn" aria-label="Minimise"><span class="msr" aria-hidden="true">remove</span></button><button type="button" class="win-btn" aria-label="Maximise"><span class="msr" aria-hidden="true">crop_square</span></button><button type="button" class="win-btn close" aria-label="Close"><span class="msr" aria-hidden="true">close</span></button></div>
+<div class="body">
+<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr" aria-hidden="true">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>
+<div class="main">
+<nav class="tabbar" aria-label="Tabs"><div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="1"><div class="{{t.cls}}" role="presentation" onClick="{{t.pick}}"><div class="tab-btn" role="tab" aria-selected="{{t.sel}}" tabindex="{{t.ti}}"><span class="msr" aria-hidden="true">{{t.icon}}</span><span class="label">{{t.label}}</span></div></div></sc-for></div><button type="button" class="tab-new" aria-label="New tab"><span class="msr" aria-hidden="true">add</span></button></nav>
+<main class="outlet">
+<sc-if value="{{v.regex_debug}}" hint-placeholder-val="{{ true }}"><div class="page"><section class="hero-band"><div class="hero-text"><span class="hero-eyebrow"><span class="msr" aria-hidden="true">bug_report</span>Patterns</span><h1>Regex debugger<span class="yue">正則除錯</span></h1><p>Watch the engine work through a pattern one step at a time: every attempt, every match and every backtrack.</p><div class="hero-stats"><div class="stat"><b>136</b><span>steps</span></div><div class="stat warn"><b>30</b><span>backtracks</span></div><div class="stat"><b>no match</b><span>result</span></div></div></div><div class="hero-art"><svg viewBox="0 0 340 190" aria-hidden="true" focusable="false">
+    <g class="spin" style="transform-origin: 96px 96px"><circle class="g" cx="96" cy="96" r="40" stroke-dasharray="14 10"/></g>
+    <circle class="n" cx="96" cy="96" r="22"/>
+    <g class="float"><rect class="n alt" x="170" y="36" width="58" height="58" rx="16"/></g>
+    <g class="float d2"><rect class="n warm" x="240" y="62" width="58" height="58" rx="16"/></g>
+    <g class="float d3"><rect class="n" x="190" y="112" width="58" height="58" rx="16"/></g>
+    <path class="g" d="M190 64 h18 M198 56 v16 M260 92 h18 M210 141 l18 0" /></svg></div></section><div class="grid"><section class="card span-5"><div class="card-head"><span class="ic"><span class="msr" aria-hidden="true">edit</span></span><h3>Pattern and text</h3></div><div class="stack"><div class="input-wrap" style="width: 100%"><span class="msr" aria-hidden="true">regular_expression</span><input aria-label="Pattern" value="^(a+)+b"></div><div class="input-wrap" style="width: 100%"><span class="msr" aria-hidden="true">text_fields</span><input aria-label="Text to test" value="aaaac"></div><div class="flag-card"><b><span class="msr" aria-hidden="true">warning</span> This pattern backtracks a lot</b><div class="small">A group repeated inside a repeat, with nothing to stop it, tries every way to split the text before it gives up: 136 steps here, and 131,100 with ten more "a"s. <code>^a+b</code> gives the same answer in 31 steps.</div></div></div></section><section class="card span-7"><div class="card-head"><span class="ic alt"><span class="msr" aria-hidden="true">bug_report</span></span><h3>Step 14 of 136</h3></div><div class="stack"><div class="rx-step-ctl"><button type="button" class="icon-btn" aria-label="First step"><span class="msr" aria-hidden="true">first_page</span></button><button type="button" class="icon-btn" aria-label="Previous step"><span class="msr" aria-hidden="true">chevron_left</span></button><button type="button" class="icon-btn" aria-label="Play"><span class="msr" aria-hidden="true">play_arrow</span></button><button type="button" class="icon-btn" aria-label="Next step"><span class="msr" aria-hidden="true">chevron_right</span></button><button type="button" class="icon-btn" aria-label="Last step"><span class="msr" aria-hidden="true">last_page</span></button><input class="slider" type="range" min="1" max="136" value="14" aria-label="Step"></div><b class="small muted">Pattern</b><div class="rx-tokens" aria-label="Pattern, current token highlighted"><span class="">^</span><span class="">(</span><span class="">a</span><span class="now">+</span><span class="">)</span><span class="">+</span><span class="">b</span></div><b class="small muted">Text</b><div class="rx-subject" aria-label="Text, current position outlined"><span class="m">aaaa</span><span class="cur">c</span></div><div class="small"><b>Backtrack:</b> give back: continue with 4, at position 4.</div></div></section><section class="card span-12"><div class="card-head"><span class="ic"><span class="msr" aria-hidden="true">format_list_numbered</span></span><h3>Every step</h3><div class="seg" role="radiogroup" aria-label="Show"><button type="button" role="radio" aria-checked="true">All</button><button type="button" role="radio" aria-checked="false">Backtracks</button><button type="button" role="radio" aria-checked="false">Matches</button></div></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>Pattern</th><th>Text</th><th>What happened</th></tr></thead><tbody><tr><td>10</td><td><code>+</code></td><td>3</td><td>repeat: try number 4</td></tr><tr><td>11</td><td><code>a</code></td><td>3</td><td><span class="badge ok">match "a"</span></td></tr><tr><td>12</td><td><code>+</code></td><td>4</td><td>repeat: try number 5</td></tr><tr><td>13</td><td><code>a</code></td><td>4</td><td><span class="badge err">no "a" here</span></td></tr><tr><td>14</td><td><code>+</code></td><td>4</td><td><span class="badge warn">give back: continue with 4</span></td></tr><tr><td>15</td><td><code>+</code></td><td>4</td><td>repeat: try number 2</td></tr><tr><td>16</td><td><code>+</code></td><td>4</td><td>repeat: try number 1</td></tr></tbody></table></div></section></div></div></sc-if>
+</main>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["dark","light"],"default":"dark"},"view":{"editor":"enum","options":["regex-debug"],"default":"regex-debug"},"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: "regex-debug" }; }
+  renderVals() {
+    const VIEWS = [{"id":"regex-debug","key":"regex_debug","icon":"bug_report","label":"Regex debugger","dest":"tools"}];
+    const RAIL = [{"id":"home","icon":"home","label":"Home","sep":false},{"id":"peers","icon":"hub","label":"Peers","sep":false},{"id":"exit","icon":"travel_explore","label":"Exit nodes","sep":false},{"id":"routes","icon":"alt_route","label":"Routes","sep":false},{"id":"serve","icon":"lan","label":"Serve","sep":false},{"id":"taildrop","icon":"move_to_inbox","label":"Taildrop","sep":false},{"id":"dns","icon":"dns","label":"DNS","sep":false},{"id":"lock","icon":"enhanced_encryption","label":"Lock","sep":false},{"id":"drive","icon":"folder_shared","label":"Taildrive","sep":false},{"id":"accounts","icon":"group","label":"Accounts","sep":false},{"id":"diagnostics","icon":"monitor_heart","label":"Diagnostics","sep":false},{"id":"cli","icon":"terminal","label":"Commands","sep":true},{"id":"admin","icon":"admin_panel_settings","label":"Admin","sep":false},{"id":"tools","icon":"construction","label":"Tools","sep":true},{"id":"docs","icon":"menu_book","label":"Docs","sep":false},{"id":"settings","icon":"settings","label":"Settings","sep":true}];
+    const view = this.props.view && VIEWS.some((x) => x.id === this.props.view) && !this.state.picked ? this.props.view : this.state.view;
+    const cur = VIEWS.find((x) => x.id === view) || VIEWS[0];
+    const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
+    return {
+      theme: this.props.theme === 'light' ? 'light' : 'dark',
+      brand: cur.label,
+      v,
+      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', cls: x.id === cur.id ? 'tab sel' : 'tab', ti: x.id === cur.id ? '0' : '-1', pick: () => this.setState({ view: x.id, picked: true }) })),
+      rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

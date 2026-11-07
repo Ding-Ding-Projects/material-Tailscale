@@ -13,7 +13,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..', '..');
-const canvasDir = path.join(root, 'design', 'canvas');
+const canvasDir = path.resolve(root, (() => { const i = process.argv.indexOf('--canvas'); return i > 0 ? process.argv[i + 1] : path.join('design', 'canvas'); })());
 const arg = (name, def) => { const i = process.argv.indexOf(`--${name}`); return i > 0 ? process.argv[i + 1] : def; };
 const tuple = { board: arg('board', 'Main.dc.html'), view: arg('view', ''), theme: arg('theme', 'dark'), width: Number(arg('width', 1440)), height: Number(arg('height', 960)), scale: Number(arg('scale', 1)) };
 const capture = arg('capture', '');

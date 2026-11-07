@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { render } from './lib/completeness.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const inv = await import(pathToFileURL(path.join(root, 'src/shared/feature-inventory.js')).href);
+const inv = await import(pathToFileURL(path.join(root, 'src/shared/feature-inventory.mjs')).href);
 const file = path.join(root, 'docs/completeness.md');
 const text = render(inv);
 if (process.argv.includes('--check')) {

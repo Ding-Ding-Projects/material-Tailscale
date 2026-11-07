@@ -64,6 +64,7 @@ class Component extends DCLogic {
     const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
     return {
       theme: this.props.theme === 'light' ? 'light' : 'dark',
+      brand: cur.label,
       v,
       tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', cls: x.id === cur.id ? 'tab sel' : 'tab', ti: x.id === cur.id ? '0' : '-1', pick: () => this.setState({ view: x.id, picked: true }) })),
       rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))

@@ -1,4 +1,4 @@
-// Checks the feature inventory (src/shared/feature-inventory.js) against the repository and a
+// Checks the feature inventory (src/shared/feature-inventory.mjs) against the repository and a
 // hand-written list of features that must be present, and renders docs/completeness.md from it.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -32,7 +32,7 @@ const mark = { done: 'finished', built: 'built, proof pending', partial: 'partly
 
 /** docs/completeness.md, generated: one table per category, every surface, evidence and notes. */
 export function render({ FEATURES, CATEGORIES }) {
-  const out = ['# Completeness inventory', '', 'Generated from `src/shared/feature-inventory.js` by `npm run gen:completeness`; edit the inventory, not this file. The Features page in the app and on the website shows the same rows with search and filters. A state of "built, proof pending" means the check it needs cannot run on the build machine; the note says which.', ''];
+  const out = ['# Completeness inventory', '', 'Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`; edit the inventory, not this file. The Features page in the app and on the website shows the same rows with search and filters. A state of "built, proof pending" means the check it needs cannot run on the build machine; the note says which.', ''];
   for (const [k, c] of Object.entries(CATEGORIES)) {
     const rows = FEATURES.filter((x) => x.category === k);
     if (!rows.length) continue;

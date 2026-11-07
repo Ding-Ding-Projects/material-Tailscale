@@ -78,6 +78,26 @@ const ART = {
     <g class="float"><path class="n alt" d="M62 112 h18 a8 8 0 1 1 16 0 h18 v18 a8 8 0 1 1 0 16 v18 h-52 Z"/></g>
     <g class="float d2"><path class="n warm" d="M228 112 h52 v52 h-18 a8 8 0 1 0 -16 0 h-18 v-18 a8 8 0 1 0 0 -16 Z"/></g>
     <g class="float d3"><path class="n" d="M146 20 h48 v14 a8 8 0 1 1 0 16 v14 h-48 v-14 a8 8 0 1 0 0 -16 Z"/></g>`),
+  disks: wrap(`
+    <g class="float"><path class="n" d="M58 54 v40 a58 17 0 0 0 116 0 v-40"/><ellipse class="n alt" cx="116" cy="54" rx="58" ry="17"/></g>
+    <g class="float d2"><path class="n" d="M170 96 v40 a58 17 0 0 0 116 0 v-40"/><ellipse class="n warm" cx="228" cy="96" rx="58" ry="17"/></g>
+    <path class="l" d="M174 80 L196 90"/>
+    <circle class="soft pulse" cx="116" cy="150" r="18"/><circle class="solid" cx="116" cy="150" r="8"/>
+    <path class="g" d="M78 150 h-26 M154 150 h26" opacity=".6"/>`),
+  models: wrap(`
+    <path class="l" d="M92 56 L170 96 L92 136 M170 96 L248 56 M170 96 L248 136"/>
+    <g class="float"><circle class="n" cx="92" cy="56" r="18"/></g>
+    <g class="float d2"><circle class="n alt" cx="92" cy="136" r="18"/></g>
+    <g class="float d3"><circle class="n warm" cx="248" cy="56" r="18"/></g>
+    <g class="float d2"><circle class="n" cx="248" cy="136" r="18"/></g>
+    <circle class="soft pulse" cx="170" cy="96" r="30"/><circle class="solid" cx="170" cy="96" r="14"/>`),
+  checklist: wrap(`
+    <g class="float"><rect class="n" x="100" y="26" width="136" height="142" rx="16"/></g>
+    <path class="l alt" d="M122 62 l8 8 l16 -16"/><path class="g" d="M160 62 h54"/>
+    <path class="l alt" d="M122 98 l8 8 l16 -16"/><path class="g" d="M160 98 h46"/>
+    <circle class="soft pulse" cx="134" cy="134" r="10"/><path class="g" d="M160 134 h40" opacity=".6"/>
+    <g class="float d2"><circle class="n warm" cx="262" cy="56" r="16"/></g>
+    <g class="float d3"><rect class="n alt" x="52" y="118" width="30" height="30" rx="9"/></g>`),
   library: wrap(`
     <g class="float d3"><rect class="n" x="96" y="40" width="150" height="120" rx="16" opacity=".6" transform="rotate(-8 170 100)"/></g>
     <g class="float d2"><rect class="n alt" x="96" y="40" width="150" height="120" rx="16" transform="rotate(4 170 100)"/></g>
@@ -94,7 +114,7 @@ const FAMILY = {
   lock: 'security', accounts: 'security',
   dns: 'dns', diagnostics: 'diagnostics',
   cli: 'command', console: 'command', admin: 'admin',
-  tools: 'tools', authenticator: 'security', base64: 'tools', converter: 'tools', regex: 'tools', draw: 'tools', ollama: 'tools',
+  tools: 'tools', authenticator: 'security', base64: 'tools', converter: 'tools', regex: 'tools', draw: 'tools', ollama: 'models', vdisks: 'disks', features: 'checklist',
   minecraft: 'minecraft', settings: 'settings', extensions: 'extensions',
   docs: 'library', changelog: 'library', history: 'library', about: 'library'
 };

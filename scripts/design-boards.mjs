@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { docFiles } from './lib/doc-articles.mjs';
+import { ADDITION_BOARDS, defineAdditions } from './lib/board-additions.mjs';
 
 const require = createRequire(import.meta.url);
 const { ART } = require('../src/shared/hero-art.js');
@@ -18,6 +19,11 @@ const assetFiles = JSON.parse(fs.readFileSync(path.join(dir, 'assets.json'), 'ut
 const assets = Object.keys(assetFiles).filter((u) => assetFiles[u].endsWith('.css'));
 /** The canvas URL of an uploaded snapshot file such as assets/shot-dark.webp. */
 const assetUrl = (file) => { const u = Object.keys(assetFiles).find((k) => assetFiles[k] === file); if (!u) throw new Error(`${file} is not uploaded to the canvas (design/canvas/assets.json)`); return u; };
+// The second canvas ("Everything added") lives in design/additions with its own uploads.
+const dir2 = path.join(root, 'design', 'additions');
+const assetFiles2 = fs.existsSync(path.join(dir2, 'assets.json')) ? JSON.parse(fs.readFileSync(path.join(dir2, 'assets.json'), 'utf8')).files : {};
+const assets2 = Object.keys(assetFiles2).filter((u) => assetFiles2[u].endsWith('.css'));
+const assetUrl2 = (file) => Object.keys(assetFiles2).find((k) => assetFiles2[k] === file) || '';
 const ARTICLES = docFiles(root).length; // the same count the app and the website show
 
 // ---------- tiny markup helpers (all output is static, escaped by hand) ----------
@@ -233,6 +239,9 @@ V['site-home'] = ['language', 'Website · home', 'home', hero('shot', 'language'
 V['site-docs'] = ['article', 'Website · docs', 'docs', V.docs[3]];
 V['site-download'] = ['download', 'Website · download', 'home', hero('library', 'download', 'Releases', 'Download', '下載', 'Unsigned Squirrel installer with automatic updates. Windows may warn about an unknown publisher.', btn('MaterialTailscaleSetup.exe', 'download', 'big'), stats([['v1.0.12', 'latest'], ['Unsigned', 'installer', 'warn']])) + grid(card('What you get', `<ol class="steps"><li>Run the installer; it needs no administrator rights.</li><li>The app opens on the welcome wizard.</li><li>Updates download in the background and ask before restarting.</li></ol>`, { span: 12, icon: 'install_desktop' }))];
 
+// ---------- the second canvas: everything added in the final pass ----------
+defineAdditions(V, { ms, btn, ibtn, chip, badge, sw, seg, field, search, stepper, ic, card, grid, row, stack, stats, table, out, pick, hero, mtabs, shotUrl: assetUrl2('assets/shot-dark.webp') });
+
 // ---------- boards ----------
 const BOARDS = [
   ['Main.dc.html', 'Home · tailnet overview', ['home', 'home-setup'], 1700],
@@ -259,10 +268,11 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;
 function board(file, title, views, height, links = assets) {
   const isSite = views[0].startsWith('site-');
   const isCompanion = views[0].startsWith('companion-');
-  const chrome = isSite
+  const chrome = isCompanion ? '' : isSite
     ? `<header class="site-header" style="display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--outline-soft)"><b style="font: 700 17px var(--font-display); flex: 1">Material Tailscale</b>${['Home', 'Docs', 'Download', 'Settings'].map((x) => `<a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">${x}</a>`).join('')}<button type="button" class="palette-trigger">${ms('search')}Search <kbd>Ctrl+Shift+F</kbd></button></header><p class="small muted" style="margin: 10px 22px 0">This website is the documentation and download page. It is not the app and cannot run Tailscale.</p>`
     : `<div class="titlebar"><span class="brand">${ms('blur_on')}Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger">${ms('search')}Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button>${ibtn('notifications', 'Notifications')}${ibtn('accessibility_new', 'Accessibility tools')}<button type="button" class="win-btn" aria-label="Minimise">${ms('remove')}</button><button type="button" class="win-btn" aria-label="Maximise">${ms('crop_square')}</button><button type="button" class="win-btn close" aria-label="Close">${ms('close')}</button></div>`;
-  const rail = isSite ? '' : `<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr" aria-hidden="true">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>`;
+  const companionChrome = `<div class="titlebar"><span class="brand">${ms('apps')}Material Tailscale · {{brand}}</span><span class="prov">v1.0.12 · portable · works offline</span><span class="grow"></span><button type="button" class="win-btn" aria-label="Minimise">${ms('remove')}</button><button type="button" class="win-btn" aria-label="Maximise">${ms('crop_square')}</button><button type="button" class="win-btn close" aria-label="Close">${ms('close')}</button></div>`;
+  const rail = isSite || isCompanion ? '' : `<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr" aria-hidden="true">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>`;
   const tabs = `<nav class="tabbar" aria-label="Tabs"><div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="${views.length}"><div class="{{t.cls}}" role="presentation" onClick="{{t.pick}}"><div class="tab-btn" role="tab" aria-selected="{{t.sel}}" tabindex="{{t.ti}}"><span class="msr" aria-hidden="true">{{t.icon}}</span><span class="label">{{t.label}}</span></div></div></sc-for></div><button type="button" class="tab-new" aria-label="New tab">${ms('add')}</button></nav>`;
   const bodies = views.map((v, i) => `<sc-if value="{{v.${v.replace(/-/g, '_')}}}" hint-placeholder-val="{{ ${i === 0} }}"><div class="page">${V[v][3]}</div></sc-if>`).join('\n');
   const meta = views.map((v) => ({ id: v, key: v.replace(/-/g, '_'), icon: V[v][0], label: V[v][1].replace(/&amp;/g, '&'), dest: V[v][2] }));
@@ -276,6 +286,7 @@ function board(file, title, views, height, links = assets) {
     const v = {}; for (const x of VIEWS) v[x.key] = x.id === cur.id;
     return {
       theme: this.props.theme === 'light' ? 'light' : 'dark',
+      brand: cur.label,
       v,
       tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', cls: x.id === cur.id ? 'tab sel' : 'tab', ti: x.id === cur.id ? '0' : '-1', pick: () => this.setState({ view: x.id, picked: true }) })),
       rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
@@ -301,7 +312,7 @@ a{color:#a9b8ff}a:hover{color:#dfe4ff}
 </style>
 </helmet>
 <div class="mm2-board theme-{{theme}}" data-board="${file}">
-${chrome}
+${isCompanion ? companionChrome : chrome}
 <div class="body">
 ${rail}
 <div class="main">
@@ -398,6 +409,26 @@ for (const [file, title, make, height] of REPORTS) {
   layout[file] = { x, y, w: 1440, h: height, title, expand: 'fill', is_interactive: true };
   order.push(file); x += 1520; rowH = Math.max(rowH, height);
 }
+// The second canvas, laid out two boards to a row.
+const layout2 = {}; const order2 = [];
+x = 0; y = 0; rowH = 0;
+ADDITION_BOARDS.forEach(([file, title, views, height], i) => {
+  const html = board(file, title, views, height, assets2);
+  const target = path.join(dir2, file);
+  if (check) { if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== html) { console.error(`Board out of date: additions/${file}`); drift++; } }
+  else { fs.mkdirSync(dir2, { recursive: true }); fs.writeFileSync(target, html); }
+  if (i && i % 2 === 0) { x = 0; y += rowH + 120; rowH = 0; }
+  layout2[file] = { x, y, w: 1440, h: height, title, expand: 'fill', is_interactive: true };
+  order2.push(file); x += 1520; rowH = Math.max(rowH, height);
+});
+const canvas2Path = path.join(dir2, 'canvas.json');
+const canvas2 = fs.existsSync(canvas2Path) ? JSON.parse(fs.readFileSync(canvas2Path, 'utf8')) : { v: 3, createdOnFiles: { v: 1, at: '2026-11-07T17:25:00Z' }, title: 'Material Tailscale · Everything added', launch: { view: 'canvas' }, pages: [], designSystems: [] };
+canvas2.boards = layout2; canvas2.order = order2;
+canvas2.notes = { n1: { x: 0, y: -300, text: 'Material Tailscale · Everything added', kind: 'title1', maxW: 2960 } };
+const canvas2Text = JSON.stringify(canvas2, null, 2) + '\n';
+if (check) { if (!fs.existsSync(canvas2Path) || fs.readFileSync(canvas2Path, 'utf8') !== canvas2Text) { console.error('additions/canvas.json out of date'); drift++; } }
+else fs.writeFileSync(canvas2Path, canvas2Text);
+
 const canvasPath = path.join(dir, 'canvas.json');
 const canvas = JSON.parse(fs.readFileSync(canvasPath, 'utf8'));
 canvas.boards = layout; canvas.order = order;
@@ -405,4 +436,4 @@ canvas.notes = { n1: { x: 0, y: -300, text: 'Material Tailscale · Midnight Mesh
 const canvasText = JSON.stringify(canvas, null, 2) + '\n';
 if (check) { if (fs.readFileSync(canvasPath, 'utf8') !== canvasText) { console.error('canvas.json out of date'); drift++; } process.exit(drift ? 1 : 0); }
 fs.writeFileSync(canvasPath, canvasText);
-console.log(`${BOARDS.length} boards, ${BOARDS.reduce((n, b) => n + b[2].length, 0)} views and ${REPORTS.length} report board(s) written to ${path.relative(root, dir)}`);
+console.log(`${BOARDS.length} boards, ${BOARDS.reduce((n, b) => n + b[2].length, 0)} views and ${REPORTS.length} report board(s) written to ${path.relative(root, dir)}; ${ADDITION_BOARDS.length} boards and ${ADDITION_BOARDS.reduce((n, b) => n + b[2].length, 0)} views to ${path.relative(root, dir2)}`);

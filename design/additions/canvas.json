@@ -1,0 +1,86 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-07T17:25:00Z"
+  },
+  "title": "Material Tailscale · Everything added",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "designSystems": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1900,
+      "title": "Features · every feature and its true state",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "SiteFeatures.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1700,
+      "title": "Website · Features",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "VirtualDisks.dc.html": {
+      "x": 0,
+      "y": 2020,
+      "w": 1440,
+      "h": 1500,
+      "title": "Virtual disks: library, create, Quick pack",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Ollama.dc.html": {
+      "x": 1520,
+      "y": 2020,
+      "w": 1440,
+      "h": 1500,
+      "title": "Ollama: models, store, chat, create, harnesses",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RegexDebugger.dc.html": {
+      "x": 0,
+      "y": 3640,
+      "w": 1440,
+      "h": 1500,
+      "title": "Regex debugger: every backtracking step",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Companions.dc.html": {
+      "x": 1520,
+      "y": 3640,
+      "w": 1440,
+      "h": 1100,
+      "title": "Portable companions: build and offline website",
+      "expand": "fill",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "SiteFeatures.dc.html",
+    "VirtualDisks.dc.html",
+    "Ollama.dc.html",
+    "RegexDebugger.dc.html",
+    "Companions.dc.html"
+  ],
+  "notes": {
+    "n1": {
+      "x": 0,
+      "y": -300,
+      "text": "Material Tailscale · Everything added",
+      "kind": "title1",
+      "maxW": 2960
+    }
+  }
+}

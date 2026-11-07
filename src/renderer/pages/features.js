@@ -1,6 +1,6 @@
 // Features: every feature in the shared list and every Tailscale feature, with what it does for
 // you, how to reach it, and its true state on the app, the website and the repository. The
-// rows come from src/shared/feature-inventory.js; nothing is shown finished that is not.
+// rows come from src/shared/feature-inventory.mjs; nothing is shown finished that is not.
 import { h, icon, clear } from '../core/dom.js';
 import { pageHero, heroStats } from '../ui/hero.js';
 import { pair } from '../core/i18n.js';
@@ -8,7 +8,7 @@ import * as store from '../core/store.js';
 import { registerPage, openDest } from '../ui/shell.js';
 import { collapsible } from '../ui/overlay.js';
 import { regexField } from '../ui/regex.js';
-import { FEATURES, STATES, SURFACES, CATEGORIES, tally } from '../../shared/feature-inventory.js';
+import { FEATURES, STATES, SURFACES, CATEGORIES, tally } from '../../shared/feature-inventory.mjs';
 
 const L = (o) => pair(o.en, o.yue);
 const P = (a) => pair(a[0], a[1]);
@@ -18,7 +18,7 @@ const haystack = (x) => [x.title, x.benefit, x.how, x.note || ['', '']].flat().c
 registerPage('features', () => {
   const onSite = !!window.mt?.site;
   const saved = store.get('featureFilters') || {};
-  const f = { surface: saved.surface || (onSite ? 'site' : 'app'), states: new Set(saved.states || []), groups: new Set(saved.groups || []) };
+  const f = { surface: saved.surface || 'app', states: new Set(saved.states || []), groups: new Set(saved.groups || []) };
   const keep = () => store.set('featureFilters', { surface: f.surface, states: [...f.states], groups: [...f.groups] }, { record: false });
 
   const search = regexField({ id: 'features', placeholder: pair('Search what features do and how to reach them', '搜尋功能做乜同點去'), onChange: () => draw() });
