@@ -2,14 +2,30 @@ import { h, icon, clear } from '../core/dom.js';
 import * as store from '../core/store.js';
 import { t, tl, emoji, pair } from '../core/i18n.js';
 import { sound } from '../core/feedback.js';
+import { liveOption } from './live-options.js';
 
 // ---------------- toasts + notification centre ----------------
 let toastHost;
+// At most three toasts stay on screen, and fewer when a short window cannot hold them; older
+// ones leave (they stay in the notification centre), so a pile of errors never stacks past
+// the top of the window where it could take focus unseen.
+const MAX_TOASTS = 3;
+const dismissers = new WeakMap();
+function trimToasts() {
+  const shown = [...toastHost.children].filter((x) => !x.classList.contains('out'));
+  let height = shown.reduce((sum, x) => sum + x.offsetHeight + 10, 0);
+  for (let i = 0; i < shown.length - 1 && (shown.length - i > MAX_TOASTS || height > innerHeight - 32); i++) {
+    height -= shown[i].offsetHeight + 10;
+    dismissers.get(shown[i])?.();
+  }
+}
 const live = h('div.sr-only', { 'aria-live': 'polite', role: 'status' });
 
 export function mountOverlays() {
-  toastHost = h('div.toasts', { role: 'region', 'aria-label': 'Notifications' });
+  toastHost = h('div.toasts', { role: 'region', 'aria-label': t('notifications') });
   document.body.append(toastHost, live);
+  store.on((k) => { if (k === 'lang') toastHost.setAttribute('aria-label', t('notifications')); });
+  addEventListener('resize', trimToasts);
 }
 
 export function announce(text) { live.textContent = ''; setTimeout(() => { live.textContent = text; }, 30); }
@@ -21,21 +37,70 @@ export function toast(message, { kind = 'info', title, actions = [], sticky, emo
     h('div.body', title ? h('b', decor + title) : null, h('div', title ? message : decor + message),
       actions.length ? h('div.row', { style: { marginTop: '8px' } }, actions.map((a) => h('button.btn.small.tonal', { on: { click: () => { a.run(); dismiss(); } } }, a.label))) : null),
     h('button.icon-btn.sm', { 'aria-label': t('close'), on: { click: () => dismiss() } }, icon('close')));
-  const dismiss = () => { el.classList.add('out'); setTimeout(() => el.remove(), 200); };
+  // Focus that came from elsewhere goes back there when the toast leaves, so it is never lost.
+  let cameFrom = null;
+  el.addEventListener('focusin', (e) => { if (e.relatedTarget && !el.contains(e.relatedTarget)) cameFrom = e.relatedTarget; });
+  // A timed toast waits while it has focus or the pointer, then gets at least two more seconds.
+  let timer = 0, left = 5200, since = 0;
+  // A leaving toast stops taking focus at once, before its exit animation ends.
+  const dismiss = () => {
+    if (el.classList.contains('out')) return;
+    clearTimeout(timer); timer = 0;
+    if (el.contains(document.activeElement)) {
+      const back = cameFrom?.isConnected && !cameFrom.closest('[inert], [hidden]') ? cameFrom : document.getElementById('outlet');
+      back?.focus({ preventScroll: true });
+    }
+    el.classList.add('out'); el.inert = true; el.tabIndex = -1; setTimeout(() => el.remove(), 200);
+  };
+  const held = () => el.matches(':hover') || el.contains(document.activeElement);
+  const run = () => { if (timer || el.classList.contains('out') || held()) return; since = Date.now(); timer = setTimeout(dismiss, Math.max(left, 2000)); };
+  const hold = () => { if (!timer) return; clearTimeout(timer); timer = 0; left -= Date.now() - since; };
   el.addEventListener('keydown', (e) => { if (e.key === 'Escape') dismiss(); });
   toastHost.append(el);
+  dismissers.set(el, dismiss);
+  trimToasts();
   announce((title ? title + '. ' : '') + message);
   if (kind === 'err' || kind === 'ok') sound(kind === 'err' ? 'error' : 'success');
-  if (!(sticky || kind === 'err' || kind === 'warn')) setTimeout(dismiss, 5200);
+  if (!(sticky || kind === 'err' || kind === 'warn')) {
+    run();
+    el.addEventListener('focusin', hold); el.addEventListener('pointerenter', hold);
+    el.addEventListener('focusout', (e) => { if (!el.contains(e.relatedTarget)) setTimeout(run, 0); });
+    el.addEventListener('pointerleave', () => setTimeout(run, 0));
+  }
   const hist = store.get('notifyHistory');
   store.set('notifyHistory', [{ id: Date.now() + Math.random(), at: Date.now(), kind, title: title || '', message }, ...hist].slice(0, 500), { record: false });
   return dismiss;
 }
 
 // ---------------- dialogs ----------------
+// ---------------- modal focus ----------------
+// While a modal is open, Tab and Shift+Tab cycle inside it and focus that lands outside it is
+// brought back. Modals stack: only the newest one holds focus. Returns a release function.
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
+const modals = [];
+const focusables = (box) => [...box.querySelectorAll(FOCUSABLE)].filter((x) => x.getClientRects().length && !x.closest('[inert], [hidden]'));
+const top = () => { while (modals.length && !modals[modals.length - 1].isConnected) modals.pop(); return modals[modals.length - 1]; };
+document.addEventListener('keydown', (e) => {
+  const box = top();
+  if (!box || e.key !== 'Tab') return;
+  const f = focusables(box);
+  if (!f.length) { e.preventDefault(); return; }
+  const i = f.indexOf(document.activeElement);
+  if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && (i === -1 || i === f.length - 1)) { e.preventDefault(); f[0].focus(); }
+}, true);
+document.addEventListener('focusin', (e) => {
+  const box = top();
+  if (box && !box.contains(e.target) && !e.target.closest?.('.toasts, .popover')) focusables(box)[0]?.focus();
+});
+export function holdFocus(box) {
+  modals.push(box);
+  return () => { const i = modals.lastIndexOf(box); if (i >= 0) modals.splice(i, 1); };
+}
+
 export function dialog({ title, body, actions = [], wide, onClose, emojiChar, initialFocus }) {
   const prev = document.activeElement;
-  const close = (v) => { scrim.remove(); document.removeEventListener('keydown', esc, true); prev?.focus?.(); onClose?.(v); };
+  const close = (v) => { release(); scrim.remove(); document.removeEventListener('keydown', esc, true); prev?.focus?.(); onClose?.(v); };
   const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(null); } };
   const btns = actions.map((a) => h(`button.btn${a.kind ? '.' + a.kind : ''}`, { on: { click: async () => { const r = a.run ? await a.run() : a.value; if (r !== false) close(r ?? a.value); } } }, a.label));
   const d = h(`div.dialog${wide ? '.wide' : ''}`, { role: 'dialog', 'aria-modal': 'true', 'aria-label': typeof title === 'string' ? title : 'Dialog' },
@@ -43,6 +108,7 @@ export function dialog({ title, body, actions = [], wide, onClose, emojiChar, in
     body, btns.length ? h('div.row', { style: { justifyContent: 'flex-end' } }, btns) : null);
   const scrim = h('div.scrim', { on: { mousedown: (e) => { if (e.target === scrim) close(null); } } }, d);
   document.body.append(scrim);
+  const release = holdFocus(d);
   document.addEventListener('keydown', esc, true);
   setTimeout(() => (initialFocus?.() || d.querySelector('input,button.btn,select,textarea'))?.focus(), 30);
   return { close, el: d };
@@ -58,10 +124,12 @@ export function confirmDialog(title, message, { okLabel = t('apply'), danger } =
 let openPop = null;
 export function closePopover() { openPop?.close(); }
 
-export function popover(anchorOrPoint, content, { onClose, width } = {}) {
+export function popover(anchorOrPoint, content, { onClose, width, label } = {}) {
   closePopover();
   const prev = document.activeElement;
-  const el = h('div.popover', { role: 'dialog' }, content);
+  const el = h('div.popover', { role: 'dialog', 'aria-label': label || t('menu') }, content);
+  // A popover is not modal: when keyboard focus moves outside it, it closes.
+  el.addEventListener('focusout', (e) => { if (e.relatedTarget && !el.contains(e.relatedTarget) && openPop?.el === el) setTimeout(() => { if (!el.contains(document.activeElement)) close(); }, 0); });
   if (width) el.style.width = width + 'px';
   document.body.append(el);
   place(el, anchorOrPoint);
@@ -84,77 +152,76 @@ export function place(el, anchor) {
 }
 
 // ---------------- context menus with filter + regex ----------------
-
-/**
- * A menu row that carries the live control for a value. live: { kind: 'switch'|'choice'|'range'|'swatch',
- * get(), set(v), options: [{ value, label }], min, max, step, format(v), disabled: reason, onSwatch() }.
- * Changes apply immediately through set(), the menu stays open, and the control re-syncs on store changes.
- */
-export function liveRow(it) {
-  const L = it.live;
-  const ctl = h('span.menu-ctl');
-  const name = it.label;
-  const build = () => {
-    clear(ctl);
-    const v = L.get();
-    if (L.kind === 'switch') {
-      ctl.append(h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(!!v), 'aria-label': name, disabled: !!L.disabled, on: { click: () => { L.set(!L.get()); build(); ctl.querySelector('[role="switch"]')?.focus(); } } }));
-    } else if (L.kind === 'choice') {
-      const g = h('span.seg', { role: 'radiogroup', 'aria-label': name });
-      const pickAt = (k) => { const o = L.options[(k + L.options.length) % L.options.length]; L.set(o.value); build(); ctl.querySelector('[role="radio"][aria-checked="true"]')?.focus(); };
-      L.options.forEach((o, k) => g.append(h('button', { type: 'button', role: 'radio', 'aria-checked': String(o.value === v), tabindex: o.value === v ? '0' : '-1', disabled: !!L.disabled, on: { click: () => pickAt(k), keydown: (e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); pickAt(k + (e.key === 'ArrowRight' ? 1 : -1)); } } } }, o.label)));
-      ctl.append(g);
-    } else if (L.kind === 'range') {
-      const out = h('output', L.format ? L.format(v) : String(v));
-      const r = h('input', { type: 'range', min: L.min, max: L.max, step: L.step || 1, value: v, 'aria-label': name, 'aria-valuetext': L.format ? L.format(v) : String(v), disabled: !!L.disabled, on: { input: (e) => { const n = Number(e.target.value); L.set(n); out.textContent = L.format ? L.format(n) : String(n); e.target.setAttribute('aria-valuetext', out.textContent); } } });
-      ctl.append(r, out);
-    } else if (L.kind === 'swatch') {
-      ctl.append(h('button.menu-swatch', { type: 'button', 'aria-label': `${name}: ${v}`, style: { background: v }, disabled: !!L.disabled, on: { click: () => L.onSwatch?.() } }));
-    }
-  };
-  ctl.sync = () => { if (!ctl.contains(document.activeElement) || L.kind !== 'range') build(); };
-  build();
-  return h(`div.menu-item.has-ctl${L.disabled ? '' : ''}`, { role: 'none', 'aria-disabled': L.disabled ? 'true' : null, title: L.disabled || null },
-    it.icon ? icon(it.icon) : null, h('span.menu-label', it.label, L.disabled ? h('span.small.muted', ` · ${L.disabled}`) : null), ctl, it.kbd ? h('span.kbd', it.kbd) : null);
-}
-
+// A filterable menu is a combobox (the filter) driving a listbox of options through
+// aria-activedescendant. Focus stays in the filter: Up and Down move the active option, Enter
+// runs it, Left and Right change a live value. A live value (live: { kind: 'switch'|'choice'|
+// 'range'|'swatch', get(), set(v), options, min, max, step, format(v), disabled: reason,
+// onSwatch() }) is drawn inside its option (src/renderer/ui/live-options.js); changes apply at
+// once, the menu stays open, and every live option re-syncs when settings change.
+let menuSeq = 0;
 export function menu(at, items, { title } = {}) {
-  const list = h('div', { role: 'menu', 'aria-label': title || 'Menu' });
-  const input = h('input', { placeholder: t('filter'), 'aria-label': t('filter') });
+  const uid = 'mn' + (++menuSeq);
+  const label = title || t('menu');
+  const list = h('div.menu-list', { role: 'listbox', id: `${uid}-list`, 'aria-label': label });
+  const input = h('input', { role: 'combobox', 'aria-autocomplete': 'list', 'aria-expanded': 'true', 'aria-controls': `${uid}-list`, placeholder: t('filter'), 'aria-label': `${t('filter')} · ${label}` });
   let regex = false;
-  const reBtn = h('button.icon-btn.sm', { 'aria-label': 'Regular expression filter', 'aria-pressed': 'false', title: 'Regex', on: { click: () => { regex = !regex; reBtn.setAttribute('aria-pressed', String(regex)); reBtn.style.color = regex ? 'var(--primary)' : ''; render(); } } }, h('span.mono', '.*'));
+  const reBtn = h('button.icon-btn.sm', { type: 'button', 'aria-label': pair('Regular expression filter', '正則表達式篩選'), 'aria-pressed': 'false', title: 'Regex', on: { click: () => { regex = !regex; reBtn.setAttribute('aria-pressed', String(regex)); reBtn.style.color = regex ? 'var(--primary)' : ''; render(); input.focus(); } } }, h('span.mono', '.*'));
+  let shown = [];
+  let active = 0;
+  const mark = () => {
+    shown.forEach((s, i) => s.opt.setAttribute('aria-selected', String(i === active)));
+    const cur = shown[active]?.opt;
+    if (cur) { input.setAttribute('aria-activedescendant', cur.id); cur.scrollIntoView({ block: 'nearest' }); } else input.removeAttribute('aria-activedescendant');
+  };
+  const fire = (i) => {
+    const s = shown[i];
+    if (!s || s.it.live?.disabled) return;
+    if (s.it.run) { pop.close(); s.it.run(); return; }
+    s.live?.activate();
+  };
   const render = () => {
     clear(list);
+    shown = [];
     const q = input.value.trim();
     let test = () => true;
     if (q) {
-      if (regex) { try { const re = new RegExp(q, 'i'); test = (s) => re.test(s); input.classList.remove('invalid'); } catch { input.classList.add('invalid'); } }
-      else test = (s) => s.toLowerCase().includes(q.toLowerCase());
+      if (regex) { try { const re = new RegExp(q, 'i'); test = (x) => re.test(x); input.classList.remove('invalid'); } catch { input.classList.add('invalid'); } }
+      else test = (x) => x.toLowerCase().includes(q.toLowerCase());
     }
     for (const it of items) {
-      if (it === '-') { if (!q) list.append(h('div.menu-sep')); continue; }
+      if (it === '-') { if (!q) list.append(h('div.menu-sep', { 'aria-hidden': 'true' })); continue; }
       if (!test(it.label)) continue;
-      if (it.live) { list.append(liveRow(it)); continue; }
-      if (it.control) { list.append(h('div', { style: { padding: '6px 10px' } }, it.control())); continue; }
-      list.append(h(`button.menu-item${it.danger ? '.danger' : ''}`, { role: 'menuitem', 'aria-keyshortcuts': it.kbd || null, on: { click: () => { pop.close(); it.run(); } } }, it.icon ? icon(it.icon) : null, h('span', it.label), it.kbd ? h('span.kbd', it.kbd) : null));
+      const i = shown.length;
+      const live = it.live ? liveOption(it.live, { announce }) : null;
+      const note = it.live?.disabled ? ` · ${it.live.disabled}` : '';
+      const opt = h(`div.menu-item${it.danger ? '.danger' : ''}${live ? '.has-ctl' : ''}`, {
+        role: 'option', id: `${uid}-o${i}`, 'aria-selected': 'false', 'aria-disabled': it.live?.disabled ? 'true' : null, 'aria-keyshortcuts': it.kbd || null, title: it.live?.disabled || null,
+        on: { click: () => { active = i; mark(); fire(i); input.focus(); }, mousemove: () => { if (active !== i) { active = i; mark(); } } }
+      }, it.icon ? icon(it.icon) : null, h('span.menu-label', it.label, note ? h('span.small.muted', note) : null), live?.visual, it.kbd ? h('span.kbd', { 'aria-hidden': 'true' }, it.kbd) : null);
+      if (live) {
+        // The option keeps its visible text as its name; the value and the keys go in its description.
+        const desc = () => { opt.setAttribute('aria-description', `${live.state()}. ${live.hint()}`); if (live.checked() !== null) opt.setAttribute('aria-checked', String(live.checked())); };
+        live.onChange(desc); desc();
+      }
+      shown.push({ it, live, opt });
+      list.append(opt);
     }
+    if (!shown.length) list.append(h('div.menu-empty', { 'aria-hidden': 'true' }, pair('Nothing matches.', '冇嘢符合。')));
+    active = Math.min(active, Math.max(0, shown.length - 1));
+    mark();
   };
-  input.addEventListener('input', render);
+  input.addEventListener('input', () => { active = 0; render(); });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); list.querySelector('.menu-item')?.focus(); }
-    if (e.key === 'Enter') { list.querySelector('.menu-item')?.click(); }
-  });
-  // Focus stops: plain commands plus each live control (switch, checked radio, slider, swatch).
-  const stops = () => [...list.querySelectorAll('button.menu-item, .menu-ctl [role="switch"], .menu-ctl [role="radio"][aria-checked="true"], .menu-ctl input[type="range"], .menu-ctl .menu-swatch')];
-  list.addEventListener('keydown', (e) => {
-    const all = stops();
-    const i = all.indexOf(document.activeElement);
-    if (e.key === 'ArrowDown') { e.preventDefault(); all[(i + 1) % all.length]?.focus(); }
-    if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) input.focus(); else all[i - 1]?.focus(); }
+    const n = shown.length;
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (n) { active = (active + 1) % n; mark(); } }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (n) { active = (active - 1 + n) % n; mark(); } }
+    else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); if (n) { active = e.key === 'PageDown' ? n - 1 : 0; mark(); } }
+    else if (e.key === 'Enter') { e.preventDefault(); fire(active); }
+    else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && shown[active]?.live) { if (shown[active].live.key(e)) e.preventDefault(); }
   });
   render();
-  const unlisten = store.on(() => list.querySelectorAll('.menu-ctl').forEach((c) => c.sync?.()));
-  const pop = popover(at, [h('div.menu-filter', input, reBtn), list], { onClose: unlisten });
+  const unlisten = store.on(() => shown.forEach((x) => x.live?.sync()));
+  const pop = popover(at, [h('div.menu-filter', input, reBtn), list], { onClose: unlisten, label });
   setTimeout(() => input.focus(), 20);
   return pop;
 }
@@ -163,7 +230,7 @@ export function menu(at, items, { title } = {}) {
 export function floatPanel(id, title, content, { width = 420, height = 520, anchor } = {}) {
   const sizes = store.get('panelSizes')[id];
   const panel = h('div.panel-float', { role: 'dialog', 'aria-label': title });
-  const head = h('header', h('span', { style: { flex: 1 } }, title),
+  const head = h('div.panel-head', h('h2.panel-title', { style: { flex: 1 } }, title),
     h('button.icon-btn.sm', { 'aria-label': 'Reset size and position', title: 'Reset size', on: { click: () => { const s = { ...store.get('panelSizes') }; delete s[id]; store.set('panelSizes', s, { record: false }); panel.style.width = width + 'px'; panel.style.height = height + 'px'; } } }, icon('fit_screen')),
     h('button.icon-btn.sm', { 'aria-label': t('close'), on: { click: () => close() } }, icon('close')));
   panel.append(head, h('div.content', content));

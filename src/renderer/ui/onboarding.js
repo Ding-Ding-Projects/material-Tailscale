@@ -7,7 +7,7 @@ import * as store from '../core/store.js';
 import * as ts from '../core/tsdata.js';
 import { segmented, stepper } from './controls.js';
 import { openDest } from './shell.js';
-import { toast } from './overlay.js';
+import { toast, holdFocus } from './overlay.js';
 import { installTailscaleButton } from './jobs.js';
 
 export function onboarding() {
@@ -39,9 +39,10 @@ export function onboarding() {
     clear(next).append(i === steps.length - 1 ? t('finish') : t('next'), icon('arrow_forward'));
   };
   const scrim = h('div.scrim', h('div.dialog.wide', { role: 'dialog', 'aria-modal': 'true', 'aria-label': pair('Setup wizard', '設定精靈'), dataset: { el: 'onboarding' } }, h('div.row', titleEl, h('span.spacer'), later), bar, body, h('div.row', back, h('span.spacer'), skip, next)));
-  const close = () => scrim.remove();
+  const close = () => { release(); scrim.remove(); };
   scrim.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   document.body.append(scrim);
+  const release = holdFocus(scrim.firstChild);
   draw();
   setTimeout(() => next.focus(), 50);
 }

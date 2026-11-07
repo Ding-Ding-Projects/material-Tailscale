@@ -9,7 +9,9 @@ import { COMMANDS } from '../../shared/cli-catalog.js';
 import { YUE_TITLES } from './cli-yue.js';
 import { SETTINGS_INDEX } from '../pages/settings-index.js';
 import { ARTICLES } from '../docs-bundle.js';
-import { switchCtl, segmented, stepper } from './controls.js';
+import { liveOption } from './live-options.js';
+import { settingLive } from './setting-live.js';
+import { announce, holdFocus } from './overlay.js';
 
 let open = null;
 let apiOps = [];
@@ -29,14 +31,6 @@ export function teleport(selector, dest, arg) {
   setTimeout(find, 80);
 }
 
-function liveControl(s) {
-  const v = store.get(s.key);
-  if (s.type === 'bool') { const c = switchCtl(v, { label: s.en }); c.onChange((x) => store.set(s.key, x)); return c.el; }
-  if (s.type === 'enum') { const c = segmented(s.options.map((o) => ({ value: o[0], label: pair(o[1], o[2]) })), v, { label: s.en }); c.onChange((x) => store.set(s.key, x)); return c.el; }
-  if (s.type === 'int') { const c = stepper(v, { min: s.min, max: s.max, label: s.en }); c.onChange((x) => { if (x !== '' && x !== undefined) store.set(s.key, x); }); return c.el; }
-  return null;
-}
-
 function entries() {
   const out = [];
   for (const d of DESTS) out.push({ group: pair('Destinations', '目的地'), title: t(d.id), sub: d.id, icon: d.icon, run: () => openDest(d.id) });
@@ -48,10 +42,12 @@ function entries() {
     for (const f of c.flags || []) out.push({ group: pair('Flags', '旗標'), title: `--${f.name}`, sub: `tailscale ${c.path.join(' ')} · ${f.desc}`, icon: 'flag', run: () => teleport(`[data-el="cmd-${c.id}-flag-${f.name}"]`, 'cli', c.id) });
   }
   for (const op of apiOps) out.push({ group: pair('Admin API', '管理 API'), title: op.summary, sub: `${op.method} ${op.path}`, icon: 'api', run: () => { openDest('admin', 'Everything'); } });
-  for (const s of SETTINGS_INDEX) out.push({ group: t('settings'), title: pair(s.en, s.yue), sub: s.help, icon: 'tune', control: () => liveControl(s), run: () => teleport(`[data-el="set-${s.key}"]`, 'settings', s.section) });
+  for (const s of SETTINGS_INDEX) out.push({ group: t('settings'), title: pair(s.en, s.yue), sub: s.help, icon: 'tune', live: settingLive(s.key)?.live, run: () => teleport(`[data-el="set-${s.key}"]`, 'settings', s.section) });
   for (const a of ARTICLES) out.push({ group: t('docs'), title: a.title, sub: a.path, icon: 'article', run: () => openDest('docs', a.path) });
   return out;
 }
+
+export function closePalette() { open?.close(); }
 
 export function openPalette() {
   if (open) { open.close(); return; }
@@ -63,9 +59,10 @@ export function openPalette() {
   const sizeBtn = h('button.icon-btn', { 'aria-label': pair('Toggle full window', '切換全視窗'), on: { click: () => { const n = store.get('paletteSize') === 'card' ? 'full' : 'card'; store.set('paletteSize', n); box.classList.toggle('full', n === 'full'); input.focus(); } } }, icon('open_in_full'));
   const results = h('div.results#pal-results', { role: 'listbox' });
   const all = entries();
-  let sel = 0, shown = [];
+  let sel = 0, shown = [], lives = [];
   const draw = () => {
     clear(results);
+    lives = [];
     const q = input.value.trim();
     let test = (s) => s.toLowerCase().includes(q.toLowerCase());
     if (re && q) { try { const r = new RegExp(q, 'i'); test = (s) => r.test(s); } catch { test = () => false; } }
@@ -73,7 +70,15 @@ export function openPalette() {
     let g = null;
     shown.forEach((e, i) => {
       if (e.group !== g) { g = e.group; results.append(h('div.pal-group', g)); }
-      const row = h('div.pal-row', { role: 'option', id: 'pal-' + i, 'aria-selected': String(i === sel), on: { click: (ev) => { if (ev.target.closest('.seg,.switch,.stepper')) return; choose(i); }, mousemove: () => { if (sel !== i) { sel = i; mark(); } } } }, icon(e.icon), h('div.ttl', h('b', e.title), e.sub ? h('span', e.sub) : null), e.control ? e.control() : null);
+      // A setting's live value is drawn inside its option; Left and Right change it, Enter goes to it.
+      const live = e.live ? liveOption(e.live, { announce }) : null;
+      const row = h('div.pal-row', { role: 'option', id: 'pal-' + i, 'aria-selected': String(i === sel), on: { click: () => choose(i), mousemove: () => { if (sel !== i) { sel = i; mark(); } } } }, icon(e.icon), h('div.ttl', h('b', e.title), e.sub ? h('span', e.sub) : null), live?.visual);
+      if (live) {
+        // The option keeps its visible text as its name; the value and the keys go in its description.
+        const desc = () => { row.setAttribute('aria-description', `${live.state()}. ${live.hint()}. ${pair('Enter goes to the setting', '撳 Enter 去設定')}`); if (live.checked() !== null) row.setAttribute('aria-checked', String(live.checked())); };
+        live.onChange(desc); desc();
+      }
+      lives[i] = live;
       results.append(row);
     });
     if (!shown.length) results.append(h('div.empty', icon('search_off'), pair('Nothing matches.', '冇嘢符合。')));
@@ -86,12 +91,15 @@ export function openPalette() {
     if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(shown.length - 1, sel + 1); mark(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); mark(); }
     else if (e.key === 'Enter') { e.preventDefault(); choose(sel); }
+    else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && lives[sel]) { if (lives[sel].key(e)) e.preventDefault(); }
     else if (e.key === 'Escape') close();
   });
-  const box = h('div.palette' + (size === 'full' ? '.full' : ''), { role: 'dialog', 'aria-label': pair('Command palette', '指令面板') }, h('div.head', icon('search'), input, reBtn, sizeBtn, h('button.icon-btn', { 'aria-label': t('close'), on: { click: () => close() } }, icon('close'))), results);
+  const box = h('div.palette' + (size === 'full' ? '.full' : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': pair('Command palette', '指令面板') }, h('div.head', icon('search'), input, reBtn, sizeBtn, h('button.icon-btn', { 'aria-label': t('close'), on: { click: () => close() } }, icon('close'))), results);
   const scrim = h('div.scrim', { style: { background: 'rgba(4,6,14,.35)' }, on: { mousedown: (e) => { if (e.target === scrim) close(); } } });
   document.body.append(scrim, box);
-  const close = () => { box.remove(); scrim.remove(); open = null; prev?.focus?.(); };
+  const release = holdFocus(box);
+  const unlisten = store.on(() => lives.forEach((l) => l?.sync()));
+  const close = () => { release(); unlisten(); box.remove(); scrim.remove(); open = null; prev?.focus?.(); };
   open = { close };
   draw();
   input.focus();

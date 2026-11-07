@@ -37,6 +37,8 @@ Design parity: every screen is designed on a design canvas and compared with the
 
 ![Design reference beside the real app for the Tools page](docs/design-parity/captures/tools/side-by-side.webp)
 
+Every-surface sweep: before a release, every page, dialog, menu and overlay of the app and every page of the website is checked in both themes, all three language modes and four window sizes for accessibility rules, console errors, cut-off or overlapping text and keyboard focus ([how it works](docs/features/appearance/every-surface-sweep.md), [latest results](docs/sweep/summary.md)).
+
 End-to-end recording (command palette, guided `tailscale set`, regex trace, Minecraft server wizard, settings), made by `npm run record` from the built app:
 
 ![End-to-end recording](docs/recording/end-to-end.gif)
@@ -63,6 +65,7 @@ Installers are built with Squirrel.Windows (`Setup.exe`, `RELEASES`, full and de
 | `npm run screenshots` | Drives the built app through every destination and writes PNGs (set `MT_CAPTURE_DIR`) |
 | `npm run record` | Records an end-to-end path through the built app as `docs/recording/end-to-end.gif` |
 | `npm run clip-matrix` | Checks every destination for cut-off text at 100, 125, 150 and 200% scale, in English, Cantonese and both, and at the minimum window size |
+| `npm run sweep` | The release check: every app surface and website page in both themes, three language modes and four window sizes (axe-core, console, layout, keyboard walk); run under `xvfb-run` on Linux after building the app and the website |
 | `npm run gen:postman` | Writes a Postman collection of every admin API operation to `docs/api/` |
 | `npm run wiki` | Builds the GitHub wiki from `docs/` (`-- --push` to publish it) |
 | `npm test` | Catalogue, argument builder, RFC 4226 and RFC 6238 vectors, settings explanations |

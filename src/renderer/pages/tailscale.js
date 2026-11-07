@@ -21,11 +21,12 @@ import { installTailscaleButton } from '../ui/jobs.js';
 const head = pageHero;
 const cmdBlock = (id, opts) => { const c = findCommand(id); return collapsible(`cmd-${id}`, h('span', pair(c.title, YUE_TITLES[id]), h('code.small.muted', { style: { marginLeft: '8px' } }, 'tailscale ' + c.path.join(' '))), h('div.card', commandForm(c, { compact: true, ...opts })), { startCollapsed: opts?.collapsed }); };
 
-function missingCard() {
+// level: 'h1' where the card is the page's main heading (Home), 'h2' under a page hero.
+function missingCard(level = 'h2') {
   const art = h('div.hero-art'); art.innerHTML = ART.network;
   return h('section.setup', { dataset: { el: 'ts-missing' }, style: { gridColumn: '1 / -1' } }, art,
     h('div.stack',
-      h('div.row', h('span.dot-live.err'), h('h2', t('notInstalled'))),
+      h('div.row', h('span.dot-live.err', { 'aria-hidden': 'true' }), h(`${level}.setup-title`, t('notInstalled'))),
       h('p', t('tsMissing')),
       h('ol.steps',
         h('li.done', pair('Material Tailscale is installed and running.', 'Material Tailscale 已經裝好兼行緊。')),
@@ -60,7 +61,7 @@ registerPage('home', (ctx) => {
     hero.classList.toggle('span-12', !!d.missing); hero.classList.toggle('span-7', !d.missing);
     for (const e of [trafficCard, kpCard, peersHead, peersWrap]) e.hidden = !!d.missing;
     for (const e of firstRun) e.hidden = !d.missing;
-    if (d.missing) { hero.append(missingCard()); return; }
+    if (d.missing) { hero.append(missingCard('h1')); return; }
     const st = stateOf(s);
     const self = s?.Self;
     const on = st.key === 'connected';
@@ -99,9 +100,9 @@ registerPage('home', (ctx) => {
   const trafficCard = h('section.card.span-5', { dataset: { el: 'home-traffic' } }, h('div.card-head', h('h2', pair('Live traffic', '即時流量')), infoBtn(pair('Live traffic', '即時流量'), pair('Bytes per second across all peers, computed from the change in counters between status polls.', '所有裝置每秒位元組，由輪詢之間嘅計數差計出。'))), chart.el);
   const chip = (name, tone = '') => h('span.ic' + (tone ? '.' + tone : ''), icon(name));
   const firstRun = [
-    h('section.card.span-6', { dataset: { el: 'home-preview' } }, h('div.card-head', chip('auto_awesome'), h('h3', pair('What you will see here', '你會喺呢度見到乜'))),
+    h('section.card.span-6', { dataset: { el: 'home-preview' } }, h('div.card-head', chip('auto_awesome'), h('h2.h3', pair('What you will see here', '你會喺呢度見到乜'))),
       h('p.muted', pair('Peers with their live path, traffic, exit nodes, routes, sharing, DNS, Tailnet Lock and every CLI command as a form.', '裝置同佢哋嘅即時路徑、流量、出口節點、路由、分享、DNS、Tailnet Lock，仲有每個 CLI 指令嘅表格。'))),
-    h('section.card.span-6', { dataset: { el: 'home-explore' } }, h('div.card-head', chip('explore', 'alt'), h('h3', pair('Prefer to look around first?', '想先周圍睇下？'))),
+    h('section.card.span-6', { dataset: { el: 'home-explore' } }, h('div.card-head', chip('explore', 'alt'), h('h2.h3', pair('Prefer to look around first?', '想先周圍睇下？'))),
       h('p.muted', pair('Settings, tools and every command form work without Tailscale. Each form previews the exact command it would run.', '設定、工具同每個指令表格冇 Tailscale 都用得。每個表格都會預覽佢會行嘅指令。')),
       h('div.row', h('button.btn.tonal', { dataset: { el: 'home-tour' }, on: { click: () => window.dispatchEvent(new Event('mt:onboard')) } }, icon('tour'), pair('Open the tour', '開導覽')),
         h('button.btn.text', { on: { click: () => openDest('cli') } }, icon('terminal'), pair('Browse every command', '睇晒所有指令'))))

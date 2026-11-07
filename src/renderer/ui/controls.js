@@ -132,7 +132,8 @@ export function pathPick(value = '', { mode = 'file', label, filters } = {}) {
   const ev = emitter();
   let v = value;
   const shown = h('span.mono.small', { style: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } });
-  const sync = () => { shown.textContent = Array.isArray(v) ? (v.length ? `${v.length} file(s): ${v.map((x) => x.split(/[\\/]/).pop()).join(', ')}` : pair('Nothing chosen', '未揀')) : (v || pair('Nothing chosen', '未揀')); };
+  // A long path is shortened with an ellipsis; the whole value stays in the tooltip.
+  const sync = () => { shown.textContent = Array.isArray(v) ? (v.length ? `${v.length} file(s): ${v.map((x) => x.split(/[\\/]/).pop()).join(', ')}` : pair('Nothing chosen', '未揀')) : (v || pair('Nothing chosen', '未揀')); shown.title = Array.isArray(v) ? v.join('\n') : (v || shown.textContent); };
   const browse = async () => {
     if (mode === 'save') { const p = await window.mt.dialog.save({ defaultPath: v || undefined, filters }); if (p) v = p; }
     else {
@@ -156,12 +157,13 @@ export function peerPick(value = '', { label, preferIp, allowUser, includeSelf }
   const ev = emitter();
   let v = value;
   let user = '';
-  const btn = h('button.pick-row', { type: 'button', 'aria-haspopup': 'dialog', 'aria-label': label || 'Choose a device' });
+  // Named by its visible text, with the field name first for screen readers.
+  const btn = h('button.pick-row', { type: 'button', 'aria-haspopup': 'dialog' });
   const userIn = allowUser ? h('input.input', { placeholder: pair('user (optional)', '用戶（可選）'), style: { maxWidth: '160px' }, 'aria-label': 'User name', on: { input: () => { user = userIn.value.trim(); ev.fire(get()); } } }) : null;
   const sync = () => {
     clear(btn);
     const p = ts.peers().find((x) => ts.peerName(x) === v || ts.peerIp(x) === v || x.DNSName === v);
-    btn.append(h('span.ava', icon(p ? ts.peerIcon(p) : 'devices')), h('span.meta', h('b', v || pair('Choose a device…', '揀裝置…')), h('span', p ? `${ts.peerIp(p)} · ${p.OS || ''} · ${ts.peerPath(p)}` : pair('Pick from your tailnet or type a name or IP', '喺 tailnet 揀或者打名／IP'))), icon('unfold_more'));
+    btn.append(h('span.sr-only', `${label || pair('Device', '裝置')}: `), h('span.ava', icon(p ? ts.peerIcon(p) : 'devices')), h('span.meta', h('b', v || pair('Choose a device…', '揀裝置…')), h('span', p ? `${ts.peerIp(p)} · ${p.OS || ''} · ${ts.peerPath(p)}` : pair('Pick from your tailnet or type a name or IP', '喺 tailnet 揀或者打名／IP'))), icon('unfold_more'));
   };
   const get = () => (v ? (user ? `${user}@${v}` : v) : undefined);
   btn.addEventListener('click', () => {
@@ -184,7 +186,7 @@ export function peerPick(value = '', { label, preferIp, allowUser, includeSelf }
     q.addEventListener('input', draw);
     q.addEventListener('keydown', (e) => { if (e.key === 'Enter' && q.value.trim()) { v = q.value.trim(); sync(); ev.fire(get()); pop.close(); } });
     draw();
-    const pop = popover(btn, h('div.stack', q, list), { width: 460 });
+    const pop = popover(btn, h('div.stack', q, list), { width: 460, label: pair('Choose an exit node', '揀出口節點') });
     setTimeout(() => q.focus(), 20);
   });
   sync();
@@ -271,6 +273,18 @@ export function certHost(value = '', { label } = {}) {
   const c = text(value || sugg[0] || '', { label, mono: true, placeholder: 'machine.tailnet-name.ts.net' });
   if (sugg.length) c.el.append(h('div.suggest', sugg.map((s) => h('button.chip.choice', { type: 'button', on: { click: () => { c.set(s); c.input.dispatchEvent(new Event('input')); } } }, s))));
   return c;
+}
+
+/**
+ * A file picker that the keyboard can reach: a real button opens a hidden file input, so the
+ * control has a name, takes focus and shows a focus ring like any other button.
+ * Returns [button, input]; place both where the button belongs.
+ */
+export function fileButton({ text: label, icon: ic, accept, context, el, cls = '.btn.small.tonal', onFile }) {
+  const input = h('input', { type: 'file', accept, hidden: true, tabindex: '-1', on: { change: () => { const f = input.files[0]; input.value = ''; if (f) onFile(f); } } });
+  // The accessible name starts with the visible label, then says what the file is for.
+  const btn = h(`button${cls}`, { type: 'button', 'aria-label': context ? `${label}: ${context}` : null, dataset: el ? { el } : {}, on: { click: () => input.click() } }, ic ? icon(ic) : null, label);
+  return [btn, input];
 }
 
 export function enumSelect(options, value, { label, labels } = {}) {

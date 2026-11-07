@@ -146,6 +146,44 @@ jobs:
           if (!(Test-Path (Join-Path $base "app-$newVer\MaterialTailscale.exe"))) { throw "Update to $new did not produce app-$newVer" }
           $fileVer = (Get-Item (Join-Path $base "app-$newVer\MaterialTailscale.exe")).VersionInfo.ProductVersion
           $result += "Updated with Update.exe to $new`: app-$newVer present, executable reports $fileVer"
+          # Photograph the updated app on the runner's desktop. Windows draws the minimise,
+          # maximise and close buttons through the title-bar overlay, which an in-app capture
+          # cannot see; hovering maximise should offer Snap layouts where Windows has them.
+          $shots = @()
+          try {
+            Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+            Add-Type -Namespace MtProof -Name Win -MemberDefinition @'
+          [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+          [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h, int x, int y, int w, int ht, bool repaint);
+          [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+          [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out RECT r);
+          [StructLayout(LayoutKind.Sequential)] public struct RECT { public int Left, Top, Right, Bottom; }
+          '@
+            function Save-Screen([string]$file) {
+              $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+              $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+              $g = [System.Drawing.Graphics]::FromImage($bmp)
+              $g.CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+              $bmp.Save($file, [System.Drawing.Imaging.ImageFormat]::Png); $g.Dispose(); $bmp.Dispose()
+            }
+            $app = Start-Process (Join-Path $base "app-$newVer\MaterialTailscale.exe") -PassThru
+            $hwnd = [IntPtr]::Zero
+            for ($i = 0; $i -lt 60 -and $hwnd -eq [IntPtr]::Zero; $i++) { Start-Sleep -Milliseconds 500; $app.Refresh(); $hwnd = $app.MainWindowHandle }
+            if ($hwnd -eq [IntPtr]::Zero) { throw 'the app opened no window within 30 seconds' }
+            $area = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
+            [MtProof.Win]::MoveWindow($hwnd, $area.Left, $area.Top, [Math]::Min($area.Width, 1280), [Math]::Min($area.Height, 800), $true) | Out-Null
+            [MtProof.Win]::SetForegroundWindow($hwnd) | Out-Null
+            Start-Sleep -Seconds 8
+            Save-Screen "$PWD\windows-title-bar.png"; $shots += 'windows-title-bar.png'
+            $r = New-Object MtProof.Win+RECT
+            [MtProof.Win]::GetWindowRect($hwnd, [ref]$r) | Out-Null
+            # The overlay is 44 pixels tall; maximise is the middle of the three caption buttons.
+            [MtProof.Win]::SetCursorPos($r.Right - 69, $r.Top + 22) | Out-Null
+            Start-Sleep -Seconds 3
+            Save-Screen "$PWD\windows-maximise-hover.png"; $shots += 'windows-maximise-hover.png'
+            $result += "Launched $new on the runner's desktop and photographed its title bar (windows-title-bar.png) and a hover over maximise (windows-maximise-hover.png)"
+          } catch { $result += "Desktop photographs not taken: $($_.Exception.Message)" }
+          if ($shots.Count) { gh release upload $new @shots --clobber }
           Get-Process MaterialTailscale -ErrorAction SilentlyContinue | Stop-Process -Force
           & (Join-Path $base 'Update.exe') --uninstall | Out-Null
           Start-Sleep -Seconds 10

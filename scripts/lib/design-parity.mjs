@@ -17,6 +17,7 @@ export function boardViews(root) {
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.dc.html')).sort()) {
     const m = fs.readFileSync(path.join(dir, f), 'utf8').match(/data-props='([^']*)'/);
     const props = m ? JSON.parse(m[1].replace(/&#39;/g, "'").replace(/&amp;/g, '&')) : {};
+    if (props.report) continue; // report boards record results; they are not screen designs
     for (const v of props.view?.options || ['default']) out.push(`${f}#${v}`);
   }
   return out;

@@ -5,7 +5,7 @@ import * as store from '../core/store.js';
 import { registerPage, openDest, openInNewTab } from '../ui/shell.js';
 import { toast, dialog, collapsible } from '../ui/overlay.js';
 import { superConfirm } from '../ui/safety.js';
-import { segmented, stepper, switchCtl, text } from '../ui/controls.js';
+import { segmented, stepper, switchCtl, text, fileButton } from '../ui/controls.js';
 import { workbench, folderSearch } from '../ui/regex.js';
 import { exportTo, FORMATS } from '../ui/exporter.js';
 import totpLib from '../../shared/totp.js';
@@ -16,7 +16,7 @@ import jsQR from 'jsqr';
 const head = pageHero;
 
 registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。'), heroStats([{ value: 8, label: pair('tools', '個工具') }, { value: pair('Offline', '離線'), label: pair('always', '一直'), tone: 'ok' }])),
-  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id)), h('code', { authenticator: pair('TOTP codes', 'TOTP 驗證碼'), base64: pair('Encode and decode', '編碼同解碼'), converter: pair('Documents, media, archives', '文件、媒體、壓縮檔'), regex: pair('Build, test, trace', '建立、測試、追蹤'), draw: pair('Sketch and annotate', '畫圖同標註'), ollama: pair('Local models', '本機模型'), minecraft: pair('Create and run', '建立同運行'), console: pair('Any arguments', '任何參數') }[id])))))));
+  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id), window.mt?.site && ['converter', 'ollama', 'minecraft', 'console'].includes(id) ? h('span.badge.info', { style: { marginLeft: '8px' } }, pair('Desktop app', '桌面版')) : null), h('code', { authenticator: pair('TOTP codes', 'TOTP 驗證碼'), base64: pair('Encode and decode', '編碼同解碼'), converter: pair('Documents, media, archives', '文件、媒體、壓縮檔'), regex: pair('Build, test, trace', '建立、測試、追蹤'), draw: pair('Sketch and annotate', '畫圖同標註'), ollama: pair('Local models', '本機模型'), minecraft: pair('Create and run', '建立同運行'), console: pair('Any arguments', '任何參數') }[id])))))));
 
 // ---------------- Authenticator ----------------
 
@@ -83,7 +83,7 @@ registerPage('authenticator', (ctx) => {
   return h('div.page', head(pair('Two-factor', '雙重驗證'), t('authenticator'), pair('Standards-exact time-based codes (RFC 6238) for any account. Secrets are kept in your operating system\'s encrypted vault.', '任何帳戶嘅標準時間碼（RFC 6238），密鑰存喺系統加密保險庫。')),
     h('div.grid', h('section.card.span-8', h('h2', pair('Codes', '驗證碼')), list),
       h('section.card.span-4.tonal', h('h2', pair('Add an account', '加帳戶')),
-        h('div.row', h('label.btn.small.tonal', icon('image'), pair('QR from image', '從圖片讀 QR'), h('input', { type: 'file', accept: 'image/*', hidden: true, on: { change: async (e) => { const f = e.target.files[0]; if (f) decodeImage(URL.createObjectURL(f)).catch((er) => toast(er.message, { kind: 'err' })); } } })),
+        h('div.row', fileButton({ icon: 'image', text: pair('QR from image', '從圖片讀 QR'), accept: 'image/*', onFile: (f) => decodeImage(URL.createObjectURL(f)).catch((er) => toast(er.message, { kind: 'err' })) }),
           h('button.btn.small.tonal', { on: { click: async () => { const d = await window.mt.clipboardImage(); if (d) decodeImage(d).catch((er) => toast(er.message, { kind: 'err' })); else { const s = await navigator.clipboard.readText().catch(() => ''); if (s.startsWith('otpauth://')) addUri(s); else toast(pair('The clipboard has no QR image or otpauth link.', '剪貼簿冇 QR 圖或 otpauth 連結。'), { kind: 'warn' }); } } } }, icon('content_paste'), pair('From clipboard', '從剪貼簿')),
           h('button.btn.small.tonal', { on: { click: () => cameraScan(addUri) } }, icon('photo_camera'), pair('Camera', '鏡頭'))),
         h('b', pair('Link', '連結')), uriIn.el, h('button.btn.small', { on: { click: () => uriIn.get() && addUri(uriIn.get()) } }, pair('Add link', '加連結')),
@@ -142,8 +142,8 @@ registerPage('base64', () => {
   };
   return h('div.page', head(pair('Encoding', '編碼'), t('base64'), pair('Encode and decode text and files with every Base64 variant, data: URLs, strict error offsets and a verified round trip.', '用各種 Base64 變體編解碼文字同檔案。')),
     h('div.grid', h('section.card.span-12.tonal', h('div.row', variant.el, enc.el), h('div.row', h('div.switch-row', h('b', pair('Padding', '填充')), pad.el), h('div.switch-row', h('b', pair('Strict decoding', '嚴格解碼')), strict.el))),
-      h('section.card.span-6', h('h3', pair('Input', '輸入')), inp, h('div.row', h('button.btn', { on: { click: doEnc } }, icon('lock'), pair('Encode', '編碼')), h('button.btn.tonal', { on: { click: doDec } }, icon('lock_open'), pair('Decode', '解碼')), h('button.btn.outline', { on: { click: () => file(false) } }, icon('upload_file'), pair('Encode a file', '編碼檔案')), h('button.btn.outline', { on: { click: () => file(true) } }, icon('file_open'), pair('Decode a file', '解碼檔案')))),
-      h('section.card.span-6', h('h3', pair('Output', '輸出')), out, status, preview, h('div.row', h('button.btn.small.outline', { on: { click: () => { navigator.clipboard.writeText(out.value); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'), t('copy')),
+      h('section.card.span-6', h('h2.h3', pair('Input', '輸入')), inp, h('div.row', h('button.btn', { on: { click: doEnc } }, icon('lock'), pair('Encode', '編碼')), h('button.btn.tonal', { on: { click: doDec } }, icon('lock_open'), pair('Decode', '解碼')), h('button.btn.outline', { on: { click: () => file(false) } }, icon('upload_file'), pair('Encode a file', '編碼檔案')), h('button.btn.outline', { on: { click: () => file(true) } }, icon('file_open'), pair('Decode a file', '解碼檔案')))),
+      h('section.card.span-6', h('h2.h3', pair('Output', '輸出')), out, status, preview, h('div.row', h('button.btn.small.outline', { on: { click: () => { navigator.clipboard.writeText(out.value); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'), t('copy')),
         h('button.btn.small.outline', { on: { click: () => { const mt = lastBytes ? sniff(lastBytes) : 'text/plain'; navigator.clipboard.writeText(`data:${mt};base64,${toB64(lastBytes || bytesOf(inp.value)).replace(/\r\n/g, '')}`); toast(pair('data: URL copied.', '已複製 data: URL。'), { kind: 'ok' }); } } }, icon('link'), 'data: URL'),
         h('button.btn.small.outline', { on: { click: async () => { if (!lastBytes) return; const p = await window.mt.dialog.save({ defaultPath: 'decoded.bin' }); if (p) { await window.mt.fs.writeBytes(p, toB64(lastBytes).replace(/\r\n/g, '').replace(/-/g, '+').replace(/_/g, '/')); toast(pair('Saved.', '已儲存。'), { kind: 'ok' }); } } } }, icon('save'), pair('Save bytes', '儲存位元組'))))));
 });
@@ -239,7 +239,7 @@ registerPage('converter', () => {
 });
 
 // ---------------- Regex page ----------------
-registerPage('regex', () => h('div.page', head(pair('Patterns', '模式'), t('regex'), pair('Build, test, explain, replace and generate code for regular expressions.', '建立、測試、解釋、替換同產生正則表達式程式碼。')), h('div.card', workbench({ initial: '(?<host>[a-z0-9-]+)\\s+(?<ip>100(?:\\.\\d{1,3}){3})' })), h('section.card', h('h3', pair('Search inside files (GREP)', '喺檔案入面搜尋（GREP）')), folderSearch())));
+registerPage('regex', () => h('div.page', head(pair('Patterns', '模式'), t('regex'), pair('Build, test, explain, replace and generate code for regular expressions.', '建立、測試、解釋、替換同產生正則表達式程式碼。')), h('div.card', workbench({ initial: '(?<host>[a-z0-9-]+)\\s+(?<ip>100(?:\\.\\d{1,3}){3})' })), h('section.card', h('h2.h3', pair('Search inside files (GREP)', '喺檔案入面搜尋（GREP）')), folderSearch())));
 
 // ---------------- Drawing board ----------------
 const PENS = [['pen', 'Pen', 'P', 3], ['marker', 'Marker', 'M', 10], ['highlighter', 'Highlighter', 'H', 18], ['pencil', 'Pencil', 'N', 1.5], ['brush', 'Brush', 'B', 8], ['calligraphy', 'Calligraphy', 'C', 6], ['neon', 'Neon', 'O', 5], ['eraser', 'Eraser', 'E', 20]];
@@ -332,9 +332,9 @@ registerPage('ollama', (ctx) => {
     } catch (e) { out.textContent = e.message; }
   };
   load();
-  clear(chat).append(h('h3', pair('Chat with a local model', '同本機模型對話')), modelSel, prompt, h('div.row', h('button.btn', { on: { click: send } }, icon('send'), pair('Send', '傳送')), h('button.btn.text', { on: { click: () => { msgs.length = 0; clear(log); } } }, pair('New conversation', '新對話'))), log);
+  clear(chat).append(h('h2.h3', pair('Chat with a local model', '同本機模型對話')), modelSel, prompt, h('div.row', h('button.btn', { on: { click: send } }, icon('send'), pair('Send', '傳送')), h('button.btn.text', { on: { click: () => { msgs.length = 0; clear(log); } } }, pair('New conversation', '新對話'))), log);
   return h('div.page', head('Local AI', t('ollama'), pair('Install, run and manage local Ollama models: list, details, pull with progress, delete, what is loaded, and chat.', '安裝、運行同管理本機 Ollama 模型。'), h('button.btn.outline', { on: { click: load } }, icon('refresh'), t('refresh'))),
-    h('div.grid', h('section.card.span-7', box, running), h('section.card.span-5.tonal', h('h3', pair('Download a model', '下載模型')), model.el, h('div.suggest', ['llama3.2', 'qwen2.5', 'gemma3', 'mistral', 'phi4', 'deepseek-r1'].map((m) => h('button.chip.choice', { on: { click: () => model.set(m) } }, m))), h('div.row', h('button.btn', { on: { click: pull } }, icon('download'), pair('Pull', '下載'))), prog, progText)),
+    h('div.grid', h('section.card.span-7', box, running), h('section.card.span-5.tonal', h('h2.h3', pair('Download a model', '下載模型')), model.el, h('div.suggest', ['llama3.2', 'qwen2.5', 'gemma3', 'mistral', 'phi4', 'deepseek-r1'].map((m) => h('button.chip.choice', { on: { click: () => model.set(m) } }, m))), h('div.row', h('button.btn', { on: { click: pull } }, icon('download'), pair('Pull', '下載'))), prog, progText)),
     h('section.card', chat));
 });
 

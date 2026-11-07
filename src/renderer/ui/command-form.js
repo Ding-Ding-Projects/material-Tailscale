@@ -23,10 +23,10 @@ export function infoBtn(title, explanation, { example, steps } = {}) {
   return h('button.info-btn', { type: 'button', 'aria-label': pair(`About ${title}`, `關於 ${title}`), on: { click: (e) => {
     e.stopPropagation();
     popover(e.currentTarget, h('div.stack', { style: { padding: '6px', maxWidth: '380px' } },
-      h('h3', title), h('div', explanation),
+      h('h2.h3', title), h('div', explanation),
       example ? h('div.stack', h('b.small', pair('Worked example', '例子')), h('div.cmdline', example)) : null,
       steps?.length ? h('div.stack', h('b.small', pair('Step by step', '一步步')), h('ol', { style: { margin: 0, paddingLeft: '20px' } }, steps.map((s) => h('li', s)))) : null,
-      h('div.small.muted', pair('This explanation never runs anything.', '呢個說明唔會執行任何嘢。'))));
+      h('div.small.muted', pair('This explanation never runs anything.', '呢個說明唔會執行任何嘢。'))), { label: title });
   } } }, icon('info'));
 }
 
@@ -195,9 +195,9 @@ export function commandForm(cmd, { compact, onResult, preset } = {}) {
     h('div.cmd-layout',
       h('div.stack', gNav, grid),
       h('div.stack.preview',
-        h('div.card', h('div.card-head', h('h3', t('pendingCommand')), h('button.icon-btn.sm', { type: 'button', 'aria-label': t('copy'), on: { click: () => { navigator.clipboard.writeText(preview.textContent.trim()); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'))), preview, errBox,
+        h('div.card', h('div.card-head', h('h2.h3', t('pendingCommand')), h('button.icon-btn.sm', { type: 'button', 'aria-label': t('copy'), on: { click: () => { navigator.clipboard.writeText(preview.textContent.trim()); toast(t('copied'), { kind: 'ok' }); } } }, icon('content_copy'))), preview, errBox,
           h('div.row', runBtn, cancelBtn, reset, guideBtn)),
-        h('div.card', h('h3', t('output')), outBox))));
+        h('div.card', h('h2.h3', t('output')), outBox))));
   return root;
 }
 

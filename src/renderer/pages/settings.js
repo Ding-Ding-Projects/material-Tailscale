@@ -4,7 +4,7 @@ import { t, pair, schoolOn, schoolName, loadVocabFromText, clearVocab, vocabStat
 import * as store from '../core/store.js';
 import { registerPage, openDest } from '../ui/shell.js';
 import { SETTINGS_INDEX, SECTIONS } from './settings-index.js';
-import { switchCtl, segmented, stepper, text, pathPick } from '../ui/controls.js';
+import { switchCtl, segmented, stepper, text, pathPick, fileButton } from '../ui/controls.js';
 import { colorPicker } from '../ui/colorpicker.js';
 import { toast, dialog, confirmDialog, floatPanel } from '../ui/overlay.js';
 import { superConfirm } from '../ui/safety.js';
@@ -123,14 +123,16 @@ function vocabSection() {
   const draw = () => {
     clear(box);
     const st = vocabState();
-    const input = h('input', { type: 'file', accept: 'application/json,.json', 'aria-label': pair('Choose a personal vocabulary JSON file', '揀個人詞彙 JSON 檔'), dataset: { el: 'vocab-upload' }, on: { change: async () => {
-      const f = input.files[0]; if (!f) return;
-      if (f.size > 256 * 1024) { toast(t('vocabBad', { why: pair('the file is larger than 256 KiB', '檔案大過 256 KiB') }), { kind: 'err' }); return; }
-      try { loadVocabFromText(await f.text()); celebrate(); draw(); } catch (e) { toast(t('vocabBad', { why: e.message }), { kind: 'err' }); }
-    } } });
+    const upload = fileButton({ icon: 'upload_file', cls: '.btn.tonal', el: 'vocab-upload', accept: 'application/json,.json',
+      text: st.loaded ? pair('Replace file…', '換檔…') : pair('Choose file…', '揀檔…'),
+      context: pair('Personal vocabulary JSON', '個人詞彙 JSON'),
+      onFile: async (f) => {
+        if (f.size > 256 * 1024) { toast(t('vocabBad', { why: pair('the file is larger than 256 KiB', '檔案大過 256 KiB') }), { kind: 'err' }); return; }
+        try { loadVocabFromText(await f.text()); celebrate(); draw(); } catch (e) { toast(t('vocabBad', { why: e.message }), { kind: 'err' }); }
+      } });
     box.append(h('div.flag-card', { dataset: { el: 'set-vocabulary' } }, h('b', pair('Personal vocabulary JSON', '個人詞彙 JSON')),
       h('div', st.loaded ? h('span.badge.ok', pair(`Loaded · ${st.count} entries`, `已載入 · ${st.count} 項`)) : h('span.badge.info', pair('No file loaded', '未載入檔案'))),
-      h('label.btn.tonal', { style: { alignSelf: 'flex-start' } }, icon('upload_file'), st.loaded ? pair('Replace file…', '換檔…') : pair('Choose file…', '揀檔…'), input),
+      h('div.row', upload),
       st.loaded ? h('button.btn.small.outline', { dataset: { el: 'vocab-clear' }, on: { click: () => { clearVocab(); toast(pair('Vocabulary cleared. Original wording restored.', '已清除詞彙，回復原本字眼。'), { kind: 'ok' }); draw(); } } }, icon('delete'), pair('Clear and reset', '清除同重設')) : null,
       h('div.small.muted', pair('You can also drop the file anywhere on the window. It is validated in full (schemaVersion 1, entries object, 256 KiB, depth 8, 160-character terms, 1,000-character replacements) and stays on this computer.', '亦可以將檔案拖到視窗任何位置。會完整驗證，只留喺本機。'))));
   };
@@ -141,7 +143,7 @@ function vocabSection() {
 function dataSection() {
   const box = h('div.stack');
   box.append(h('div.row', ...FORMATS.filter((f) => ['json', 'yaml', 'md'].includes(f.id)).map((f) => h('button.btn.small.outline', { on: { click: () => exportTo(f, () => ({ name: 'material-tailscale-settings', data: store.exportable() })) } }, icon('download'), `${t('export')} ${f.label}`)),
-    h('label.btn.small.tonal', icon('upload'), pair('Import settings…', '匯入設定…'), h('input', { type: 'file', accept: '.json', hidden: true, on: { change: async (e) => { try { const j = JSON.parse(await e.target.files[0].text()); if (j.schema !== 'material-tailscale.settings') throw new Error(pair('Not a Material Tailscale settings export.', '唔係本程式嘅設定匯出。')); store.replaceAll(j.settings, 'Import settings'); toast(pair('Settings imported.', '已匯入設定。'), { kind: 'ok' }); } catch (err) { toast(err.message, { kind: 'err' }); } } } }))),
+    fileButton({ icon: 'upload', text: pair('Import settings…', '匯入設定…'), accept: '.json', onFile: async (f) => { try { const j = JSON.parse(await f.text()); if (j.schema !== 'material-tailscale.settings') throw new Error(pair('Not a Material Tailscale settings export.', '唔係本程式嘅設定匯出。')); store.replaceAll(j.settings, 'Import settings'); toast(pair('Settings imported.', '已匯入設定。'), { kind: 'ok' }); } catch (err) { toast(err.message, { kind: 'err' }); } } })),
     h('div.row', h('button.btn.small.outline', { on: { click: () => openDest('history') } }, icon('history'), pair('Version history', '版本歷史')), h('button.btn.small.outline', { on: { click: async () => { const i = await window.mt.info(); window.mt.shell.openPath(i.userData); } } }, icon('folder_open'), pair('Open app data folder', '打開程式資料夾')),
       h('button.btn.small.danger', { on: { click: async () => { if (await superConfirm({ action: pair('Reset every setting to its default', '將所有設定重設為預設'), affects: pair('Appearance, language, schedules, panels and favourites. Locks, credentials and history are kept.', '外觀、語言、排程、面板同收藏。鎖、憑證同歷史會保留。') })) { const keep = { locks: store.get('locks'), onboarded: true }; store.replaceAll(keep, 'Reset all settings'); toast(pair('All settings reset.', '已重設全部設定。'), { kind: 'ok' }); } } } }, icon('restart_alt'), pair('Reset all settings…', '重設全部設定…'))));
   const edSel = h('select.input', { 'aria-label': pair('External editor', '外部編輯器') }, h('option', { value: '' }, pair('Detecting editors…', '偵測緊編輯器…')));
@@ -154,8 +156,7 @@ function dataSection() {
 function logoSection() {
   const box = h('div.row');
   for (const k of ['mesh', 'orbit', 'knot']) box.append(h('button.chip.choice', { 'aria-pressed': String(store.get('logo') === k), on: { click: () => { store.set('logo', k); openDest('settings', 'appearance'); } } }, logoSvg(20, k), k));
-  const up = h('input', { type: 'file', accept: 'image/png,image/jpeg,image/webp', hidden: true, on: { change: async () => {
-    const f = up.files[0]; if (!f) return;
+  const up = fileButton({ icon: 'upload', text: pair('Upload logo…', '上載標誌…'), accept: 'image/png,image/jpeg,image/webp', onFile: async (f) => {
     if (f.size > 5 * 1024 * 1024) { toast(pair('Image is larger than 5 MB.', '圖片大過 5 MB。'), { kind: 'err' }); return; }
     try {
       const bmp = await createImageBitmap(f);
@@ -166,8 +167,8 @@ function logoSection() {
       store.set('logoCustom', c.toDataURL('image/png')); store.set('logo', 'custom');
       toast(pair('Logo converted and applied.', '已轉換並套用標誌。'), { kind: 'ok' }); openDest('settings', 'appearance');
     } catch (e) { toast(pair(`That image could not be used: ${e.message}`, `用唔到呢張圖：${e.message}`), { kind: 'err' }); }
-  } } });
-  box.append(h('label.btn.small.tonal', icon('upload'), pair('Upload logo…', '上載標誌…'), up));
+  } });
+  box.append(...up);
   if (store.get('logoCustom')) box.append(h('button.btn.small.text', { on: { click: () => { store.set('logoCustom', null); store.set('logo', 'mesh'); openDest('settings', 'appearance'); } } }, t('reset')));
   return h('div.flag-card', { dataset: { el: 'set-logo-upload' } }, h('b', pair('Logo presets and upload', '標誌預設同上載')), box);
 }

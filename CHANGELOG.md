@@ -13,8 +13,17 @@ Every push to `main` publishes the next release. A section headed "Unreleased" i
 - The changelog lists every published release with its code name and commit, and shows unreleased work as unreleased.
 - Help requests copied from an error now include the real app version.
 - Releases carry one full package, one delta from the previous release and a matching update index, instead of every historic package; Squirrel's GitHub sync had started to collide on the duplicates.
-- Design parity evidence for all 48 design views, checked by the tests.
+- Design parity evidence for all 49 design views, checked by the tests.
 - Screenshots are captured at 100% zoom again, with a provenance manifest.
+- A release check sweeps every page, dialog, menu and overlay of the app and every page of the website, in both themes, all three language modes and four window sizes, for accessibility rules, console errors, clipped or overlapping text and keyboard focus. The first runs reported 1,791 findings, a few of them from the checker itself; the real problems were fixed where they started, in shared components and tokens rather than screen by screen, and the final run before this release reports none.
+- On Windows the title bar keeps Windows' own minimise, maximise and close buttons, so Snap layouts work, and their colours follow the theme.
+- Menus and the command palette are proper lists: arrow keys move, Left and Right change a live value, and screen readers hear each value and how to change it. Dialogs, the setup wizard and the palette keep Tab inside until they close.
+- The tab bar holds only tabs; Delete closes a utility tab and New tab sits beside the list.
+- Every control shows a focus ring from the keyboard, including search boxes, steppers and sliders, and scrolling boxes can be scrolled from the keyboard.
+- Narrow and short windows no longer scroll sideways, the Settings list scrolls on short windows, and the title bar shortens its version line and search button instead of hiding them.
+- Light-theme success and danger buttons and badges meet the contrast minimum.
+- Toasts wait while they have keyboard focus or the pointer, at most three stay on screen (fewer on short windows), and focus goes back where it came from when one leaves. Keyboard focus always brings the focused control into view, including read-only output boxes, and long button labels wrap inside the button instead of running off a phone screen.
+- Website routes for desktop-only tools explain that the tool is in the desktop app instead of failing to render.
 
 ## v1.0.12 · 2026-11-07 · Crab Roe Siu Mai · 蟹籽燒賣 · cd93523
 

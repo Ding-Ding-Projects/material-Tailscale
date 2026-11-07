@@ -6,6 +6,8 @@ Every push to main builds the app on GitHub Actions, packages the installer, ver
 
 Packaging downloads only the previous release's `RELEASES` index and its newest full package (`MT_PREVIOUS_RELEASE`), so Squirrel builds one delta from it. The seeded package is then removed and `RELEASES` is trimmed to the packages this release ships. Earlier releases re-uploaded every historic package, which made each release larger than the last and made Squirrel's GitHub sync download the same file name from several releases at once; that collision failed the packaging step.
 
+After publishing, the install-proof job installs the previous release on a clean Windows runner, updates it to the new one with `Update.exe`, launches the updated app and photographs the runner's desktop twice: the window with the title bar Windows draws (`windows-title-bar.png`) and a pointer resting on maximise (`windows-maximise-hover.png`), where Windows offers Snap layouts if the runner's edition has them. Both photographs are attached to the release, and the job appends what it did, or why a photograph could not be taken, to the release notes before uninstalling.
+
 ## Configuration
 
 .github/workflows/release.yml

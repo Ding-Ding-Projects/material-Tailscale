@@ -13,7 +13,7 @@ Every row that stands for a value shows its live control beside the label:
 
 Right-clicking a setting card puts that setting's own control at the top of the menu. Every menu also carries a short set of quick settings. Changing a control applies at once through the same path as Settings, saves, keeps the menu open so several values can be adjusted in one visit, and every other place that shows the value updates. A control that cannot change from here, such as the language while School mode is on, stays visible, disabled, with its reason.
 
-Keyboard: Up and Down move between rows, Space toggles a switch, Left and Right change a choice or a slider, Enter runs a plain command, Escape closes the menu and returns focus to where you were. Each control reports its real role and state to screen readers, for example "Action sounds, switch, on".
+Keyboard: focus stays in the filter, which is a combobox driving a listbox of options. Up and Down (and Page Up and Page Down) move the active option, Enter runs a command, switches a switch, steps a choice or opens a swatch, Left and Right change a switch, choice or slider in place, and Escape closes the menu and returns focus to where you were. Tab leaves the menu and closes it. Each value is drawn inside its option rather than nested as a separate control, so a screen reader meets one option with its name, its state (for example "checked", or "Dark") and a hint naming the keys. The pointer can still click a segment, the switch or the swatch, or drag along a slider.
 
 ## Configuration
 

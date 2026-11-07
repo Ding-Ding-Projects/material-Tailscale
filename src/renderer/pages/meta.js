@@ -134,18 +134,18 @@ registerPage('status', (ctx) => {
     const self = s.Self || {};
     const kv = (k, v) => h('tr', h('th', { scope: 'row' }, k), h('td', v));
     extra.append(
-      h('section.card.span-6', { dataset: { el: 'status-self' } }, h('div.card-head', chip('laptop'), h('h3', pair('This device', '呢部裝置'))),
+      h('section.card.span-6', { dataset: { el: 'status-self' } }, h('div.card-head', chip('laptop'), h('h2.h3', pair('This device', '呢部裝置'))),
         h('div.tbl-wrap', h('table.tbl', h('tbody',
           kv('HostName', self.HostName || '—'), kv('DNSName', h('span.mono', self.DNSName || '—')), kv('TailscaleIPs', h('span.mono', (self.TailscaleIPs || []).join(', ') || '—')),
           kv('OS', self.OS || '—'), kv('Relay', self.Relay || '—'), kv('Online', h(`span.badge.${self.Online ? 'ok' : 'warn'}`, String(!!self.Online))))))),
-      h('section.card.span-6', { dataset: { el: 'status-health' } }, h('div.card-head', chip('health_and_safety', 'alt'), h('h3', pair('Health', '健康'))),
+      h('section.card.span-6', { dataset: { el: 'status-health' } }, h('div.card-head', chip('health_and_safety', 'alt'), h('h2.h3', pair('Health', '健康'))),
         health.length ? h('ol.steps.warn', health.map((m) => h('li', m))) : h('div.empty.small', icon('verified'), pair('tailscaled reports no health warnings.', 'tailscaled 冇報告健康警告。'))));
   };
   const off = ts.subscribe(draw);
   ctx.onCleanup(off);
   const exportBtn = h('button.btn.outline', { type: 'button', dataset: { el: 'status-export' }, on: { click: () => exportTo(FORMATS.find((f) => f.id === 'json'), () => ({ name: 'tailscale-status', data: { backend: last?.status?.BackendState || null, missing: !!last?.missing, lastPoll: last?.lastPoll ? new Date(last.lastPoll).toISOString() : null, status: last?.status || null } })) } }, icon('data_object'), pair('Export JSON', '匯出 JSON'));
   return h('div.page', head(pair('Evidence', '證據'), t('status'), pair('What this app can see right now, and where each claim comes from.', '本程式而家睇到嘅嘢，同每項嘅來源。'), exportBtn, stats),
-    h('section.card', { dataset: { el: 'status-checks' } }, h('div.card-head', h('span.ic', icon('fact_check')), h('h3', pair('Checks', '檢查'))), checks), extra);
+    h('section.card', { dataset: { el: 'status-checks' } }, h('div.card-head', h('span.ic', icon('fact_check')), h('h2.h3', pair('Checks', '檢查'))), checks), extra);
 });
 
 registerPage('notifications', () => h('div.page', head(pair('Messages', '訊息'), t('notifications'), pair('Every notification, including dismissed ones. Search, select and delete in bulk.', '所有通知，包括已關閉嘅。可以搜尋同批量刪除。')), h('div.card', notificationCentre())));
@@ -171,7 +171,7 @@ registerPage('about', () => {
         h('button.btn.outline', { type: 'button', dataset: { el: 'about-update' }, on: { click: () => checkForUpdates() } }, icon('system_update'), pair('Check for updates', '檢查更新')),
         heroStats([{ value: `v${i.version}`, label: t('version') }, { value: b.commitTime ? fmtDateTime(b.commitTime) : pair('unavailable', '冇資料'), label: t('updated') }])),
       h('div.grid',
-        h('section.card.span-6', { dataset: { el: 'about-build' } }, h('div.card-head', logoSvg(40), h('h3', pair('Build', '建置'))),
+        h('section.card.span-6', { dataset: { el: 'about-build' } }, h('div.card-head', logoSvg(40), h('h2.h3', pair('Build', '建置'))),
           h('div.tbl-wrap', h('table.tbl', h('tbody',
             store.get('displayName') ? row(pair('Shown as', '顯示為'), store.get('displayName')) : null,
             row(t('version'), `v${i.version}`),
@@ -182,7 +182,7 @@ registerPage('about', () => {
             row(pair('Runtime', '執行環境'), `Electron ${i.electron} · ${i.platform} ${i.arch}`),
             row(pair('Installer', '安裝程式'), pair('Squirrel.Windows, unsigned', 'Squirrel.Windows，冇簽名'))))),
           b.photoUrl ? h('img.about-photo', { src: b.photoUrl, alt: b.codeName || '' }) : null),
-        h('section.card.span-6', { dataset: { el: 'about-licences' } }, h('div.card-head', chip('gavel', 'alt'), h('h3', pair('Licences', '授權'))),
+        h('section.card.span-6', { dataset: { el: 'about-licences' } }, h('div.card-head', chip('gavel', 'alt'), h('h2.h3', pair('Licences', '授權'))),
           h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', h('th', pair('Component', '組件')), h('th', pair('Licence', '授權')))), h('tbody', LICENCES.map(([n, l]) => h('tr', h('td', n), h('td.mono.small', l))))))),
         h('section.card.span-12', { dataset: { el: 'about-notice' } },
           h('p', { style: { margin: 0 } }, pair('Material Tailscale is an independent desktop manager for Tailscale. It is not made by or affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.', 'Material Tailscale 係獨立嘅 Tailscale 桌面管理程式，同 Tailscale Inc. 冇關係。Tailscale 係 Tailscale Inc. 嘅商標。')),

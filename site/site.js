@@ -22,12 +22,15 @@ import { COMMANDS } from '../src/shared/cli-catalog.js';
 import '../src/renderer/pages/settings.js';
 import '../src/renderer/pages/tools.js';
 import '../src/renderer/pages/meta.js';
+import { settingLive } from '../src/renderer/ui/setting-live.js';
+import { watchScrollRegions } from '../src/renderer/ui/scroll-focus.js';
+import { revealFocus } from '../src/renderer/ui/focus-reveal.js';
 
 const S = window.__SITE__ || {};
 const REL = window.__RELEASE__ || null;
 const NAV = [['home', 'Home', '主頁', 'home'], ['features', 'Features', '功能', 'auto_awesome'], ['docs', 'Docs', '說明文件', 'menu_book'], ['download', 'Download', '下載', 'download'], ['changelog', 'Changelog', '更新紀錄', 'update'], ['status', 'Status', '狀態', 'monitoring'], ['tools', 'Tools', '工具', 'construction'], ['settings', 'Settings', '設定', 'settings']];
 let current = 'home', currentArg = null, cleanup = null;
-const outlet = h('main.outlet#outlet', { tabindex: '-1', style: { overflow: 'visible' } });
+const outlet = h('div.outlet#outlet', { tabindex: '-1', style: { overflow: 'visible' } });
 
 function parseHash() { const [d, ...rest] = location.hash.replace(/^#\/?/, '').split('/'); return [d || 'home', rest.length ? decodeURIComponent(rest.join('/')) : null]; }
 function open(dest, arg) { location.hash = '#/' + dest + (arg ? '/' + encodeURIComponent(arg) : ''); }
@@ -37,7 +40,7 @@ function render() {
     cleanup?.(); cleanup = null; clear(outlet);
     const ctx = { arg: currentArg, onCleanup: (f) => { cleanup = f; } };
     const local = LOCAL[current];
-    const fn = local || getPage(current) || LOCAL.home;
+    const fn = local || (DESKTOP_ONLY[current] ? desktopOnly(current) : getPage(current)) || desktopOnly(current);
     try { outlet.append(fn(ctx)); } catch (e) { outlet.append(h('div.card', h('h2', pair('This page failed to render', '呢頁顯示唔到')), h('div.out', String(e)))); }
     drawNav(); window.scrollTo({ top: 0 });
     document.title = `${NAV.find((n) => n[0] === current)?.[1] || 'Material Tailscale'} · Material Tailscale`;
@@ -77,6 +80,19 @@ const FEATURE_CARDS = [
   ['accessibility_new', 'Accessible by default', '無障礙', 'Text size, contrast, reduced motion, focus rings, large targets, read aloud.']
 ];
 
+// Pages that need this computer (bundled converters, local models, game servers, the Tailscale
+// command line) live in the desktop app. Their routes say so instead of failing.
+const DESKTOP_ONLY = {
+  converter: pair('It converts files on your computer with the bundled ffmpeg and 7-Zip.', '佢用內置嘅 ffmpeg 同 7-Zip 喺你部電腦度轉換檔案。'),
+  ollama: pair('It manages the Ollama models installed on your computer.', '佢管理你部電腦度嘅 Ollama 模型。'),
+  minecraft: pair('It creates and runs game servers on your computer, in Docker or over SSH.', '佢喺你部電腦、Docker 或者 SSH 度建立同運行遊戲伺服器。'),
+  console: pair('It runs tailscale commands on your computer.', '佢喺你部電腦度執行 tailscale 指令。')
+};
+const desktopOnly = (id) => () => h('div.page',
+  pageHero(pair('Desktop app', '桌面版'), DESKTOP_ONLY[id] ? t(id) : pair('In the desktop app', '喺桌面版入面'), `${DESKTOP_ONLY[id] || pair('This page manages Tailscale on your computer, so it lives in the desktop app.', '呢頁管理你部電腦嘅 Tailscale，所以喺桌面版入面。')} ${pair('The website shows everything that can run safely in a browser.', '網站只放可以安全喺瀏覽器運行嘅嘢。')}`,
+    h('a.btn', { href: '#/download' }, icon('download'), pair('Download for Windows', '下載 Windows 版')),
+    h('a.btn.outline', { href: '#/tools' }, icon('construction'), pair('Tools that run here', '喺度用到嘅工具'))));
+
 const LOCAL = {
   home: () => h('div.page',
     pageHero(pair('Material Tailscale for Windows', 'Windows 版 Material Tailscale'), pair('Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。'), pair('A Material 3 Expressive desktop app for Windows that gives every Tailscale command, flag and admin setting a real control. This website is its landing, documentation, download and status page; the app itself runs on your computer.', 'Windows 上嘅 Material 3 桌面程式，將每個 Tailscale 指令、旗標同管理設定變成真正嘅控制項。呢個網站係主頁、文件、下載同狀態頁；程式喺你部電腦運行。'),
@@ -110,9 +126,8 @@ function gallery() {
 function openPalette() {
   const items = [...NAV.map(([id, en, yue, ic]) => ({ label: pair(en, yue), icon: ic, run: () => open(id) })),
     ...ARTICLES.map((a) => ({ label: a.title, icon: 'article', run: () => open('docs', a.path) })),
-    ...SETTINGS_INDEX.filter((s) => !['tailscale', 'about'].includes(s.section)).map((s) => ({ label: pair(s.en, s.yue), icon: 'tune', run: () => { open('settings', s.section); setTimeout(() => { const el = document.querySelector(`[data-el="set-${s.key}"]`); el?.scrollIntoView({ block: 'center' }); el?.classList.add('teleport-hl'); el?.querySelector('button,input,select')?.focus(); }, 300); } })),
-    ...['authenticator', 'base64', 'regex', 'draw', 'history', 'notifications'].map((id) => ({ label: t(id), icon: 'construction', run: () => open(id) })),
-    { label: pair('Theme', '主題'), control: () => h('div.seg', ['dark', 'light', 'system'].map((v) => h('button', { role: 'radio', 'aria-checked': String(store.get('theme') === v), on: { click: () => store.set('theme', v) } }, v))) }];
+    ...SETTINGS_INDEX.filter((s) => !['tailscale', 'about'].includes(s.section)).map((s) => ({ label: pair(s.en, s.yue), icon: 'tune', live: settingLive(s.key)?.live, run: () => { open('settings', s.section); setTimeout(() => { const el = document.querySelector(`[data-el="set-${s.key}"]`); el?.scrollIntoView({ block: 'center' }); el?.classList.add('teleport-hl'); el?.querySelector('button,input,select')?.focus(); }, 300); } })),
+    ...['authenticator', 'base64', 'regex', 'draw', 'history', 'notifications'].map((id) => ({ label: t(id), icon: 'construction', run: () => open(id) }))];
   menu({ x: Math.max(8, innerWidth / 2 - 210), y: 70 }, items, { title: pair('Command palette', '指令面板') });
 }
 
@@ -142,16 +157,19 @@ store.on(() => applySettings());
 
 (async () => {
   mountOverlays();
+  watchScrollRegions();
+  revealFocus();
   i18n.setSchool(await window.mt.shared.get());
   window.mt.shared.onChange((r) => { i18n.setSchool(r); render(); });
   i18n.restoreVocab();
   const lang = h('div.seg', { role: 'radiogroup', 'aria-label': pair('Language', '語言') }, [['en', 'EN'], ['yue', '廣'], ['both', 'EN+廣']].map(([v, l]) => h('button', { role: 'radio', 'aria-checked': String(store.get('lang') === v), on: { click: () => { store.set('lang', v); location.reload(); } } }, l)));
   const menuBtn = h('button.icon-btn.site-menu', { 'aria-label': pair('Menu', '選單'), 'aria-expanded': 'false', on: { click: () => { const o = document.body.classList.toggle('nav-open'); menuBtn.setAttribute('aria-expanded', String(o)); } } }, icon('menu'));
   const header = h('header.site-header', { dataset: { el: 'site-header' } }, menuBtn, h('a.brand', { href: '#/home' }, logoSvg(26), h('b', 'Material Tailscale')), navBox, h('div.spacer'),
-    h('button.palette-trigger', { on: { click: openPalette } }, icon('search'), h('kbd', 'Ctrl+Shift+F')), lang, a11y);
+    h('button.palette-trigger', { 'aria-keyshortcuts': 'Control+Shift+F', title: `${pair('Search the site', '搜尋網站')} (Ctrl+Shift+F)`, on: { click: openPalette } }, icon('search'), h('span.sr-only', pair('Search the site', '搜尋網站')), h('kbd', 'Ctrl+Shift+F')), lang, a11y);
   const prov = h('footer.site-footer', h('span', S.version ? pair(`Website ${S.version} · updated ${fmtDateTime(S.commitTime)}`, `網站 ${S.version} · 更新 ${fmtDateTime(S.commitTime)}`) : pair('Website build provenance unavailable', '冇網站建置資料')),
     h('span', pair('Not affiliated with Tailscale Inc. Tailscale is a trademark of Tailscale Inc.', '同 Tailscale Inc. 冇關係。')));
-  document.body.append(h('div.ambient', { 'aria-hidden': 'true' }), header, h('div.site-prov.small.muted', { dataset: { el: 'provenance' } }, S.version ? `${pair('Version', '版本')} ${S.version} · ${pair('updated', '更新')} ${fmtDateTime(S.commitTime)}` : ''), outlet, prov);
+  // The provenance line belongs to the main landmark, above the page it describes.
+  document.body.append(h('div.ambient', { 'aria-hidden': 'true' }), header, h('main.site-main', h('div.site-prov.small.muted', { dataset: { el: 'provenance' } }, S.version ? `${pair('Version', '版本')} ${S.version} · ${pair('updated', '更新')} ${fmtDateTime(S.commitTime)}` : ''), outlet), prov);
   applySettings(); applyAppearance(); drawNav(); render();
   runSchedules(); setInterval(() => runSchedules().catch(() => {}), 30000);
   new MutationObserver(() => applyLocks()).observe(outlet, { childList: true, subtree: true });

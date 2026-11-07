@@ -2,6 +2,7 @@
 if (require('electron-squirrel-startup')) process.exit(0);
 
 const { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, autoUpdater, clipboard, Notification } = require('electron');
+const { openRoute } = require('./capture-routes.js');
 const fs = require('node:fs');
 const path = require('node:path');
 const ts = require('./tailscale');
@@ -42,10 +43,16 @@ function watchShared() {
 }
 
 // ---------- window ----------
+// On Windows the title bar keeps Windows' own caption buttons through the title-bar overlay, so
+// Snap layouts work; the renderer hides its drawn buttons and sends the theme's colours (checked
+// below). Other platforms draw the buttons in the page.
+const OVERLAY = process.platform === 'win32';
+const OVERLAY_HEIGHT = 44;
 function createWindow() {
   win = new BrowserWindow({
-    width: 1440, height: 940, minWidth: 380, minHeight: 560,
-    frame: false, titleBarStyle: 'hidden', backgroundColor: '#0b0f1a', show: false,
+    width: 1440, height: 940, minWidth: 380, minHeight: 480,
+    ...(OVERLAY ? { titleBarStyle: 'hidden', titleBarOverlay: { color: '#131829', symbolColor: '#e6e8f2', height: OVERLAY_HEIGHT } } : { frame: false, titleBarStyle: 'hidden' }),
+    backgroundColor: '#0b0f1a', show: false,
     icon: path.join(ROOT, 'assets', 'icon.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true, nodeIntegration: false, spellcheck: true, backgroundThrottling: false }
   });
@@ -99,7 +106,7 @@ const handle = (ch, fn) => ipcMain.handle(ch, async (_e, ...a) => {
   try { return { ok: true, value: await fn(...a) }; } catch (err) { return { ok: false, error: err.message, code: err.code }; }
 });
 
-handle('app:info', () => ({ product: PRODUCT, version: app.getVersion(), build: buildInfo(), platform: process.platform, arch: process.arch, electron: process.versions.electron, userData: app.getPath('userData'), packaged: app.isPackaged }));
+handle('app:info', () => ({ product: PRODUCT, version: app.getVersion(), build: buildInfo(), platform: process.platform, arch: process.arch, electron: process.versions.electron, userData: app.getPath('userData'), packaged: app.isPackaged, titleBarOverlay: OVERLAY }));
 handle('cli:catalog', () => ({ commands: COMMANDS, groups: GROUPS, global: GLOBAL_FLAGS }));
 handle('api:catalog', () => require('../shared/api-catalog.json'));
 handle('ts:locate', () => ts.locate());
@@ -171,6 +178,13 @@ handle('update:check', () => {
 handle('win:minimize', () => win.minimize());
 handle('win:maximize', () => (win.isMaximized() ? win.unmaximize() : win.maximize()));
 handle('win:close', () => win.close());
+handle('win:overlay', (o) => {
+  if (!OVERLAY || !win) return false;
+  const hex = /^#[0-9a-f]{6}$/i;
+  if (!o || !hex.test(o.color) || !hex.test(o.symbolColor)) throw new Error('Title-bar colours must be #rrggbb.');
+  win.setTitleBarOverlay({ color: o.color, symbolColor: o.symbolColor, height: OVERLAY_HEIGHT });
+  return true;
+});
 handle('win:title', (t) => win.setTitle(String(t).slice(0, 120)));
 handle('win:capture', async () => (await win.webContents.capturePage()).toPNG().toString('base64'));
 
@@ -200,6 +214,9 @@ function detectEditors() {
 }
 
 app.setAppUserModelId('com.dingdingprojects.materialtailscale');
+// The every-surface sweep runs in a throwaway profile: it never touches the user's settings,
+// starts from a known state, and can run beside an open copy of the app.
+if (process.env.MT_SWEEP_DIR) app.setPath('userData', fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'mt-sweep-profile-')));
 const single = app.requestSingleInstanceLock();
 if (!single) app.quit();
 app.on('second-instance', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
@@ -217,7 +234,10 @@ async function captureAll(dir) {
   await wait(150);
   if (process.env.MT_CAPTURE_DIAG) console.log(await wc.executeJavaScript('JSON.stringify({ w: innerWidth, h: innerHeight, dpr: devicePixelRatio, fs: getComputedStyle(document.body).fontSize, ts: getComputedStyle(document.documentElement).getPropertyValue("--text-scale") })'));
   if (process.env.MT_CAPTURE_MOTION) await wc.executeJavaScript(`window.__mtSet('motion', ${JSON.stringify(process.env.MT_CAPTURE_MOTION)}); true`);
-  if (process.env.MT_CAPTURE_LANG) await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(process.env.MT_CAPTURE_LANG)}); true`);
+  // Captures change settings only for their run: the user's saved settings come back at the end.
+  const savedSettings = await wc.executeJavaScript("localStorage.getItem('mt.settings.v1')").catch(() => null);
+  const captureLang = process.env.MT_CAPTURE_LANG || 'both';
+  await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(captureLang)}); true`);
   const clipping = [];
   const provenance = [];
   // Finds visible text that is cut off: horizontal overflow without a scroll
@@ -227,23 +247,14 @@ async function captureAll(dir) {
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {
-      // An entry may name a visible button to press after opening: dest:arg>Button label
-      const [route, press] = d.split('>');
-      const [dest, arg] = route.split(':');
-      await wc.executeJavaScript("document.querySelectorAll('.popover, .panel-float, .scrim').forEach((x) => x.remove()); true");
-      await wc.executeJavaScript(`window.__mtOpen(${JSON.stringify(dest)}, ${JSON.stringify(arg || undefined)}); true`);
-      await wait(900);
-      if (press?.startsWith('overlay@')) { const [kind, oarg] = press.slice(8).split('#'); await wc.executeJavaScript(`window.__mtOverlay(${JSON.stringify(kind)}, ${JSON.stringify(oarg || '')})`); await wait(1200); }
-      else if (press?.startsWith('menu@')) { await wc.executeJavaScript(`window.__mtContext(${JSON.stringify(press.slice(5))})`); await wait(900); }
-      else if (press?.startsWith('appearance@')) { const [elId, tab] = press.slice(11).split('#'); await wc.executeJavaScript(`window.__mtAppearance(${JSON.stringify(elId)}, ${JSON.stringify(tab || '')})`); await wait(1200); }
-      else if (press) { await wc.executeJavaScript(`[...document.querySelectorAll('button')].find((b) => { const x = b.textContent.trim(); return b.offsetParent && (x.endsWith(${JSON.stringify(press)}) || x.includes(${JSON.stringify(press + ' · ')})); })?.click(); true`); await wait(1200); }
+      await openRoute(wc, d);
       if (process.env.MT_CAPTURE_CLIP) { const found = await wc.executeJavaScript(CLIP_PROBE).catch(() => []); if (found.length) clipping.push({ theme, dest: d, found }); }
       const img = await wc.capturePage();
       const file = `${theme}-${d.replace(/[:>]/g, '-').replace(/[^a-zA-Z0-9-]/g, '').toLowerCase()}.png`;
       const png = img.toPNG();
       fs.writeFileSync(path.join(dir, file), png);
       const vp = await wc.executeJavaScript('({ width: innerWidth, height: innerHeight, dpr: devicePixelRatio, lang: document.documentElement.lang, motion: document.documentElement.classList.contains("reduce-motion") ? "reduced" : "full" })').catch(() => ({}));
-      provenance.push({ file, route: d, theme, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: vp.lang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
+      provenance.push({ file, route: d, theme, viewport: { width: vp.width, height: vp.height }, scale: vp.dpr, zoom: wc.getZoomFactor(), motion: vp.motion, language: captureLang, bytes: png.length, sha256: require('node:crypto').createHash('sha256').update(png).digest('hex') });
     }
   }
   if (process.env.MT_CAPTURE_PALETTE !== '0') {
@@ -263,6 +274,7 @@ async function captureAll(dir) {
     privacy: 'No account is signed in on the capture machine; no tailnet, token or personal data appears in these captures.',
     captures: provenance
   }, null, 2) + '\n');
+  await wc.executeJavaScript(savedSettings === null ? "localStorage.removeItem('mt.settings.v1'); true" : `localStorage.setItem('mt.settings.v1', ${JSON.stringify(savedSettings)}); true`).catch(() => {});
   app.quit();
 }
 
@@ -300,6 +312,7 @@ if (process.env.MT_CAPTURE_DIR && process.env.MT_CAPTURE_SCALE) app.commandLine.
 
 app.whenReady().then(() => {
   createWindow();
+  if (process.env.MT_SWEEP_DIR) { win.webContents.once('did-finish-load', async () => { try { win.focus(); win.webContents.focus(); await require('./sweep.js').runSweep(win, process.env.MT_SWEEP_DIR); } catch (e) { console.error('sweep failed:', e); } app.quit(); }); return; }
   if (process.env.MT_RECORD_DIR) { win.setSize(1440, 900); win.webContents.once('did-finish-load', () => recordPath(process.env.MT_RECORD_DIR)); return; }
   if (process.env.MT_CAPTURE_DIR) { win.setSize(Number(process.env.MT_CAPTURE_W || 1440), Number(process.env.MT_CAPTURE_H || 940)); win.webContents.once('did-finish-load', () => captureAll(process.env.MT_CAPTURE_DIR)); return; }
   createTray();

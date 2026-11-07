@@ -1,0 +1,11 @@
+{
+  "note": "Every-surface sweep scores. 'before' is the first run of each slice; slices were first run in this order, so later slices already include fixes from earlier ones. The first app run also counted findings that came from the sweep's own probes (focus rings read before a 1 ms transition finished, and the command palette left open from the previous surface); those were corrected in the tool, not the app. 'after' is the final full run of the same slice.",
+  "slices": [
+    { "id": "app-desktop", "label": "App · desktop · dark · English", "surface": "app", "sizes": ["desktop"], "themes": ["dark"], "langs": ["en"], "before": { "date": "2026-11-07", "checks": 56, "findings": 861, "distinct": 157 } },
+    { "id": "app-narrow", "label": "App · 960×540, tablet, phone · dark · English", "surface": "app", "sizes": ["small", "tablet", "mobile"], "themes": ["dark"], "langs": ["en"], "before": { "date": "2026-11-07", "checks": 168, "findings": 454, "distinct": 52 } },
+    { "id": "app-light-lang", "label": "App · desktop · light · Cantonese and bilingual", "surface": "app", "sizes": ["desktop"], "themes": ["light"], "langs": ["yue", "both"], "before": { "date": "2026-11-07", "checks": 112, "findings": 7, "distinct": 5 } },
+    { "id": "site-desktop", "label": "Website · desktop · dark · English", "surface": "site", "sizes": ["desktop"], "themes": ["dark"], "langs": ["en"], "before": { "date": "2026-11-07", "checks": 80, "findings": 81, "distinct": 2 } },
+    { "id": "site-sizes", "label": "Website · four sizes · dark · English", "surface": "site", "sizes": ["desktop", "small", "tablet", "mobile"], "themes": ["dark"], "langs": ["en"], "before": { "date": "2026-11-07", "checks": 320, "findings": 388, "distinct": 3 } }
+  ],
+  "final": null
+}

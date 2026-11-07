@@ -26,7 +26,7 @@ export const S = {
   notInstalled: { en: 'Tailscale not found', yue: '搵唔到 Tailscale' }, starting: { en: 'Starting', yue: '啟動緊' },
   direct: { en: 'direct', yue: '直連' }, relay: { en: 'relayed', yue: '中繼' }, offline: { en: 'offline', yue: '離線' }, idle: { en: 'idle', yue: '閒置' },
   newTab: { en: 'New tab', yue: '新分頁' }, pendingCommand: { en: 'Command that will run', yue: '將會執行嘅指令' },
-  output: { en: 'Output', yue: '輸出' }, filter: { en: 'Filter', yue: '篩選' }, all: { en: 'All', yue: '全部' }, none: { en: 'None', yue: '無' },
+  output: { en: 'Output', yue: '輸出' }, filter: { en: 'Filter', yue: '篩選' }, menu: { en: 'Menu', yue: '選單' }, all: { en: 'All', yue: '全部' }, none: { en: 'None', yue: '無' },
   leaveUnchanged: { en: 'Leave as is', yue: '唔改' }, on: { en: 'On', yue: '開' }, off: { en: 'Off', yue: '關' },
   editAppearance: { en: 'Edit appearance…', yue: '編輯外觀…' }, lockElement: { en: 'Lock this element…', yue: '鎖住呢個元素…' },
   version: { en: 'Version', yue: '版本' }, updated: { en: 'Updated', yue: '更新時間' }, codeName: { en: 'Code name', yue: '代號' },

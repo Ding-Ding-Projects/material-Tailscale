@@ -19,9 +19,9 @@
   --primary: oklch(from var(--seed) 0.80 calc(c * 0.9) h);
   --on-primary: #0b0f1a;
   --primary-cont: oklch(from var(--seed) 0.36 calc(c * 0.7) h);
-  --secondary: #6ce6b6; --secondary-cont: #123b2f;
+  --secondary: #6ce6b6; --secondary-cont: #123b2f; --on-secondary: #0b0f1a; --on-secondary-cont: var(--secondary);
   --tertiary: #ffc46b; --tertiary-cont: #3b2e12;
-  --error: #ffb4ab; --error-cont: #5a1a1a;
+  --error: #ffb4ab; --error-cont: #5a1a1a; --on-error: #2a0000;
   --glow-1: oklch(from var(--seed) 0.38 0.12 h / .9);
   --glow-2: #173a33;
   --shadow: 0 18px 50px rgba(0,0,0,.45);
@@ -33,9 +33,9 @@
   --on: #141726; --on-2: #3a4060; --on-3: #5b6283;
   --primary: oklch(from var(--seed) 0.45 calc(c * 1.1) h); --on-primary: #ffffff;
   --primary-cont: oklch(from var(--seed) 0.90 calc(c * 0.5) h);
-  --secondary: #0b7a57; --secondary-cont: #c9f2e2;
+  --secondary: #0b7a57; --secondary-cont: #c9f2e2; --on-secondary: #ffffff; --on-secondary-cont: #05583e;
   --tertiary: #8a5a00; --tertiary-cont: #ffe2b8;
-  --error: #b3261e; --error-cont: #f9dedc;
+  --error: #b3261e; --error-cont: #f9dedc; --on-error: #ffffff;
   --glow-1: oklch(from var(--seed) 0.9 0.06 h / .9); --glow-2: #dff5ec;
   --shadow: 0 18px 50px rgba(30,40,90,.15);
 }

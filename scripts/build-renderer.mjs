@@ -6,14 +6,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import esbuild from 'esbuild';
 import { parseChangelog } from './lib/changelog.mjs';
+import { docFiles } from './lib/doc-articles.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 fs.mkdirSync(path.join(dist, 'styles'), { recursive: true });
 
-const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.md') ? [path.join(d, e.name)] : []));
-const docsDir = path.join(root, 'docs');
-const files = fs.existsSync(docsDir) ? walk(docsDir).sort() : [];
+const files = docFiles(root);
 const articles = files.map((f) => {
   const body = fs.readFileSync(f, 'utf8');
   const rel = path.relative(root, f).replace(/\\/g, '/');

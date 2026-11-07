@@ -61,25 +61,47 @@ export function mountShell(info) {
   window.mt.win.onState(({ maximized }) => { maxBtn.firstChild.textContent = maximized ? 'filter_none' : 'crop_square'; });
   titleEl = h('span', appName());
   const b = info.build;
-  provEl = h('span.prov', { dataset: { el: 'provenance' } }, b ? [`v${b.version}`, b.codeName, `${t('updated')} ${b.commitTime ? fmtDateTime(b.commitTime) : pair('time unavailable', '冇時間資料')}`].filter(Boolean).join(' · ') : pair(`v${info.version} · build provenance unavailable`, `v${info.version} · 冇建置來源資料`));
+  // Version and update time always stay on the front screen: the full line on wide windows,
+  // a short one (version, date and minute) on narrow ones, and the full line as a tooltip.
+  const full = b ? [`v${b.version}`, b.codeName, `${t('updated')} ${b.commitTime ? fmtDateTime(b.commitTime) : pair('time unavailable', '冇時間資料')}`].filter(Boolean).join(' · ') : pair(`v${info.version} · build provenance unavailable`, `v${info.version} · 冇建置來源資料`);
+  const short = b ? `v${b.version} · ${b.commitTime ? fmtDateTime(b.commitTime).replace(/:\d\d \(.*\)$/, '') : pair('time unavailable', '冇時間資料')}` : `v${info.version}`;
+  provEl = h('span.prov', { dataset: { el: 'provenance' }, title: full }, h('span.prov-long', full), h('span.prov-short', { 'aria-hidden': 'true' }, short));
   const titlebar = h('header.titlebar', { dataset: { el: 'titlebar' } },
     h('div.brand', logoSvg(22), titleEl), provEl, h('div.grow'),
-    h('button.palette-trigger', { dataset: { el: 'palette-trigger' }, on: { click: () => window.dispatchEvent(new CustomEvent('mt:palette')) } }, icon('search'), h('span', pair('Search everything', '搜尋全部')), h('kbd', 'Ctrl+Shift+F')),
+    h('button.palette-trigger', { dataset: { el: 'palette-trigger' }, 'aria-keyshortcuts': 'Control+Shift+F', title: `${pair('Search everything', '搜尋全部')} (Ctrl+Shift+F)`, on: { click: () => window.dispatchEvent(new CustomEvent('mt:palette')) } }, icon('search'), h('span.pt-label', pair('Search everything', '搜尋全部')), h('kbd', 'Ctrl+Shift+F'), h('span.sr-only.pt-narrow', pair('Search everything', '搜尋全部'))),
     h('button.win-btn', { 'aria-label': t('notifications'), on: { click: () => openDest('notifications') } }, icon('notifications')),
     h('button.win-btn', { 'aria-label': pair('Accessibility tools', '無障礙工具'), dataset: { el: 'a11y-button' }, on: { click: (e) => window.dispatchEvent(new CustomEvent('mt:a11y', { detail: e.currentTarget })) } }, icon('accessibility_new')),
-    h('button.win-btn', { 'aria-label': pair('Minimise', '縮細'), on: { click: () => window.mt.win.minimize() } }, icon('remove')),
-    maxBtn,
-    h('button.win-btn.close', { 'aria-label': t('close'), on: { click: () => window.mt.win.close() } }, icon('close')));
+    // With the Windows title-bar overlay, Windows draws minimise, maximise (with Snap layouts) and close.
+    info.titleBarOverlay ? null : h('button.win-btn', { 'aria-label': pair('Minimise', '縮細'), on: { click: () => window.mt.win.minimize() } }, icon('remove')),
+    info.titleBarOverlay ? null : maxBtn,
+    info.titleBarOverlay ? null : h('button.win-btn.close', { 'aria-label': t('close'), on: { click: () => window.mt.win.close() } }, icon('close')));
+  if (info.titleBarOverlay) { titlebar.classList.add('overlay'); setTimeout(syncTitleBarOverlay, 30); store.on((k) => { if (['theme', 'seed', 'contrast'].includes(k)) setTimeout(syncTitleBarOverlay, 50); }); }
   titlebar.addEventListener('dblclick', (e) => { if (e.target.classList.contains('grow')) window.mt.win.maximize(); });
   railEl = h('nav.rail', { 'aria-label': pair('Destinations', '目的地'), dataset: { el: 'rail' } });
-  strip = h('div.tabstrip', { role: 'tablist', 'aria-label': pair('Tabs', '分頁'), dataset: { el: 'tabstrip' } });
+  // The tab list holds only tabs. New tab sits beside it, and the whole bar is a labelled landmark.
+  strip = h('div.tabstrip', { role: 'tablist', 'aria-label': pair('Open tabs', '開咗嘅分頁'), dataset: { el: 'tabstrip' } });
+  const newTab = h('button.tab-new', { type: 'button', 'aria-label': t('newTab'), title: `${t('newTab')} (Ctrl+T)`, dataset: { el: 'tab-new' }, on: { click: (e) => newTabCatalog(e.currentTarget) } }, icon('add'));
+  const tabbar = h('nav.tabbar', { 'aria-label': pair('Tabs', '分頁') }, strip, newTab);
   outlet = h('main.outlet', { id: 'outlet', tabindex: '-1' });
-  const app = h('div#app', titlebar, h('div.body', railEl, h('div.main', strip, outlet)));
+  const app = h('div#app', titlebar, h('div.body', railEl, h('div.main', tabbar, outlet)));
   document.body.append(h('div.ambient', { 'aria-hidden': 'true' }), app);
   renderRail(); renderTabs(); render();
   onLang(() => { titleEl.textContent = appName(); renderRail(); renderTabs(); render(); });
   store.on((k) => { if (k === 'displayName') { titleEl.textContent = appName(); window.mt.win.title(appName()); } });
   window.mt.win.title(appName());
+}
+
+// Sends the title bar's surface and text colours to the Windows overlay as #rrggbb.
+function cssHex(color) {
+  const c = document.createElement('canvas'); c.width = c.height = 1;
+  const x = c.getContext('2d'); x.fillStyle = color; x.fillRect(0, 0, 1, 1);
+  const [r, g, b] = x.getImageData(0, 0, 1, 1).data;
+  return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
+}
+function syncTitleBarOverlay() {
+  const cs = getComputedStyle(document.querySelector('.titlebar') || document.documentElement);
+  const root = getComputedStyle(document.documentElement);
+  window.mt.win.overlay({ color: cssHex(root.getPropertyValue('--surface').trim() || cs.backgroundColor), symbolColor: cssHex(root.getPropertyValue('--on').trim() || cs.color) }).catch(() => {});
 }
 
 function renderRail() {
@@ -96,18 +118,20 @@ function renderTabs() {
   for (const tb of tabs) {
     const d = DESTS.find((x) => x.id === tb.dest) || DESTS[0];
     const label = tb.kind === 'workspace' ? pair('Tailnet', 'Tailnet') + ' · ' + t(d.id) : t(d.id) + (tb.arg ? ` · ${tb.arg}` : '');
-    const el = h('div.tab', { role: 'tab', tabindex: tb.id === active ? '0' : '-1', 'aria-selected': String(tb.id === active), dataset: { el: 'tab-' + tb.id }, on: { click: () => selectTab(tb.id), auxclick: (e) => { if (e.button === 1 && tb.kind !== 'workspace') closeTab(tb.id); } } },
-      icon(tb.kind === 'workspace' ? 'lan' : d.icon), h('span.label', label),
-      tb.kind !== 'workspace' ? h('button.x', { 'aria-label': pair(`Close ${label}`, `關閉 ${label}`), on: { click: (e) => { e.stopPropagation(); closeTab(tb.id); } } }, icon('close')) : null);
-    el.addEventListener('keydown', (e) => {
+    const closable = tb.kind !== 'workspace';
+    const sel = tb.id === active;
+    // The tab and its close mark are siblings. Keyboard users close a tab with Delete; the mark is for the pointer.
+    const tab = h('div.tab-btn', { role: 'tab', tabindex: sel ? '0' : '-1', 'aria-selected': String(sel), title: label, 'aria-description': closable ? pair('Delete closes this tab', '撳 Delete 閂呢個分頁') : null, dataset: { el: 'tab-' + tb.id } },
+      icon(tb.kind === 'workspace' ? 'lan' : d.icon), h('span.label', label));
+    tab.addEventListener('keydown', (e) => {
       const i = tabs.findIndex((x) => x.id === tb.id);
-      if (e.key === 'ArrowRight') selectTab(tabs[(i + 1) % tabs.length].id, true);
-      if (e.key === 'ArrowLeft') selectTab(tabs[(i - 1 + tabs.length) % tabs.length].id, true);
-      if (e.key === 'Delete' && tb.kind !== 'workspace') closeTab(tb.id);
+      const go = { ArrowRight: (i + 1) % tabs.length, ArrowLeft: (i - 1 + tabs.length) % tabs.length, Home: 0, End: tabs.length - 1 }[e.key];
+      if (go !== undefined) { e.preventDefault(); selectTab(tabs[go].id, true); }
+      if (e.key === 'Delete' && closable) { e.preventDefault(); closeTab(tb.id); strip.querySelector('[aria-selected="true"]')?.focus(); }
     });
-    strip.append(el);
+    strip.append(h(`div.tab${sel ? '.sel' : ''}`, { role: 'presentation', on: { click: () => selectTab(tb.id), auxclick: (e) => { if (e.button === 1 && closable) closeTab(tb.id); } } },
+      tab, closable ? h('span.x', { 'aria-hidden': 'true', title: pair(`Close ${label}`, `關閉 ${label}`), on: { click: (e) => { e.stopPropagation(); closeTab(tb.id); } } }, icon('close')) : null));
   }
-  strip.append(h('button.tab-new', { 'aria-label': t('newTab'), title: `${t('newTab')} (Ctrl+T)`, dataset: { el: 'tab-new' }, on: { click: (e) => newTabCatalog(e.currentTarget) } }, icon('add')));
 }
 
 export function newTabCatalog(anchor) {

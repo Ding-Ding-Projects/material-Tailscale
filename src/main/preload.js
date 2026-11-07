@@ -35,7 +35,7 @@ contextBridge.exposeInMainWorld('mt', {
   clipboardImage: call('clipboard:readImage'),
   notify: call('notify'),
   update: { install: call('update:install'), check: call('update:check'), onState: on('update:state') },
-  win: { minimize: call('win:minimize'), maximize: call('win:maximize'), close: call('win:close'), title: call('win:title'), capture: call('win:capture'), onState: on('win:state') },
+  win: { minimize: call('win:minimize'), maximize: call('win:maximize'), close: call('win:close'), title: call('win:title'), capture: call('win:capture'), overlay: call('win:overlay'), onState: on('win:state') },
   onTray: on('tray:result'),
   pathForFile: (file) => webUtils.getPathForFile(file)
 });

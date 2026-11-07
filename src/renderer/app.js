@@ -5,8 +5,8 @@ import { t, pair } from './core/i18n.js';
 import * as ts from './core/tsdata.js';
 import { readAloud, narrate } from './core/feedback.js';
 import { mountShell, openDest, newTabCatalog, closeTab, currentDest, render, DESTS, openInNewTab } from './ui/shell.js';
-import { mountOverlays, toast, menu, popover, confirmDialog } from './ui/overlay.js';
-import { openPalette } from './ui/palette.js';
+import { mountOverlays, toast, menu, popover, confirmDialog, closePopover } from './ui/overlay.js';
+import { openPalette, closePalette } from './ui/palette.js';
 import { editAppearance, applyAppearance } from './ui/appearance.js';
 import { lockWizard, applyLocks } from './ui/locks.js';
 import { celebrate } from './ui/celebrate.js';
@@ -20,6 +20,9 @@ import { runMcSchedules } from './pages/minecraft.js';
 import { runSchedules } from './core/schedules.js';
 import { SETTINGS_INDEX } from './pages/settings-index.js';
 import './pages/meta.js';
+import { settingLive } from './ui/setting-live.js';
+import { watchScrollRegions } from './ui/scroll-focus.js';
+import { revealFocus } from './ui/focus-reveal.js';
 
 // ---------- appearance from settings ----------
 function applySettings() {
@@ -62,7 +65,7 @@ window.addEventListener('mt:a11y', (e) => {
 });
 
 const SHORTCUTS = [['Ctrl+Shift+F', pair('Command palette', '指令面板')], ['Ctrl+T', t('newTab')], ['Ctrl+W', pair('Close tab', '關分頁')], ['Ctrl+Tab', pair('Next tab', '下一個分頁')], ['Ctrl+1…9', pair('Rail destinations', '目的地')], ['Ctrl+R', t('refresh')], ['Ctrl+=, Ctrl+-', pair('Text size', '字體大小')], ['Shift+F10', pair('Context menu for the focused element', '焦點元素嘅選單')], ['F1', pair('Keyboard shortcuts', '快捷鍵')]];
-function showKeys() { popover({ x: innerWidth / 2 - 180, y: 80 }, h('div.stack', { style: { padding: '10px' } }, h('h3', pair('Keyboard shortcuts', '鍵盤快捷鍵')), ...SHORTCUTS.map(([k, l]) => h('div.row.nowrap', h('code.chip.mono', k), h('span', l))))); }
+function showKeys() { popover({ x: innerWidth / 2 - 180, y: 80 }, h('div.stack', { style: { padding: '10px' } }, h('h2.h3', pair('Keyboard shortcuts', '鍵盤快捷鍵')), ...SHORTCUTS.map(([k, l]) => h('div.row.nowrap', h('code.chip.mono', k), h('span', l)))), { label: pair('Keyboard shortcuts', '鍵盤快捷鍵') }); }
 
 // ---------- time awareness chip ----------
 const started = Date.now();
@@ -76,21 +79,9 @@ function timeChip() {
 
 // ---------- global context menu on every element ----------
 
-// ---------- live controls for settings inside context menus ----------
-const SET_ICONS = { theme: 'contrast', lang: 'translate', textScale: 'format_size', motion: 'animation', sounds: 'volume_up', narrator: 'record_voice_over', seed: 'palette', density: 'density_medium', contrast: 'tonality', focusRing: 'center_focus_strong', largeTargets: 'touch_app', funnyEn: 'sentiment_very_satisfied', funnyYue: 'sentiment_very_satisfied', adhdFocus: 'center_focus_weak', adhdLowStim: 'blur_on', adhdMomentum: 'east', quietHours: 'bedtime', statusInterval: 'timer' };
+// ---------- live values for settings inside context menus ----------
 const QUICK = ['theme', 'lang', 'textScale', 'motion', 'sounds', 'seed'];
-function liveFor(key) {
-  const s = SETTINGS_INDEX.find((x) => x.key === key); if (!s) return null;
-  const short = (en, yue) => (store.get('lang') === 'yue' ? yue : en);
-  const locked = i18n.schoolOn() && ['lang', 'funnyEn', 'funnyYue', 'dialogEmoji'].includes(key) ? pair('Set by School mode', '學校模式設定咗') : null;
-  const base = { label: short(s.en, s.yue), icon: SET_ICONS[key] || 'tune' };
-  const get = () => store.get(key); const set = (v) => store.set(key, v, { label: s.en });
-  if (s.type === 'bool') return { ...base, live: { kind: 'switch', get, set, disabled: locked } };
-  if (s.type === 'enum') return { ...base, live: { kind: 'choice', options: s.options.map((o) => ({ value: o[0], label: short(o[1], o[2]) })), get, set, disabled: locked } };
-  if (s.type === 'int' || s.type === 'float') return { ...base, live: { kind: 'range', min: s.min, max: s.max, step: s.type === 'float' ? 0.1 : 1, get, set, format: (v) => (key === 'textScale' ? `${v}%` : String(v)), disabled: locked } };
-  if (s.type === 'color') return { ...base, live: { kind: 'swatch', get, set, onSwatch: () => openDest('settings', s.section) } };
-  return null;
-}
+const liveFor = settingLive;
 
 function contextFor(target, at) {
   const el = target.closest('[data-el]');
@@ -123,7 +114,7 @@ document.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (e.ctrlKey && e.shiftKey && k === 'f') { e.preventDefault(); openPalette(); }
   else if (e.ctrlKey && k === 't') { e.preventDefault(); newTabCatalog(); }
-  else if (e.ctrlKey && k === 'w') { e.preventDefault(); const t0 = document.querySelector('.tab[aria-selected="true"]')?.dataset.el?.slice(4); if (t0) closeTab(t0); }
+  else if (e.ctrlKey && k === 'w') { e.preventDefault(); const t0 = document.querySelector('.tab-btn[aria-selected="true"]')?.dataset.el?.slice(4); if (t0) closeTab(t0); }
   else if (e.ctrlKey && e.key === 'Tab') { e.preventDefault(); const tabs = [...document.querySelectorAll('.tab')]; const i = tabs.findIndex((x) => x.getAttribute('aria-selected') === 'true'); tabs[(i + (e.shiftKey ? -1 : 1) + tabs.length) % tabs.length]?.click(); }
   else if (e.ctrlKey && /^[1-9]$/.test(e.key)) { const d = DESTS.filter((x) => x.rail)[Number(e.key) - 1]; if (d) { e.preventDefault(); openDest(d.id); } }
   else if (e.ctrlKey && k === 'r') { e.preventDefault(); ts.poll(); render(); }
@@ -178,6 +169,8 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
 // ---------- boot ----------
 (async () => {
   mountOverlays();
+  watchScrollRegions();
+  revealFocus();
   const info = await window.mt.info();
   window.__MT_VERSION__ = `${info.version}${info.build?.commit ? ` (${info.build.commit.slice(0, 7)})` : ''} on ${info.platform} ${info.arch}`;
   i18n.setSchool(await window.mt.shared.get().catch(() => ({})));
@@ -206,6 +199,8 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   // Capture hooks: open the context menu or the appearance editor for an element by data-el.
   window.__mtContext = (elId) => { const el = document.querySelector(`[data-el="${CSS.escape(elId)}"]`); if (!el) return false; const r = el.getBoundingClientRect(); contextFor(el, { x: r.left + 24, y: r.top + 24 }); return true; };
   // Capture hooks for overlays, each opening the real component with neutral sample wording.
+  // Automation hook: closes the palette, popovers, panels and dialogs between captured states.
+  window.__mtCloseOverlays = () => { closePalette(); closePopover(); document.querySelectorAll('.panel-float, .scrim').forEach((x) => x.remove()); return true; };
   window.__mtOverlay = async (kind, arg) => {
     if (kind === 'palette') { openPalette(); await new Promise((r) => setTimeout(r, 80)); const i = document.querySelector('input[role="combobox"]'); if (i && arg) { i.value = arg; i.dispatchEvent(new Event('input', { bubbles: true })); } return true; }
     if (kind === 'onboarding') { onboarding(); return true; }

@@ -8,15 +8,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { docFiles } from './lib/doc-articles.mjs';
 
 const require = createRequire(import.meta.url);
 const { ART } = require('../src/shared/hero-art.js');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'design', 'canvas');
 const assets = Object.keys(JSON.parse(fs.readFileSync(path.join(dir, 'assets.json'), 'utf8')).files);
+const ARTICLES = docFiles(root).length; // the same count the app and the website show
 
 // ---------- tiny markup helpers (all output is static, escaped by hand) ----------
-const ms = (n, cls = '') => `<span class="msr${cls}">${n}</span>`;
+const ms = (n, cls = '') => `<span class="msr${cls}" aria-hidden="true">${n}</span>`;
 const btn = (label, icon, cls = '') => `<button type="button" class="btn${cls ? ' ' + cls : ''}">${icon ? ms(icon) : ''}${label}</button>`;
 const ibtn = (icon, label) => `<button type="button" class="icon-btn" aria-label="${label}">${ms(icon)}</button>`;
 const chip = (label, pressed) => pressed === undefined ? `<span class="chip">${label}</span>` : `<button type="button" class="chip choice" aria-pressed="${pressed}">${label}</button>`;
@@ -63,7 +65,7 @@ V['home-setup'] = ['rocket_launch', 'First run', 'home', `<section class="setup"
 V.peers = ['hub', 'Peers', 'peers', hero('network', 'hub', 'Tailnet', 'Peers', '裝置', 'Every device on your tailnet with its live path, traffic, tags and quick actions. Right-click any device for more.', btn('Export', 'ios_share', 'outline') + btn('Select', 'checklist', 'text'), stats([['6', 'devices'], ['5', 'online', 'ok'], ['2', 'relayed', 'warn']])) + `<section class="card">${row(search('Filter by name, IP, tag, OS'))}${row(chip('All · 全部', true), chip('direct', false), chip('relayed', false), chip('idle', false), chip('offline', false), '<span class="spacer"></span>', seg(['Cards', 'Table'], 'Cards', 'Layout'))}</section>` + peerGrid()];
 V['peers-table'] = ['table_rows', 'Peers · table', 'peers', hero('network', 'hub', 'Tailnet', 'Peers', '裝置', 'The same devices as a sortable table with bulk actions.', '', stats([['6', 'devices'], ['2 selected', 'bulk actions']])) + `<div class="card"><div class="bulk-bar row">${badge('2 selected')}${btn('Ping all', 'network_ping', 'small outline')}${btn('Copy IPs', 'content_copy', 'small outline')}${btn('Expire keys', 'key_off', 'small danger')}</div>${table(['', 'Device', 'Address', 'OS', 'Path', 'Received', 'Sent', 'Last seen'], PEERS.map((p, i) => [`<input type="checkbox" aria-label="Select ${p[0]}" ${i < 2 ? 'checked' : ''}>`, `<b>${p[0]}</b>`, `<span class="mono">${p[2]}</span>`, p[1], badge(p[3], p[3] === 'direct' ? 'ok' : p[3] === 'relay' ? 'warn' : 'info'), p[5].match(/↓(\S+ \S+)/)[1], p[5].match(/↑(\S+ \S+)/)[1], p[5].split(' · ')[0].replace('Last seen ', '')]))}</div>`];
 const mark = (tone, text) => `<span class="state-mark"><span class="dot-live${tone ? ' ' + tone : ''}" aria-hidden="true"></span><span>${text}</span></span>`;
-V.status = ['monitoring', 'Status', 'peers', hero('network', 'monitoring', 'Evidence', 'Status', '狀態', 'What this app can see right now, and where each claim comes from.', btn('Export JSON', 'data_object', 'outline'), stats([['Running', 'backend', 'ok'], ['3 s', 'refresh'], ['0', 'health warnings', 'ok']])) + `<section class="card"><div class="card-head">${ic('fact_check')}<h3>Checks</h3></div>${table(['Check', 'State', 'Evidence'], [['Tailscale program', mark('', 'found'), ''], ['Backend state', mark('', 'Running'), '<span class="small muted">from tailscale status --json</span>'], ['Health warnings', mark('', '0'), ''], ['Last status poll', mark('', '2026-11-06 19:58:02'), ''], ['MagicDNS suffix', 'tail0a1b2.ts.net', ''], ['Tailnet', 'studio.example', ''], ['Client version', '1.90.6', '']])}</section>` + grid(card('This device', table(['Field', 'Value'], [['HostName', 'studio-laptop'], ['TailscaleIPs', '<span class="mono">100.101.12.4</span>'], ['OS', 'windows'], ['Relay', 'tor'], ['Online', badge('true', 'ok')]]), { span: 6, icon: 'laptop' }), card('Health', `<div class="empty small"><span class="msr">verified</span>tailscaled reports no health warnings.</div>`, { span: 6, icon: 'health_and_safety', tone: 'alt' }))];
+V.status = ['monitoring', 'Status', 'peers', hero('network', 'monitoring', 'Evidence', 'Status', '狀態', 'What this app can see right now, and where each claim comes from.', btn('Export JSON', 'data_object', 'outline'), stats([['Running', 'backend', 'ok'], ['3 s', 'refresh'], ['0', 'health warnings', 'ok']])) + `<section class="card"><div class="card-head">${ic('fact_check')}<h3>Checks</h3></div>${table(['Check', 'State', 'Evidence'], [['Tailscale program', mark('', 'found'), ''], ['Backend state', mark('', 'Running'), '<span class="small muted">from tailscale status --json</span>'], ['Health warnings', mark('', '0'), ''], ['Last status poll', mark('', '2026-11-06 19:58:02'), ''], ['MagicDNS suffix', 'tail0a1b2.ts.net', ''], ['Tailnet', 'studio.example', ''], ['Client version', '1.90.6', '']])}</section>` + grid(card('This device', table(['Field', 'Value'], [['HostName', 'studio-laptop'], ['TailscaleIPs', '<span class="mono">100.101.12.4</span>'], ['OS', 'windows'], ['Relay', 'tor'], ['Online', badge('true', 'ok')]]), { span: 6, icon: 'laptop' }), card('Health', `<div class="empty small"><span class="msr" aria-hidden="true">verified</span>tailscaled reports no health warnings.</div>`, { span: 6, icon: 'health_and_safety', tone: 'alt' }))];
 
 V.exit = ['travel_explore', 'Exit nodes', 'exit', hero('routes', 'route', 'Routing', 'Exit nodes', '出口節點', 'Send internet traffic through another device, a Mullvad location, or let Tailscale pick automatically.', btn('Suggest the best one', 'auto_awesome', 'tonal'), stats([['home-nas', 'in use', 'ok'], ['2', 'offered'], ['31', 'Mullvad cities']])) + grid(card('Choose an exit node · 揀出口節點', stack(search('Filter by name, country or city'), pick('block', 'None: route traffic normally', 'tailscale set --exit-node=', false), pick('auto_awesome', 'Automatic (best available)', 'auto:any', false), pick('dns', 'home-nas', '100.92.7.18 · direct · 4 ms', true), pick('router', 'cabin-router', '100.66.8.31 · relayed · 38 ms', false), sw('Allow local network access', '--exit-node-allow-lan-access', true)), { span: 7, icon: 'travel_explore' }), card('Mullvad locations', stack(seg(['Countries', 'Cities'], 'Cities', 'Group by'), table(['Location', 'Load', ''], [['Toronto · CA', '<div class="gauge" style="--v: 34; width: 28px; height: 28px"></div>', btn('Use', '', 'small tonal')], ['Tokyo · JP', '<div class="gauge" style="--v: 61; width: 28px; height: 28px"></div>', btn('Use', '', 'small tonal')], ['Frankfurt · DE', '<div class="gauge" style="--v: 22; width: 28px; height: 28px"></div>', btn('Use', '', 'small tonal')]])), { span: 5, icon: 'public', tone: 'warm' }))];
 V.routes = ['alt_route', 'Routes', 'routes', hero('routes', 'alt_route', 'Routing', 'Routes', '路由', 'Advertise subnets and app connectors, accept routes from peers and see what is approved.', btn('Advertise a subnet', 'add', ''), stats([['2', 'advertised'], ['1', 'awaiting approval', 'warn']])) + grid(card('Advertised by this device', stack(`<div class="chips-editor row">${chip('<span class="mono">198.51.100.0/24</span>')}${chip('<span class="mono">203.0.113.0/24</span>')}<input class="input" style="flex: 1; min-width: 160px" aria-label="Add a route" placeholder="Add a CIDR, for example 192.0.2.0/24"></div>`, row(chip('198.51.100.0/24', false), chip('203.0.113.0/24', false), chip('192.0.2.0/24', false)), sw('Accept routes from peers', '--accept-routes', true), sw('SNAT subnet routes', '--snat-subnet-routes (Linux)', true)), { span: 7, icon: 'alt_route' }), card('Approval', table(['Route', 'State'], [['198.51.100.0/24', badge('approved', 'ok')], ['203.0.113.0/24', badge('awaiting approval', 'warn')]]), { span: 5, icon: 'verified', tone: 'alt' }))];
@@ -110,7 +112,7 @@ V['settings-appearance'] = ['palette', 'Appearance', 'settings', setHero + `<div
 V['settings-language'] = ['translate', 'Language &amp; voice', 'settings', setHero + `<div class="split">${setNav('Language')}<div class="split-main"><div class="flags-grid">${flag('Language', 'lang', seg(['English', '廣東話', 'Both'], 'Both', 'Language'), 'Compact bilingual shows both.')}${flag('English funny level', 'funnyEn', `<input type="range" min="1" max="5" value="5" aria-label="English funny level" style="width: 100%">`, 'Level 5 · facts never change')}${flag('Cantonese funny level', 'funnyYue', `<input type="range" min="1" max="5" value="5" aria-label="Cantonese funny level" style="width: 100%">`, 'Level 5 · 事實唔會變')}${flag('Dim sum surprise', 'dimsum', `<button type="button" class="switch" role="switch" aria-checked="true" aria-label="Dim sum surprise"></button>`, 'A 1-in-10 chance of a dish at launch.')}</div></div></div>`];
 V['settings-accessibility'] = ['accessibility_new', 'Accessibility', 'settings', setHero + `<div class="split">${setNav('Accessibility')}<div class="split-main"><div class="flags-grid">${flag('High contrast', 'contrast', `<button type="button" class="switch" role="switch" aria-checked="false" aria-label="High contrast"></button>`, 'Stronger text and outlines.')}${flag('Large targets', 'largeTargets', `<button type="button" class="switch" role="switch" aria-checked="false" aria-label="Large targets"></button>`, 'Every control at least 52 px.')}${flag('Focus ring', 'focusRing', seg(['Bold', 'Subtle'], 'Bold', 'Focus ring'), 'Visible keyboard focus.')}${flag('Read aloud', 'readAloud', `<button type="button" class="switch" role="switch" aria-checked="false" aria-label="Read aloud"></button>`, 'Never reads secrets.')}</div></div></div>`];
 
-V.docs = ['menu_book', 'Docs', 'docs', hero('library', 'menu_book', 'Offline', 'Docs', '說明文件', '57 articles bundled into the app. Links between articles open here.', '', stats([['57', 'articles'], ['Offline', 'always', 'ok']])) + `<div class="card">${search('Search titles and article text')}</div><div class="split"><nav class="subnav" aria-label="Articles">${['Material Tailscale documentation', 'Completeness inventory', 'Accessibility tools', 'Per-element appearance editor', 'Peers and live status', 'Exit nodes', 'Minecraft servers'].map((x, i) => `<button type="button" class="subnav-item" aria-current="${i === 4}">${ms('article')}${x}</button>`).join('')}</nav><div class="split-main"><article class="card md"><h1>Peers and live status</h1><p>Every device on your tailnet appears as a card with its live path (direct, relayed or idle), traffic, tags and quick actions.</p><h2>Behaviour</h2><ul><li>Cards or a sortable table, with filters and a regex search.</li><li>Right-click a peer for every action, with shortcuts shown.</li></ul><h2>Suggested articles</h2><p><a href="#">Exit nodes</a> · <a href="#">Taildrop</a></p></article></div></div>`];
+V.docs = ['menu_book', 'Docs', 'docs', hero('library', 'menu_book', 'Offline', 'Docs', '說明文件', `${ARTICLES} articles bundled into the app. Links between articles open here.`, '', stats([[String(ARTICLES), 'articles'], ['Offline', 'always', 'ok']])) + `<div class="card">${search('Search titles and article text')}</div><div class="split"><nav class="subnav" aria-label="Articles">${['Material Tailscale documentation', 'Completeness inventory', 'Accessibility tools', 'Per-element appearance editor', 'Peers and live status', 'Exit nodes', 'Minecraft servers'].map((x, i) => `<button type="button" class="subnav-item" aria-current="${i === 4}">${ms('article')}${x}</button>`).join('')}</nav><div class="split-main"><article class="card md"><h1>Peers and live status</h1><p>Every device on your tailnet appears as a card with its live path (direct, relayed or idle), traffic, tags and quick actions.</p><h2>Behaviour</h2><ul><li>Cards or a sortable table, with filters and a regex search.</li><li>Right-click a peer for every action, with shortcuts shown.</li></ul><h2>Suggested articles</h2><p><a href="#">Exit nodes</a> · <a href="#">Taildrop</a></p></article></div></div>`];
 const release = (icon, title, sub, badges, notes, tone = 'warm') => `<section class="card lift"><div class="row"><span class="ic ${tone}">${ms(icon)}</span><div style="flex: 1; min-width: 0"><h2 class="release-title">${title}</h2><div class="small muted">${sub}</div></div>${badges}</div><ul>${notes.map((n) => `<li>${n}</li>`).join('')}</ul></section>`;
 V.changelog = ['update', 'Changelog', 'docs', hero('library', 'update', 'Releases', 'Changelog', '更新紀錄', 'Every released version with its date, code name and commit.', '', stats([['v1.0.12', 'running now'], ['6', 'releases listed'], ['Yes', 'unreleased work', 'ok']])) + `<div class="stack"><div class="card tonal"><div class="row">${search('Search changes')}<label class="row">From ${field('mm/dd/yyyy', '', 'From date')}</label><label class="row">To ${field('mm/dd/yyyy', '', 'To date')}</label>${btn('Export', 'download', 'small outline')}${btn('Copy', 'content_copy', 'small outline')}</div></div>${release('construction', 'Unreleased', 'Midnight Mesh 2', badge('on main, not released yet', 'warn'), ['Every screen redesigned on a design canvas, with the boards generated from the app\'s own stylesheets.', 'Context menus show live switches, choices, sliders and swatches for values.', 'The changelog lists every published release and shows unreleased work as unreleased.'])}${release('ramen_dining', 'v1.0.12', 'Crab Roe Siu Mai · 蟹籽燒賣 · 2026-11-07', badge('running now', 'ok') + '<span class="chip mono">cd93523</span>', ['Transient release API errors are retried, and packaging errors are reported clearly.', 'Clipping fixes and a shared schedules runner.'])}${release('ramen_dining', 'v1.0.11', 'Classic Siu Mai · 燒賣 · 2026-11-07', '<span class="chip mono">a788bb7</span>', ['The Minecraft server manager.', 'Regex flavour conversion, attempt trace, benchmark and folder search.'])}</div>`];
 V.history = ['history', 'History', 'docs', hero('library', 'history', 'Local', 'History', '歷史', 'Every change made through the app, as local version history you can diff, restore and export. Secrets are never stored.', btn('Export redacted', 'ios_share', 'outline'), stats([['142', 'changes'], ['Encrypted', 'snapshots', 'ok']])) + `<div class="card">${search('Search history')}${table(['When', 'Change', ''], [['21:30', 'Exit node set to home-nas', btn('Diff', 'difference', 'small outline')], ['21:12', 'Accept routes turned on', btn('Restore', 'restore', 'small outline')], ['Yesterday', 'Minecraft survival-1: difficulty, pvp', btn('Diff', 'difference', 'small outline')]])}</div>`];
@@ -125,7 +127,7 @@ V.confirm = ['gpp_maybe', 'Super confirmation', 'home', `<div class="dialog" rol
 V.ladder = ['stairs', 'Unlock ladder', 'home', `<div class="dialog" role="dialog" aria-label="Unlock" style="position: relative; max-width: 760px; margin: 0 auto"><header class="row"><span style="flex: 1; font: 700 20px var(--font-display)">Locked out? Climb the ladder</span>${badge('rung 2 of 3')}</header><ol class="steps"><li class="done">Dim sum quiz</li><li>Quick sums</li><li>Whack-a-mole</li></ol><div class="card tonal"><b>7 × 8 + 3 = ?</b>${row(field('Answer', '59'), btn('Check', 'check', ''))}</div><p class="small muted">For fun, not security. Three tries an hour; a support ticket is always available.</p></div>`];
 V.toasts = ['notifications_active', 'Notices', 'home', `<div class="toasts" style="position: relative; display: flex; flex-direction: column; gap: 10px; max-width: 520px; margin: 0 auto"><div class="toast ok" role="status">${ms('check_circle')}<span style="flex: 1">Connected to example.github.</span>${ibtn('close', 'Dismiss')}</div><div class="toast err" role="alert">${ms('error')}<span style="flex: 1">tailscale up failed: exit code 1.</span>${btn('Copy a help request', '', 'small text')}</div><div class="update-banner" role="status">${ms('system_update')}<span style="flex: 1">Update 1.0.13 is ready. The update is unsigned.</span>${btn('Restart to install update', 'restart_alt', 'small')}</div></div>`];
 
-V['site-home'] = ['language', 'Website · home', 'home', hero('network', 'language', 'Material Tailscale for Windows', 'Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。', 'Every Tailscale feature in a modern desktop app: peers, exit nodes, routes, sharing, DNS, Tailnet Lock, every CLI command and the whole admin API. This website is documentation and downloads, not the app itself.', btn('Download for Windows', 'download', 'big') + btn('Read the docs', 'menu_book', 'outline big'), stats([['93', 'API operations'], ['73', 'commands'], ['57', 'articles']])) + `<div class="grid">${[['hub', 'Peers', 'Live path, traffic and quick actions.'], ['travel_explore', 'Exit nodes', 'Mullvad, suggestions and LAN access.'], ['lan', 'Serve and Funnel', 'Share local services safely.'], ['enhanced_encryption', 'Tailnet Lock', 'Keys, signatures and recovery.'], ['terminal', 'Every command', 'Each flag a rich control.'], ['admin_panel_settings', 'Admin API', '93 operations as forms.']].map(([i, t, s]) => `<section class="card lift span-4"><div class="card-head">${ic(i)}<h3>${t}</h3></div><p class="muted" style="margin: 0">${s}</p></section>`).join('')}</div>`];
+V['site-home'] = ['language', 'Website · home', 'home', hero('network', 'language', 'Material Tailscale for Windows', 'Every Tailscale switch. One beautiful window.', '所有 Tailscale 開關，一個靚靚嘅窗口。', 'Every Tailscale feature in a modern desktop app: peers, exit nodes, routes, sharing, DNS, Tailnet Lock, every CLI command and the whole admin API. This website is documentation and downloads, not the app itself.', btn('Download for Windows', 'download', 'big') + btn('Read the docs', 'menu_book', 'outline big'), stats([['93', 'API operations'], ['73', 'commands'], [String(ARTICLES), 'articles']])) + `<div class="grid">${[['hub', 'Peers', 'Live path, traffic and quick actions.'], ['travel_explore', 'Exit nodes', 'Mullvad, suggestions and LAN access.'], ['lan', 'Serve and Funnel', 'Share local services safely.'], ['enhanced_encryption', 'Tailnet Lock', 'Keys, signatures and recovery.'], ['terminal', 'Every command', 'Each flag a rich control.'], ['admin_panel_settings', 'Admin API', '93 operations as forms.']].map(([i, t, s]) => `<section class="card lift span-4"><div class="card-head">${ic(i)}<h3>${t}</h3></div><p class="muted" style="margin: 0">${s}</p></section>`).join('')}</div>`];
 V['site-docs'] = ['article', 'Website · docs', 'docs', V.docs[3]];
 V['site-download'] = ['download', 'Website · download', 'home', hero('library', 'download', 'Releases', 'Download', '下載', 'Unsigned Squirrel installer with automatic updates. Windows may warn about an unknown publisher.', btn('MaterialTailscaleSetup.exe', 'download', 'big'), stats([['v1.0.12', 'latest'], ['Unsigned', 'installer', 'warn']])) + grid(card('What you get', `<ol class="steps"><li>Run the installer; it needs no administrator rights.</li><li>The app opens on the welcome wizard.</li><li>Updates download in the background and ask before restarting.</li></ol>`, { span: 12, icon: 'install_desktop' }))];
 
@@ -156,8 +158,8 @@ function board(file, title, views, height) {
   const chrome = isSite
     ? `<header class="site-header" style="display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--outline-soft)"><b style="font: 700 17px var(--font-display); flex: 1">Material Tailscale</b>${['Home', 'Docs', 'Download', 'Settings'].map((x) => `<a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">${x}</a>`).join('')}<button type="button" class="palette-trigger">${ms('search')}Search <kbd>Ctrl+Shift+F</kbd></button></header><p class="small muted" style="margin: 10px 22px 0">This website is the documentation and download page. It is not the app and cannot run Tailscale.</p>`
     : `<div class="titlebar"><span class="brand">${ms('blur_on')}Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger">${ms('search')}Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button>${ibtn('notifications', 'Notifications')}${ibtn('accessibility_new', 'Accessibility tools')}<button type="button" class="win-btn" aria-label="Minimise">${ms('remove')}</button><button type="button" class="win-btn" aria-label="Maximise">${ms('crop_square')}</button><button type="button" class="win-btn close" aria-label="Close">${ms('close')}</button></div>`;
-  const rail = isSite ? '' : `<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>`;
-  const tabs = `<div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="${views.length}"><button type="button" class="tab" role="tab" aria-selected="{{t.sel}}" onClick="{{t.pick}}"><span class="msr">{{t.icon}}</span><span class="label">{{t.label}}</span></button></sc-for><button type="button" class="tab-new" aria-label="New tab">${ms('add')}</button></div>`;
+  const rail = isSite ? '' : `<nav class="rail" aria-label="Destinations"><sc-for list="{{rail}}" as="r" hint-placeholder-count="16"><sc-if value="{{r.sep}}" hint-placeholder-val="{{ false }}"><div class="rail-sep"></div></sc-if><button type="button" class="rail-item" aria-current="{{r.cur}}"><span class="pill"><span class="msr" aria-hidden="true">{{r.icon}}</span></span>{{r.label}}</button></sc-for></nav>`;
+  const tabs = `<nav class="tabbar" aria-label="Tabs"><div class="tabstrip" role="tablist" aria-label="Open tabs"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="${views.length}"><div class="{{t.cls}}" role="presentation" onClick="{{t.pick}}"><div class="tab-btn" role="tab" aria-selected="{{t.sel}}" tabindex="{{t.ti}}"><span class="msr" aria-hidden="true">{{t.icon}}</span><span class="label">{{t.label}}</span></div></div></sc-for></div><button type="button" class="tab-new" aria-label="New tab">${ms('add')}</button></nav>`;
   const bodies = views.map((v, i) => `<sc-if value="{{v.${v.replace(/-/g, '_')}}}" hint-placeholder-val="{{ ${i === 0} }}"><div class="page">${V[v][3]}</div></sc-if>`).join('\n');
   const meta = views.map((v) => ({ id: v, key: v.replace(/-/g, '_'), icon: V[v][0], label: V[v][1].replace(/&amp;/g, '&'), dest: V[v][2] }));
   const script = `class Component extends DCLogic {
@@ -171,7 +173,7 @@ function board(file, title, views, height) {
     return {
       theme: this.props.theme === 'light' ? 'light' : 'dark',
       v,
-      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', pick: () => this.setState({ view: x.id, picked: true }) })),
+      tabs: VIEWS.map((x) => ({ icon: x.icon, label: x.label, sel: x.id === cur.id ? 'true' : 'false', cls: x.id === cur.id ? 'tab sel' : 'tab', ti: x.id === cur.id ? '0' : '-1', pick: () => this.setState({ view: x.id, picked: true }) })),
       rail: RAIL.map((r) => ({ ...r, cur: r.id === cur.dest ? 'page' : 'false' }))
     };
   }
@@ -215,6 +217,60 @@ ${script}
 `;
 }
 
+// ---------- report boards ----------
+// Not screen designs: they record results (the every-surface sweep's before and after score)
+// and carry a "report" prop, so the design-parity inventory skips them.
+function sweepReport() {
+  const hist = JSON.parse(fs.readFileSync(path.join(root, 'docs/sweep/history.json'), 'utf8'));
+  const f = hist.final;
+  const fmt = (n) => (n === undefined || n === null ? '—' : Number(n).toLocaleString('en-US'));
+  const bar = (n, max, tone) => `<div style="height: 10px; border-radius: 5px; background: var(--surface-3); overflow: hidden"><div style="height: 100%; width: ${max ? Math.max(n ? 2 : 0, Math.round((n / max) * 100)) : 0}%; background: var(--${tone})"></div></div>`;
+  const slice = (s) => {
+    const max = Math.max(s.before?.findings || 0, s.after?.findings || 0, 1);
+    const after = s.after ? `${fmt(s.after.findings)} findings · ${fmt(s.after.checks)} checks` : 'not run yet';
+    return card(s.label, `<div class="stack"><div class="row" style="align-items: baseline"><b style="font: 800 34px var(--font-display); color: var(--tertiary)">${fmt(s.before?.findings)}</b><span class="muted">first run · ${fmt(s.before?.distinct)} distinct · ${fmt(s.before?.checks)} checks</span></div>${bar(s.before?.findings || 0, max, 'tertiary')}<div class="row" style="align-items: baseline"><b style="font: 800 34px var(--font-display); color: var(--secondary)">${s.after ? fmt(s.after.findings) : '—'}</b><span class="muted">final run · ${after}</span></div>${bar(s.after?.findings || 0, max, 'secondary')}</div>`, { span: 6, icon: s.surface === 'site' ? 'public' : 'desktop_windows', tone: s.surface === 'site' ? 'alt' : '' });
+  };
+  const fixes = [['Icon names read aloud', 'Every glyph is hidden from assistive technology by the DOM builder'], ['Tab list with buttons inside', 'Tabs only in the list; Delete closes; New tab outside'], ['Controls nested in options', 'Combobox driving a listbox; live values drawn inside options'], ['Modals that let Tab leave', 'One shared focus hold for dialogs, the wizard and the palette'], ['Focus shown by tone only', 'Rings on search boxes, steppers, sliders and active options'], ['Pages pushed sideways', 'App grid column bound to the window; illustrations shrink on narrow windows'], ['Unreachable Settings sections', 'The section list scrolls inside short windows'], ['Light-theme contrast', 'On-colour tokens for green and danger buttons and the ok badge'], ['Website routes that failed', 'Desktop-only tools explain themselves and link to the download']];
+  const body = hero('library', 'fact_check', 'Release check', 'Every-surface sweep', '全面巡查', 'Every page, dialog, menu and overlay of the app and the website, in dark and light, English, Cantonese and bilingual, at desktop, 1080p at 200%, tablet and phone sizes: axe-core WCAG 2.2 AA and best practices, console, clipped, off-screen and overlapping text, and a keyboard walk.', '', stats([[f ? fmt(f.checks) : '—', 'surface checks'], [f ? fmt(f.findings) : '—', 'findings in the final run', f && !f.findings ? 'ok' : 'warn'], [f ? f.date : 'pending', 'final run']]))
+    + grid(...hist.slices.map(slice), card('Fixed at the root', table(['Pattern', 'Root fix'], fixes), { span: 12, icon: 'build_circle' }))
+    + `<p class="small muted" style="max-width: 980px">${hist.note}</p>`;
+  return body;
+}
+function reportBoard(file, title, body, height) {
+  const props = { theme: { editor: 'enum', options: ['dark', 'light'], default: 'dark' }, report: { editor: 'enum', options: ['sweep'], default: 'sweep' }, $preview: { width: 1440, height } };
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>${title}</title>
+<script src="./support.js"></script>
+${assets.map((u) => `<link rel="stylesheet" href="${u}">`).join('\n')}
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="${FONTS}">
+<style>
+html,body{margin:0;height:auto;overflow:auto;background:#0b0f1a}
+</style>
+</helmet>
+<div class="mm2-board theme-{{theme}}" data-board="${file}">
+<main class="outlet" style="padding: 32px">
+<div class="page">${body}</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='${JSON.stringify(props).replace(/&/g, '&amp;').replace(/'/g, '&#39;')}'>
+class Component extends DCLogic {
+  renderVals() { return { theme: this.props.theme === 'light' ? 'light' : 'dark' }; }
+}
+</script>
+</body>
+</html>
+`;
+}
+const REPORTS = [['Sweep.dc.html', 'Every-surface sweep · before and after', sweepReport, 1500]];
+
 // ---------- write files and the canvas layout ----------
 const check = process.argv.includes('--check');
 let drift = 0;
@@ -229,6 +285,15 @@ BOARDS.forEach(([file, title, views, height], i) => {
   layout[file] = { x, y, w: 1440, h: height, title, expand: 'fill', is_interactive: true };
   order.push(file); x += 1520; rowH = Math.max(rowH, height);
 });
+x = 0; y += rowH + 120; rowH = 0;
+for (const [file, title, make, height] of REPORTS) {
+  const html = reportBoard(file, title, make(), height);
+  const target = path.join(dir, file);
+  if (check) { if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== html) { console.error(`Board out of date: ${file}`); drift++; } }
+  else fs.writeFileSync(target, html);
+  layout[file] = { x, y, w: 1440, h: height, title, expand: 'fill', is_interactive: true };
+  order.push(file); x += 1520; rowH = Math.max(rowH, height);
+}
 const canvasPath = path.join(dir, 'canvas.json');
 const canvas = JSON.parse(fs.readFileSync(canvasPath, 'utf8'));
 canvas.boards = layout; canvas.order = order;
@@ -236,4 +301,4 @@ canvas.notes = { n1: { x: 0, y: -300, text: 'Material Tailscale · Midnight Mesh
 const canvasText = JSON.stringify(canvas, null, 2) + '\n';
 if (check) { if (fs.readFileSync(canvasPath, 'utf8') !== canvasText) { console.error('canvas.json out of date'); drift++; } process.exit(drift ? 1 : 0); }
 fs.writeFileSync(canvasPath, canvasText);
-console.log(`${BOARDS.length} boards, ${BOARDS.reduce((n, b) => n + b[2].length, 0)} views written to ${path.relative(root, dir)}`);
+console.log(`${BOARDS.length} boards, ${BOARDS.reduce((n, b) => n + b[2].length, 0)} views and ${REPORTS.length} report board(s) written to ${path.relative(root, dir)}`);

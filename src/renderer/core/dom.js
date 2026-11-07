@@ -16,6 +16,8 @@ export function h(sel, props, ...kids) {
     else if (k in el && typeof v !== 'string' && k !== 'list') el[k] = v;
     else el.setAttribute(k, v === true ? '' : v);
   }
+  // Icon-font glyphs are ligature words ("content_copy"); a screen reader must never read them.
+  if (el.classList.contains('msr') && !el.hasAttribute('aria-hidden')) el.setAttribute('aria-hidden', 'true');
   append(el, kids);
   return el;
 }

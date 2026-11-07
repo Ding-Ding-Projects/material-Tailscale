@@ -46,7 +46,7 @@ export function regexField({ placeholder, onChange, id }) {
   const toggle = h('button.icon-btn.sm', { type: 'button', 'aria-pressed': 'false', 'aria-label': pair('Use a regular expression', '用正則表達式'), title: 'Regex', on: { click: () => { re = !re; toggle.setAttribute('aria-pressed', String(re)); toggle.style.color = re ? 'var(--primary)' : ''; fire(); } } }, h('span.mono', '.*'));
   const builder = h('button.icon-btn.sm', { type: 'button', 'aria-label': pair('Open the regex builder', '開正則表達式工具'), title: pair('Regex builder', '正則工具'), on: { click: (e) => {
     const wb = workbench({ initial: input.value, onUse: (p) => { input.value = p; re = true; toggle.setAttribute('aria-pressed', 'true'); toggle.style.color = 'var(--primary)'; fire(); pop.close(); } });
-    const pop = popover(e.currentTarget, wb, { width: 560 });
+    const pop = popover(e.currentTarget, wb, { width: 560, label: pair('Regex builder', '正則工具') });
   } } }, icon('build'));
   const fire = () => {
     err.textContent = '';
