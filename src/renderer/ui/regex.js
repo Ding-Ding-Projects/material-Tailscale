@@ -6,6 +6,7 @@ import { h, icon, clear } from '../core/dom.js';
 import { pair, t } from '../core/i18n.js';
 import { popover, toast } from './overlay.js';
 import RX from '../../shared/regex-flavors.js';
+import { stepDebugger } from './regex-debugger.js';
 
 const TOKENS = [
   ['Any character', '.', '任何字元'], ['Digit', '\\d', '數字'], ['Not digit', '\\D', '非數字'], ['Word char', '\\w', '字詞字元'], ['Whitespace', '\\s', '空白'],
@@ -173,6 +174,7 @@ export function workbench({ initial = '', onUse } = {}) {
   const fl = flavourPanel(() => pat.value, () => ({ ...flags }));
   const tr = tracePanel(() => pat.value, flagStr, () => sample.value);
   const bn = benchPanel(() => pat.value, flagStr, () => sample.value);
+  const sd = stepDebugger(() => pat.value, flagStr, () => sample.value);
   [pat, sample, repl].forEach((x) => x.addEventListener('input', run));
   pat.addEventListener('input', () => fl.draw());
   drawLib(); run();
@@ -189,5 +191,6 @@ export function workbench({ initial = '', onUse } = {}) {
     h('b.small', pair('Library', '模式庫')), libBox,
     h('b.small', pair('Convert to another flavour', '轉去其他語法')), fl.el,
     h('b.small', pair('Debugger: attempt trace', '除錯：嘗試追蹤')), tr.el,
+    h('b.small', pair('Debugger: every step and backtrack', '除錯：每一步同回溯')), sd.el,
     h('b.small', pair('Benchmark', '效能測試')), bn.el);
 }

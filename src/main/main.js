@@ -11,6 +11,9 @@ const secrets = require('./secrets');
 const history = require('./history');
 const ladder = require('./ladder');
 const tools = require('./tools');
+const ollama = require('./ollama');
+const harness = require('./ollama-harness');
+const vdisk = require('./vdisk');
 const mc = require('./minecraft');
 const extensions = require('./extensions');
 const b64files = require('./base64-files');
@@ -135,6 +138,24 @@ handle('ladder:complete', (name, opts) => ladder.complete(lockId(name), opts));
 const progress = (job) => (p) => win?.webContents.send('tools:progress', { job, ...p });
 handle('tools:installTailscale', (job) => tools.installTailscale(progress(job)));
 handle('tools:installOllama', (job) => tools.installOllama(progress(job)));
+// Ollama suite: every local API request goes through the allowlist in src/main/ollama.js.
+ollama.setup({ userData: () => app.getPath('userData'), send: (ch, msg) => win?.webContents.send(ch, msg) });
+harness.setup({ userData: () => app.getPath('userData') });
+for (const [name, fn] of Object.entries({
+  runtime: () => ollama.runtime(), start: () => ollama.start(), stop: () => ollama.stop(), hardware: () => ollama.hardware(),
+  call: (op, body) => ollama.call(op, body), stream: (op, body, id) => ollama.stream(op, body, id, (line) => win?.webContents.send('ollama:stream', { id, line })), cancel: (id) => ollama.cancel(id),
+  catalog: () => ollama.catalog(), refreshCatalog: (job) => ollama.refreshCatalog(progress(job)),
+  pulls: () => ollama.pullState(), enqueue: (tags) => ollama.enqueue(tags), cancelPull: (id) => ollama.cancelPull(id), retryPull: (id) => ollama.retryPull(id), clearPulls: () => ollama.clearPulls(), setParallel: (n) => ollama.setParallel(n),
+  chats: () => ollama.chats(), saveChat: (s) => ollama.saveChat(s), deleteChat: (id) => ollama.deleteChat(id), exportChats: (ids, format) => ollama.exportChats(ids, format)
+})) handle('ollama:' + name, fn);
+// Virtual disks: validated requests; anything that changes a disk asks Windows for permission.
+vdisk.setup({ userData: () => app.getPath('userData') });
+handle('vdisk:run', (op, request, job) => vdisk.run(op, request, (p) => win?.webContents.send('vdisk:progress', { job, ...p })));
+handle('vdisk:measure', (items) => vdisk.measure(vdisk.validate('pack', { items }).items));
+for (const [name, fn] of Object.entries({
+  list: () => harness.list(), add: (spec) => harness.addProfile(spec), remove: (id) => harness.removeProfile(id), preflight: (o) => harness.preflight(o),
+  launch: (o) => harness.launch(o), snapshots: () => harness.snapshots(), restore: (f) => harness.restore(f)
+})) handle('harness:' + name, fn);
 handle('tools:ensureJava', (feature, job) => tools.ensureJava(feature, progress(job)));
 handle('tools:archiveCreate', (opts, job) => tools.archiveCreate(opts, progress(job)));
 handle('tools:archiveExtract', (opts, job) => tools.archiveExtract(opts, progress(job)));
@@ -294,7 +315,7 @@ async function captureAll(dir) {
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge.
   const CLIP_PROBE = `(() => { const out = []; const W = innerWidth; for (const el of document.querySelectorAll('body *')) { if (!el.offsetParent || el.closest('[aria-hidden=true],.out,.tbl-wrap,.picker-list,canvas,svg,.cmdline')) continue; const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); if (!r.width) continue; const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()); if (!hasText) continue; const clipped = el.scrollWidth > el.clientWidth + 6 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll' && cs.textOverflow !== 'ellipsis'; const past = r.right > W + 1; if (clipped || past) out.push({ sw: el.scrollWidth, cw: el.clientWidth, text: el.textContent.trim().slice(0, 60), tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 40), why: past ? 'past the right edge' : 'overflow hidden' }); if (out.length > 40) break; } return out; })()`;
-  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,base64>overlay@b64-demo,converter,regex,draw,ollama,minecraft,extensions,extensions>overlay@ext-consent,docs,features,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
+  const dests = (process.env.MT_CAPTURE_DESTS || 'home,peers,exit,routes,serve,taildrop,dns,lock,drive,certs,accounts,diagnostics,cli,cli:set,cli:serve,admin,console,tools,authenticator,base64,base64>overlay@b64-demo,converter,regex,draw,regex-debug,ollama,ollama:store,ollama:chat,ollama:create,ollama:harness,ollama:help,vdisks,vdisks:create,vdisks:pack,minecraft,extensions,extensions>overlay@ext-consent,docs,features,status,history,changelog,notifications,settings,settings:appearance,settings:language,settings:school,settings:schedules,about').split(',');
   for (const theme of (process.env.MT_CAPTURE_THEMES || 'dark,light').split(',')) {
     await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); window.__mtSet('motion', 'reduced'); true`);
     for (const d of dests) {

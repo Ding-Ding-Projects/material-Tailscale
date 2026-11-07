@@ -31,6 +31,10 @@ export const DEFAULTS = Object.freeze({
   locks: {},                   // lock metadata (credentials live in the vault)
   collapsed: {},
   featureFilters: {},
+  ollamaTab: 'models',
+  ollamaCart: [],
+  ollamaFit: { numCtx: 4096, perK: 0.125 },
+  vdiskLibrary: [],
   panelSizes: {},
   editor: '',
   onboarded: false,

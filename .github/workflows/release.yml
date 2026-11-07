@@ -193,3 +193,28 @@ jobs:
           Set-Content -Path notes.md -Value ($notes + $block) -Encoding utf8
           gh release edit $new --notes-file notes.md
           $result
+
+  vdisk-proof:
+    # Runs every virtual disk operation of the app's own disk script on a clean Windows
+    # runner (create, attach, detach, grow, shrink, compact, convert, differencing,
+    # merge, ISO and Quick pack) and appends the results to the release notes. Evidence
+    # only: the release is already published and nothing waits on this job.
+    needs: [release, install-proof]
+    if: ${{ always() && needs.release.result == 'success' }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run every virtual disk operation and record the results
+        shell: powershell
+        run: |
+          $tag = gh release list --limit 1 --json tagName --jq '.[0].tagName'
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts/vdisk-proof.ps1 -Out vdisk-proof.md
+          $code = $LASTEXITCODE
+          $notes = gh release view $tag --json body --jq .body
+          $block = "`n`n## Virtual disk proof (clean Windows runner)`n`n" + ((Get-Content vdisk-proof.md -Encoding UTF8) -join "`n") + "`n"
+          Set-Content -Path notes.md -Value ($notes + $block) -Encoding utf8
+          gh release edit $tag --notes-file notes.md
+          exit $code

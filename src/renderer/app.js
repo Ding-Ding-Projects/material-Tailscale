@@ -22,6 +22,9 @@ import { runSchedules } from './core/schedules.js';
 import { SETTINGS_INDEX } from './pages/settings-index.js';
 import './pages/meta.js';
 import './pages/features.js';
+import './pages/regex-debug.js';
+import './pages/ollama/index.js';
+import './pages/vdisks.js';
 import './pages/extensions.js';
 import * as extensions from './ui/extensions-client.js';
 import { settingLive } from './ui/setting-live.js';
@@ -179,6 +182,7 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   watchScrollRegions();
   revealFocus();
   const info = await window.mt.info();
+  window.__MT_PLATFORM__ = info.platform;
   window.__MT_VERSION__ = `${info.version}${info.build?.commit ? ` (${info.build.commit.slice(0, 7)})` : ''} on ${info.platform} ${info.arch}`;
   i18n.setSchool(await window.mt.shared.get().catch(() => ({})));
   window.mt.shared.onChange((rec) => { i18n.setSchool(rec); render(); });

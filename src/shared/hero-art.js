@@ -114,7 +114,7 @@ const FAMILY = {
   lock: 'security', accounts: 'security',
   dns: 'dns', diagnostics: 'diagnostics',
   cli: 'command', console: 'command', admin: 'admin',
-  tools: 'tools', authenticator: 'security', base64: 'tools', converter: 'tools', regex: 'tools', draw: 'tools', ollama: 'models', vdisks: 'disks', features: 'checklist',
+  tools: 'tools', authenticator: 'security', base64: 'tools', converter: 'tools', regex: 'tools', 'regex-debug': 'tools', draw: 'tools', ollama: 'models', vdisks: 'disks', features: 'checklist',
   minecraft: 'minecraft', settings: 'settings', extensions: 'extensions',
   docs: 'library', changelog: 'library', history: 'library', about: 'library'
 };

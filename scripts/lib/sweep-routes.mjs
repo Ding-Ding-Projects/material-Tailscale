@@ -13,7 +13,7 @@ const SETTINGS = ['tailscale', 'language', 'appearance', 'accessibility', 'sound
 export const APP_ROUTES = [
   'home', 'peers', 'exit', 'routes', 'serve', 'taildrop', 'dns', 'lock', 'drive', 'certs', 'accounts', 'diagnostics',
   'cli', 'cli:set', 'cli:set>Guide me', 'cli:serve', 'admin', 'console',
-  'tools', 'authenticator', 'base64', 'base64>overlay@b64-demo', 'converter', 'regex', 'draw', 'ollama',
+  'tools', 'authenticator', 'base64', 'base64>overlay@b64-demo', 'converter', 'regex', 'regex-debug', 'draw', 'ollama', 'ollama:store', 'ollama:chat', 'ollama:create', 'ollama:harness', 'ollama:help', 'vdisks', 'vdisks:create', 'vdisks:pack',
   'minecraft', 'minecraft>New server', 'minecraft>Discover and adopt',
   'extensions', 'extensions>overlay@ext-consent',
   'docs', 'features', 'status', 'history', 'changelog', 'notifications', 'about',

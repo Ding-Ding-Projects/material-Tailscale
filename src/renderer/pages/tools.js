@@ -15,8 +15,8 @@ import jsQR from 'jsqr';
 
 const head = pageHero;
 
-registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。'), heroStats([{ value: 8, label: pair('tools', '個工具') }, { value: pair('Offline', '離線'), label: pair('always', '一直'), tone: 'ok' }])),
-  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'draw', 'ollama', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', draw: 'draw', ollama: 'smart_toy', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id), window.mt?.site && ['converter', 'ollama', 'minecraft', 'console'].includes(id) ? h('span.badge.info', { style: { marginLeft: '8px' } }, pair('Desktop app', '桌面版')) : null), h('code', { authenticator: pair('TOTP codes', 'TOTP 驗證碼'), base64: pair('Encode and decode', '編碼同解碼'), converter: pair('Documents, media, archives', '文件、媒體、壓縮檔'), regex: pair('Build, test, trace', '建立、測試、追蹤'), draw: pair('Sketch and annotate', '畫圖同標註'), ollama: pair('Local models', '本機模型'), minecraft: pair('Create and run', '建立同運行'), console: pair('Any arguments', '任何參數') }[id]))))),
+registerPage('tools', () => h('div.page', head(pair('Built in', '內置'), t('tools'), pair('Local utilities that work offline. Each opens in the workspace or a new tab.', '離線都用到嘅本機工具。'), heroStats([{ value: 10, label: pair('tools', '個工具') }, { value: pair('Offline', '離線'), label: pair('always', '一直'), tone: 'ok' }])),
+  h('div.grid.stagger', ['authenticator', 'base64', 'converter', 'regex', 'regex-debug', 'draw', 'ollama', 'vdisks', 'minecraft', 'console'].map((id, i) => h('button.cmd-tile.span-3', { style: { '--i': i }, dataset: { el: 'tool-' + id }, on: { click: () => openDest(id), auxclick: () => openInNewTab(id) } }, h('span.ico', icon({ authenticator: 'pin', base64: 'data_object', converter: 'swap_horiz', regex: 'regular_expression', 'regex-debug': 'bug_report', draw: 'draw', ollama: 'smart_toy', vdisks: 'hard_drive', minecraft: 'grass', console: 'keyboard' }[id])), h('span', h('b', t(id), window.mt?.site && ['converter', 'ollama', 'vdisks', 'minecraft', 'console'].includes(id) ? h('span.badge.info', { style: { marginLeft: '8px' } }, pair('Desktop app', '桌面版')) : null), h('code', { authenticator: pair('TOTP codes', 'TOTP 驗證碼'), base64: pair('Encode and decode', '編碼同解碼'), converter: pair('Documents, media, archives', '文件、媒體、壓縮檔'), regex: pair('Build, test, trace', '建立、測試、追蹤'), 'regex-debug': pair('Every backtracking step', '每一步回溯'), draw: pair('Sketch and annotate', '畫圖同標註'), ollama: pair('Local models', '本機模型'), vdisks: pair('VHD, VHDX, ISO, Quick pack', 'VHD、VHDX、ISO、快速打包'), minecraft: pair('Create and run', '建立同運行'), console: pair('Any arguments', '任何參數') }[id]))))),
   h('div.grid', h('button.cmd-tile.span-12.addon-tile', { dataset: { el: 'tool-extensions' }, on: { click: () => openDest('extensions'), auxclick: () => openInNewTab('extensions') } },
     h('span.ico', icon('extension')), h('span', h('b', t('extensions'), window.mt?.site ? h('span.badge.info', { style: { marginLeft: '8px' } }, pair('Desktop app', '桌面版')) : null),
       h('code', pair('Add actions to devices and checks to Diagnostics, in any language', '用任何語言為裝置加動作、為診斷加檢查')))))));
@@ -241,57 +241,4 @@ registerPage('draw', (ctx) => {
   return h('div.page', head(pair('Annotate', '標註'), t('draw'), pair('Seven pens plus an eraser, Shift-locked straight strokes, undo and redo, SVG and 1x to 3x PNG export.', '七支筆加擦膠，Shift 畫直線，復原重做，匯出 SVG 同 PNG。')), h('div.card.tonal', toolbar), cv);
 });
 
-// ---------------- Ollama suite ----------------
-const OLL = 'http://127.0.0.1:11434';
-registerPage('ollama', (ctx) => {
-  const box = h('div.stack'), running = h('div.stack'), chat = h('div.stack');
-  const load = async () => {
-    clear(box).append(h('div.skeleton', { style: { height: '80px' } }));
-    try {
-      const [tags, ps, ver] = await Promise.all([fetch(OLL + '/api/tags').then((x) => x.json()), fetch(OLL + '/api/ps').then((x) => x.json()).catch(() => ({ models: [] })), fetch(OLL + '/api/version').then((x) => x.json()).catch(() => ({}))]);
-      clear(box).append(h('div.row', h('span.badge.ok', pair(`Ollama ${ver.version || ''} is running`, `Ollama ${ver.version || ''} 運行緊`)), h('span.small.muted', pair(`${(tags.models || []).length} models`, `${(tags.models || []).length} 個模型`))));
-      for (const m of tags.models || []) box.append(h('div.pick-row', { style: { cursor: 'default' } }, h('span.ava', icon('smart_toy')), h('span.meta', h('b', m.name), h('span', `${fmtBytes(m.size)} · ${m.details?.family || ''} ${m.details?.parameter_size || ''} ${m.details?.quantization_level || ''}`)),
-        h('button.btn.small.outline', { on: { click: async () => dialog({ title: m.name, wide: true, body: h('div.out', JSON.stringify(await fetch(OLL + '/api/show', { method: 'POST', body: JSON.stringify({ name: m.name }) }).then((x) => x.json()), null, 2).slice(0, 20000)) }) } }, pair('Details', '詳情')),
-        h('button.btn.small.tonal', { on: { click: () => { modelSel.value = m.name; prompt.focus(); } } }, pair('Chat', '對話')),
-        h('button.icon-btn.sm', { 'aria-label': pair(`Delete ${m.name}`, `刪除 ${m.name}`), on: { click: async () => { if (await superConfirm({ action: pair(`Delete the model ${m.name}`, `刪除模型 ${m.name}`), affects: fmtBytes(m.size) })) { await fetch(OLL + '/api/delete', { method: 'DELETE', body: JSON.stringify({ name: m.name }) }); toast(pair('Model deleted.', '已刪除模型。'), { kind: 'ok' }); load(); } } } }, icon('delete'))));
-      if (!tags.models?.length) box.append(h('div.empty.small', pair('No models downloaded yet. Pull one below.', '未有模型，喺下面下載。')));
-      clear(running).append(h('b', pair('Loaded in memory', '已載入記憶體')), ...(ps.models?.length ? ps.models.map((m) => h('div.chip', `${m.name} · ${fmtBytes(m.size_vram || m.size)} VRAM`)) : [h('span.small.muted', pair('None', '無'))]));
-      clear(modelSel).append(...(tags.models || []).map((m) => h('option', { value: m.name }, m.name)));
-    } catch {
-      clear(box).append(h('span.badge.warn', pair('Ollama is not running or not installed', 'Ollama 未運行或者未安裝')),
-        h('p', pair('One click downloads the official Ollama installer, verifies its SHA-256 checksum from the release, and installs it. If a previous install is broken, this repairs it in place; your models are kept.', '一撳就下載官方 Ollama 安裝程式、驗證 SHA-256 再安裝。舊版壞咗都會原地修復，模型會保留。')),
-        h('button.btn', { dataset: { el: 'install-ollama' }, on: { click: () => withProgress(pair('Install Ollama', '安裝 Ollama'), (job) => window.mt.tools.installOllama(job), { onDone: (r, b) => { if (r?.ok) { b.append(h('p', pair(`Ollama ${r.version} installed; checksum verified.`, `已安裝 Ollama ${r.version}。`))); setTimeout(load, 4000); } else if (r?.message) b.append(h('p', r.message)); } }) } }, icon('download'), pair('Install or repair Ollama', '安裝或修復 Ollama')));
-      clear(running);
-    }
-  };
-  const model = text('llama3.2', { label: 'Model', mono: true });
-  const prog = h('div.sc-progress', h('i', { style: { background: 'var(--primary)' } })); const progText = h('div.small');
-  const pull = async () => {
-    try {
-      const res = await fetch(OLL + '/api/pull', { method: 'POST', body: JSON.stringify({ name: model.get() }) });
-      const rd = res.body.getReader(); const dec = new TextDecoder();
-      for (;;) { const { done, value } = await rd.read(); if (done) break; for (const line of dec.decode(value).split('\n').filter(Boolean)) { const j = JSON.parse(line); if (j.error) throw new Error(j.error); const pct = j.total ? Math.round(((j.completed || 0) / j.total) * 100) : null; prog.firstChild.style.width = (pct ?? 5) + '%'; progText.textContent = `${j.status}${pct !== null ? ` ${pct}%` : ''}`; } }
-      toast(pair('Model downloaded.', '模型已下載。'), { kind: 'ok' }); load();
-    } catch (e) { toast(e.message, { kind: 'err' }); }
-  };
-  const modelSel = h('select.input', { 'aria-label': pair('Chat model', '對話模型') });
-  const prompt = h('textarea.input', { placeholder: pair('Ask something…', '問啲嘢…'), style: { minHeight: '80px', fontFamily: 'var(--font-body)' }, 'aria-label': pair('Message', '訊息') });
-  const msgs = []; const log = h('div.stack');
-  const send = async () => {
-    if (!prompt.value.trim() || !modelSel.value) return;
-    msgs.push({ role: 'user', content: prompt.value }); log.append(h('div.card.tonal', { style: { padding: '12px' } }, h('b', pair('You', '你')), h('div', prompt.value))); prompt.value = '';
-    const out = h('div', { style: { whiteSpace: 'pre-wrap' } }); log.append(h('div.card', { style: { padding: '12px' } }, h('b', modelSel.value), out));
-    try {
-      const res = await fetch(OLL + '/api/chat', { method: 'POST', body: JSON.stringify({ model: modelSel.value, messages: msgs, stream: true }) });
-      const rd = res.body.getReader(); const dec = new TextDecoder(); let full = '';
-      for (;;) { const { done, value } = await rd.read(); if (done) break; for (const line of dec.decode(value).split('\n').filter(Boolean)) { const j = JSON.parse(line); full += j.message?.content || ''; out.textContent = full; } }
-      msgs.push({ role: 'assistant', content: full });
-    } catch (e) { out.textContent = e.message; }
-  };
-  load();
-  clear(chat).append(h('h2.h3', pair('Chat with a local model', '同本機模型對話')), modelSel, prompt, h('div.row', h('button.btn', { on: { click: send } }, icon('send'), pair('Send', '傳送')), h('button.btn.text', { on: { click: () => { msgs.length = 0; clear(log); } } }, pair('New conversation', '新對話'))), log);
-  return h('div.page', head('Local AI', t('ollama'), pair('Install, run and manage local Ollama models: list, details, pull with progress, delete, what is loaded, and chat.', '安裝、運行同管理本機 Ollama 模型。'), h('button.btn.outline', { on: { click: load } }, icon('refresh'), t('refresh'))),
-    h('div.grid', h('section.card.span-7', box, running), h('section.card.span-5.tonal', h('h2.h3', pair('Download a model', '下載模型')), model.el, h('div.suggest', ['llama3.2', 'qwen2.5', 'gemma3', 'mistral', 'phi4', 'deepseek-r1'].map((m) => h('button.chip.choice', { on: { click: () => model.set(m) } }, m))), h('div.row', h('button.btn', { on: { click: pull } }, icon('download'), pair('Pull', '下載'))), prog, progText)),
-    h('section.card', chat));
-});
-
+// The Ollama suite lives in pages/ollama/.
