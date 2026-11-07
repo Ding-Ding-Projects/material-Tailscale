@@ -56,6 +56,7 @@ registerPage('home', (ctx) => {
     const s = d.status;
     clear(hero);
     hero.classList.toggle('bare', !!d.missing);
+    for (const e of [kpCard, peersHead, peersWrap]) e.hidden = !!d.missing;
     if (d.missing) { hero.append(missingCard()); return; }
     const st = stateOf(s);
     const self = s?.Self;
@@ -91,12 +92,13 @@ registerPage('home', (ctx) => {
     if (!top.length) peersBox.append(h('div.empty', icon('hub'), s ? pair('No peers yet. Add a device to your tailnet.', '未有其他裝置。加部裝置入 tailnet 啦。') : pair('Waiting for status…', '等緊狀態…')));
     top.forEach((p, i) => peersBox.append(peerCard(p, i)));
   };
+  const kpCard = h('section.card.span-12', kp);
+  const peersHead = h('div.span-12.row', h('h2', { style: { flex: 1 } }, t('peers')), h('button.btn.text', { on: { click: () => openDest('peers') } }, pair('All peers', '全部裝置'), icon('arrow_forward')));
+  const peersWrap = h('div.span-12', peersBox);
   const off = ts.subscribe(draw);
   ctx.onCleanup(() => { off(); chart.destroy(); });
   page.append(h('div.grid', hero, h('section.card.span-5', { dataset: { el: 'home-traffic' } }, h('div.card-head', h('h2', pair('Live traffic', '即時流量')), infoBtn(pair('Live traffic', '即時流量'), pair('Bytes per second across all peers, computed from the change in counters between status polls.', '所有裝置每秒位元組，由輪詢之間嘅計數差計出。'))), chart.el),
-    h('section.card.span-12', kp),
-    h('div.span-12.row', h('h2', { style: { flex: 1 } }, t('peers')), h('button.btn.text', { on: { click: () => openDest('peers') } }, pair('All peers', '全部裝置'), icon('arrow_forward'))),
-    h('div.span-12', peersBox)));
+    kpCard, peersHead, peersWrap));
   return page;
 });
 
