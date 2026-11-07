@@ -33,6 +33,8 @@ Problem patterns this sweep caught once and now checks everywhere:
 - a read-only output box that Tab reached without scrolling it into view (keyboard focus now scrolls any control that is out of sight just far enough);
 - a box that started scrolling only after a resize or a font load and stayed out of the keyboard order;
 - a bilingual button label wider than a phone screen (button labels now wrap inside the button).
+- choice rows that claimed to be checked without being radio buttons (they are radio buttons in a named radio group now), feature cards with a list-item role their element could not carry, and labelled boxes with no role to label;
+- section tabs whose scroll arrow sat on top of a tab on a phone (the arrow now takes its own space beside the strip), and a row of chat buttons that ran off a phone screen (it wraps).
 
 ## Configuration
 
