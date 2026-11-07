@@ -43,19 +43,16 @@
 @keyframes mm-pulse { 0% { opacity: .75; transform: scale(.6); } 100% { opacity: 0; transform: scale(2.3); } }
 @keyframes mm-spin { to { transform: rotate(360deg); } }
 /* Narrow windows keep the illustration small beside the text; phones drop it (it is decorative). */
-/* A hero with the real app in it: the capture rises from the band's lower right corner and
-   runs off its right and bottom edges; the theme picks the dark or light capture. */
-.hero-band.has-shot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); padding-right: 0; padding-bottom: 0; }
+/* A hero with the real app in it: the whole window of a smaller capture, set in from the band's
+   edges and running off its bottom; the theme picks the dark or light capture. */
+.hero-band.has-shot { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); padding-bottom: 0; }
 .hero-band.has-shot > .hero-text { padding-bottom: 28px; }
-.hero-shot { position: relative; align-self: end; min-width: 0; aspect-ratio: 4 / 3; border-radius: var(--r-l) 0 0 0; overflow: hidden; border: 1px solid var(--outline); border-right: 0; border-bottom: 0; background: var(--surface-2); box-shadow: 0 -12px 40px rgba(0, 0, 0, .28); }
-/* Cropped to the window's upper left at a size where its words can be read, instead of the whole
-   window shrunk until nothing can: the crop ends in the gap after the second column of controls
-   (977 of the capture's 1440 pixels) and below their second row, so no control is cut. */
-.hero-shot img { position: absolute; left: 0; top: 0; width: calc(100% * 1440 / 977); max-width: none; height: auto; }
+.hero-shot { position: relative; align-self: end; min-width: 0; aspect-ratio: 1120 / 690; border-radius: var(--r-l) var(--r-l) 0 0; overflow: hidden; border: 1px solid var(--outline); border-bottom: 0; background: var(--surface-2); box-shadow: 0 -12px 40px rgba(0, 0, 0, .28); }
+.hero-shot img { position: absolute; left: 0; top: 0; width: 100%; height: auto; }
 .hero-shot .shot-light, :root[data-theme="light"] .hero-shot .shot-dark, .theme-light .hero-shot .shot-dark { display: none; }
 :root[data-theme="light"] .hero-shot .shot-light, .theme-light .hero-shot .shot-light { display: block; }
 @media (max-width: 900px) { .hero-band { grid-template-columns: minmax(0, 1fr) 120px; gap: 16px; padding: 22px; } .hero-art { justify-self: end; align-self: start; max-width: 120px; height: 84px; } }
-@media (max-width: 900px) { .hero-band.has-shot { grid-template-columns: minmax(0, 1fr); padding: 22px 0 0 22px; } .hero-band.has-shot > .hero-text { padding: 0 22px 4px 0; } }
+@media (max-width: 900px) { .hero-band.has-shot { grid-template-columns: minmax(0, 1fr); padding: 22px 22px 0; } .hero-band.has-shot > .hero-text { padding-bottom: 4px; } }
 @media (max-width: 560px) { .hero-band { grid-template-columns: minmax(0, 1fr); } .hero-band > .hero-art { display: none; } .hero-band h1 { font-size: calc(34px * var(--text-scale)); } }
 
 /* ===== Cards ===== */

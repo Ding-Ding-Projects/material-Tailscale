@@ -256,8 +256,9 @@ const RAIL = [['home', 'home', 'Home'], ['peers', 'hub', 'Peers'], ['exit', 'tra
 
 const FONTS = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&amp;family=JetBrains+Mono:wght@400;600&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=block';
 
-function board(file, title, views, height) {
+function board(file, title, views, height, links = assets) {
   const isSite = views[0].startsWith('site-');
+  const isCompanion = views[0].startsWith('companion-');
   const chrome = isSite
     ? `<header class="site-header" style="display: flex; align-items: center; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--outline-soft)"><b style="font: 700 17px var(--font-display); flex: 1">Material Tailscale</b>${['Home', 'Docs', 'Download', 'Settings'].map((x) => `<a href="#" style="padding: 8px 12px; border-radius: 999px; text-decoration: none">${x}</a>`).join('')}<button type="button" class="palette-trigger">${ms('search')}Search <kbd>Ctrl+Shift+F</kbd></button></header><p class="small muted" style="margin: 10px 22px 0">This website is the documentation and download page. It is not the app and cannot run Tailscale.</p>`
     : `<div class="titlebar"><span class="brand">${ms('blur_on')}Material Tailscale</span><span class="prov">v1.0.12 · Updated 2026-11-07 00:58:31 (UTC−05:00)</span><span class="grow"></span><button type="button" class="palette-trigger">${ms('search')}Search everything · 搜尋全部 <kbd>Ctrl+Shift+F</kbd></button>${ibtn('notifications', 'Notifications')}${ibtn('accessibility_new', 'Accessibility tools')}<button type="button" class="win-btn" aria-label="Minimise">${ms('remove')}</button><button type="button" class="win-btn" aria-label="Maximise">${ms('crop_square')}</button><button type="button" class="win-btn close" aria-label="Close">${ms('close')}</button></div>`;
@@ -288,7 +289,7 @@ function board(file, title, views, height) {
 <meta charset="utf-8">
 <title>${title}</title>
 <script src="./support.js"></script>
-${assets.map((u) => `<link rel="stylesheet" href="${u}">`).join('\n')}
+${links.map((u) => `<link rel="stylesheet" href="${u}">`).join('\n')}
 </head>
 <body>
 <x-dc>
@@ -339,7 +340,7 @@ function sweepReport() {
     + `<p class="small muted" style="max-width: 980px">${hist.note}</p>`;
   return body;
 }
-function reportBoard(file, title, body, height) {
+function reportBoard(file, title, body, height, links = assets) {
   const props = { theme: { editor: 'enum', options: ['dark', 'light'], default: 'dark' }, report: { editor: 'enum', options: ['sweep'], default: 'sweep' }, $preview: { width: 1440, height } };
   return `<!doctype html>
 <html lang="en">
@@ -347,7 +348,7 @@ function reportBoard(file, title, body, height) {
 <meta charset="utf-8">
 <title>${title}</title>
 <script src="./support.js"></script>
-${assets.map((u) => `<link rel="stylesheet" href="${u}">`).join('\n')}
+${links.map((u) => `<link rel="stylesheet" href="${u}">`).join('\n')}
 </head>
 <body>
 <x-dc>

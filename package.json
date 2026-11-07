@@ -27,7 +27,8 @@
     "design:parity": "node scripts/design-parity.mjs",
     "design:boards": "node scripts/design-boards.mjs",
     "design:reference": "electron tools/design-reference",
-    "sweep": "node scripts/sweep.mjs"
+    "sweep": "node scripts/sweep.mjs",
+    "gen:completeness": "node scripts/gen-completeness.mjs"
   },
   "dependencies": {
     "7zip-bin": "^5.2.0",

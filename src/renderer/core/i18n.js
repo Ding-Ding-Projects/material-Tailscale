@@ -13,7 +13,7 @@ export const S = {
   dns: { en: 'DNS', yue: 'DNS' }, lock: { en: 'Tailnet Lock', yue: '網絡鎖' }, drive: { en: 'Taildrive', yue: '共享資料夾' },
   certs: { en: 'Certificates', yue: '證書' }, accounts: { en: 'Accounts', yue: '帳戶' }, diagnostics: { en: 'Diagnostics', yue: '診斷' },
   cli: { en: 'Every command', yue: '全部指令' }, admin: { en: 'Admin console', yue: '管理控制台' }, console: { en: 'Raw console', yue: '原始終端' },
-  tools: { en: 'Tools', yue: '工具' }, settings: { en: 'Settings', yue: '設定' }, docs: { en: 'Docs', yue: '說明文件' },
+  tools: { en: 'Tools', yue: '工具' }, settings: { en: 'Settings', yue: '設定' }, docs: { en: 'Docs', yue: '說明文件' }, features: { en: 'Features', yue: '功能' },
   changelog: { en: 'Changelog', yue: '更新紀錄' }, history: { en: 'History', yue: '歷史' }, status: { en: 'Status', yue: '狀態' },
   about: { en: 'About', yue: '關於' }, authenticator: { en: 'Authenticator', yue: '驗證器' }, base64: { en: 'Base64', yue: 'Base64' },
   converter: { en: 'File converter', yue: '檔案轉換' }, regex: { en: 'Regex builder', yue: '正則表達式' }, draw: { en: 'Drawing board', yue: '畫板' },

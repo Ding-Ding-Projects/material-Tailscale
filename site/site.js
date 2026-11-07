@@ -23,6 +23,7 @@ import '../src/renderer/pages/settings.js';
 import '../src/renderer/pages/tools.js';
 import '../src/renderer/pages/base64.js';
 import '../src/renderer/pages/meta.js';
+import '../src/renderer/pages/features.js';
 import { settingLive } from '../src/renderer/ui/setting-live.js';
 import { watchScrollRegions } from '../src/renderer/ui/scroll-focus.js';
 import { revealFocus } from '../src/renderer/ui/focus-reveal.js';
@@ -113,8 +114,6 @@ const LOCAL = {
     download(),
     h('h2', pair('What it covers', '包括乜嘢')), h('div.grid.stagger', FEATURE_CARDS.map(([ic, en, yue, d], i) => h('a.cmd-tile.span-3', { href: '#/features', style: { '--i': i } }, h('span.ico', icon(ic)), h('span', h('b', pair(en, yue)), h('div.small.muted', d))))),
     h('h2', pair('Screens from the real app', '實際程式截圖')), gallery()),
-  features: () => h('div.page', pageHero(pair('Everything', '全部'), pair('Features', '功能'), pair('Each feature has its own article.', '每個功能都有自己嘅文章。')),
-    h('div.grid.stagger', ARTICLES.map((a, i) => h('a.cmd-tile.span-4', { href: '#/docs/' + encodeURIComponent(a.path), style: { '--i': i } }, h('span.ico', icon('article')), h('span', h('b', a.title), h('div.small.muted', a.category)))))),
   download: () => h('div.page', pageHero(pair('Releases', '發佈'), pair('Download', '下載'), pair('Unsigned Squirrel installer with automatic updates. Windows may warn about an unknown publisher.', '未簽署嘅 Squirrel 安裝程式，會自動更新。Windows 可能會警告未知發行者。')), download(), h('div.card', h('h2', pair('Install', '安裝')), h('ol', h('li', pair('Download MaterialTailscaleSetup.exe.', '下載 MaterialTailscaleSetup.exe。')), h('li', pair('Run it. If SmartScreen warns about an unknown publisher, choose More info, then Run anyway. The installer is unsigned.', '執行。SmartScreen 警告時揀「更多資訊」再「仍要執行」，安裝程式冇簽名。')), h('li', pair('Install Tailscale too if you have not. The app finds it automatically.', '如果未裝 Tailscale 都要裝，程式會自動搵到。')))),
     h('div.card.tonal', h('h3', pair('Build it yourself', '自己建置')), h('div.cmdline', '.\\build.bat --run'))),
   status: () => h('div.page', h('h1', pair('Status', '狀態')), h('div.tbl-wrap', h('table.tbl', h('tbody',

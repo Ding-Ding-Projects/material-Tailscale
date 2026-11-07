@@ -32,6 +32,7 @@ export const DESTS = [
   { id: 'minecraft', icon: 'grass', rail: false },
   { id: 'extensions', icon: 'extension', rail: false },
   { id: 'docs', icon: 'menu_book', rail: true },
+  { id: 'features', icon: 'checklist', rail: false },
   { id: 'status', icon: 'monitoring', rail: false },
   { id: 'history', icon: 'history', rail: false },
   { id: 'changelog', icon: 'update', rail: false },

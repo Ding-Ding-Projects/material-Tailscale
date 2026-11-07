@@ -30,6 +30,7 @@ export const DEFAULTS = Object.freeze({
   appearance: {},              // per-element overrides keyed by data-el id
   locks: {},                   // lock metadata (credentials live in the vault)
   collapsed: {},
+  featureFilters: {},
   panelSizes: {},
   editor: '',
   onboarded: false,

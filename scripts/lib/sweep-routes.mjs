@@ -16,7 +16,7 @@ export const APP_ROUTES = [
   'tools', 'authenticator', 'base64', 'base64>overlay@b64-demo', 'converter', 'regex', 'draw', 'ollama',
   'minecraft', 'minecraft>New server', 'minecraft>Discover and adopt',
   'extensions', 'extensions>overlay@ext-consent',
-  'docs', 'status', 'history', 'changelog', 'notifications', 'about',
+  'docs', 'features', 'status', 'history', 'changelog', 'notifications', 'about',
   ...SETTINGS.map((s) => `settings:${s}`),
   'home>overlay@palette', 'home>overlay@onboarding', 'home>overlay@confirm', 'home>overlay@ladder', 'home>overlay@toasts', 'home>overlay@dimsum',
   'home>click@tab-new', 'settings:appearance>menu@set-theme',

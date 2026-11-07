@@ -1,68 +1,143 @@
 # Completeness inventory
 
-Per-surface inventory of the shared product feature list. App = desktop app, Site = website. Evidence lists the implementation file, article and capture.
+Generated from `src/shared/feature-inventory.js` by `npm run gen:completeness`; edit the inventory, not this file. The Features page in the app and on the website shows the same rows with search and filters. A state of "built, proof pending" means the check it needs cannot run on the build machine; the note says which.
 
-| Feature | App | Site | Implementation | Article | Capture |
+## Tailscale
+
+| Feature | App | Website | Repository | Evidence | Note |
 | --- | --- | --- | --- | --- | --- |
-| Language modes | yes | yes | src/renderer/core/i18n.js | features/language/language-modes.md | dark-settings-language.png |
-| Funny levels and dialog emojis | yes | yes | core/i18n.js, ui/overlay.js | features/language/funny-levels.md | dark-settings-language.png |
-| Personal vocabulary upload and drop | yes | yes | core/i18n.js, pages/settings.js, app.js | features/language/personal-vocabulary.md | — |
-| School mode (shared record) | yes | yes (per browser) | main.js shared record, pages/settings.js | features/language/school-mode.md | dark-settings-school.png |
-| Narrator and voice pickers | yes | yes (same settings and voice pickers; speaks the site's own notices) | core/feedback.js | features/language/narrator.md | — |
-| Action sounds | yes | yes | core/feedback.js | features/language/action-sounds.md | — |
-| Scheduled settings | yes | yes (runs while the page is open) | core/schedules.js | features/language/scheduled-settings.md | dark-settings-schedules.png |
-| Display name | yes | n/a | ui/shell.js | features/language/display-name.md | — |
-| ADHD modes, Momentum suggestions | yes | yes (Momentum: app only, it follows commands) | app.js, ui/command-form.js, shared/momentum.js | features/language/adhd-modes.md | — |
-| Dim sum surprise (cannot be turned off) | yes | yes | ui/dimsum.js | features/language/dim-sum-surprise.md | — |
-| Material 3 design, frameless window | yes | yes | styles/app.css, ui/shell.js | features/appearance/material-design.md | all |
-| Motion with reduced path | yes | yes | styles/app.css | features/appearance/motion.md | — |
-| Live charts | yes | n/a | ui/livechart.js | features/appearance/live-charts.md | dark-home.png |
-| Appearance editor | yes | yes | ui/appearance.js | features/appearance/appearance-editor.md | — |
-| Colour picker and translator | yes | yes | ui/colorpicker.js | features/appearance/color-picker.md | — |
-| Logo presets and upload | yes | uses app logo | ui/logo.js, pages/settings.js | features/appearance/logo.md | dark-settings-appearance.png |
-| Overlays, resizable panels | yes | yes | ui/overlay.js | features/navigation/context-menus.md | — |
-| Collapsible filters | yes | yes | ui/overlay.js collapsible | — | dark-peers.png |
-| Accessibility tools | yes | yes | app.js, site.js | features/appearance/accessibility.md | — |
-| Truthful empty states | yes | yes | all pages | — | dark-home.png |
-| Onboarding wizard | yes | n/a | ui/onboarding.js | features/navigation/onboarding.md | — |
-| Tabs | yes | n/a (site uses pages) | ui/shell.js | features/appearance/window-and-navigation.md | all |
-| Regex builder, flavour conversion, trace, benchmark | yes | yes | ui/regex.js, shared/regex-flavors.js | features/navigation/regex-builder.md | dark-regex.png |
-| Folder search (GREP) | yes | n/a (needs local files) | ui/regex.js, main/tools.js | features/navigation/regex-builder.md | — |
-| Guide me on command forms | yes | n/a | ui/command-form.js | features/tailscale/cli-commands.md | — |
-| Help request on failures | yes | n/a | ui/jobs.js, ui/command-form.js | features/tools/minecraft.md | — |
-| Command palette | yes | yes | ui/palette.js, site.js | features/navigation/command-palette.md | light-palette.png |
-| Context menus with shortcuts | yes | yes | app.js, ui/overlay.js | features/navigation/context-menus.md | — |
-| Rich controls and info buttons | yes | yes | ui/controls.js, ui/command-form.js | features/navigation/rich-controls.md | dark-cli-set.png |
-| Settings explanations and provenance | yes | yes | pages/settings.js, settings-index.js | features/navigation/settings-explanations.md | dark-settings.png |
-| Super confirmation | yes | yes | ui/safety.js | features/safety/super-confirmation.md | — |
-| Element locks, ladder, Support Tickets | yes | yes | ui/locks.js | features/safety/element-locks.md | — |
-| Authenticator and QR pairing | yes | yes | pages/tools.js, ui/locks.js | features/safety/authenticator.md | dark-authenticator.png |
-| Local history | yes | yes (browser store) | main/history.js | features/records/local-history.md | dark-history.png |
-| Exports and editor hand-off | yes | downloads | ui/exporter.js | features/records/exports.md | — |
-| Bulk actions | yes | yes | pages/tailscale.js, admin.js, overlay.js | features/records/bulk-actions.md | dark-peers.png |
-| Changelog viewer | yes | yes | pages/meta.js | features/records/changelog.md | dark-changelog.png |
-| Offline docs | yes | yes | pages/meta.js, build-renderer.mjs | features/records/offline-docs.md | dark-docs.png |
-| Rendered provider text | yes | yes | ui/markdown.js | features/records/offline-docs.md | — |
-| Notifications and centre | yes | yes | ui/overlay.js | features/records/notifications.md | dark-notifications.png |
-| File converter | partial | partial | pages/tools.js | features/tools/file-converter.md | dark-converter.png |
-| Virtual disk manager (VHD, VHDX, VHD Set, ISO attach, Quick pack) | no, not started | no (feature article not written) | — | — | — |
-| Base64 toolkit: same-folder drop conversion, variants and options, strict offsets, data: URLs, sandboxed preview, exports, history with undo | yes | yes (results download under the same names) | pages/base64.js, main/base64-files.js, shared/base64.js | features/tools/base64.md | dark-base64-overlayb64-demo.png |
-| Minecraft server manager | built; catalogues and download resolution verified live for all seven flavours; running a server and the generator unverified here | n/a | pages/minecraft.js, main/minecraft.js | features/tools/minecraft.md | dark-minecraft.png |
-| Ollama suite | partial (list, pull) | n/a | pages/tools.js | features/tools/ollama.md | dark-ollama.png |
-| Drawing and annotation | yes | yes | pages/tools.js | features/tools/drawing.md | dark-draw.png |
-| Front-screen version and time | yes | yes | ui/shell.js, site.js | — | title bar in every capture |
-| Real screenshots | yes | yes | main.js capture mode | — | docs/screenshots |
-| Squirrel installer, auto updates | yes | n/a | scripts/package-win.mjs, main.js | features/release/updates.md | — |
-| Release on every push | yes | n/a | .github/workflows/release.yml | features/release/release-pipeline.md | — |
-| Build entrypoints | yes | n/a | build.bat, build-installer.bat, download-dependencies.* | features/release/build-from-source.md | — |
-| Website with every feature | n/a | yes | site/ | — | — |
-| Social preview | yes | yes | social-preview.png | — | — |
+| Every Tailscale command | built, proof pending | n/a | n/a | `src/shared/cli-catalog.js`, `src/renderer/ui/command-form.js`, [article](features/tailscale/cli-commands.md), [screenshot](screenshots/dark-cli-set.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Peers and live status | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/peers.md), [screenshot](screenshots/dark-peers.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Exit nodes | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, `src/renderer/ui/controls.js`, [article](features/tailscale/exit-nodes.md), [screenshot](screenshots/dark-exit.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Subnet routes | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/subnet-routes.md), [screenshot](screenshots/dark-routes.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Serve and Funnel | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/serve-funnel.md), [screenshot](screenshots/dark-serve.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Taildrop | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/taildrop.md), [screenshot](screenshots/dark-taildrop.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| MagicDNS | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/magicdns.md), [screenshot](screenshots/dark-dns.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Tailnet Lock | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, `src/renderer/ui/safety.js`, [article](features/tailscale/tailnet-lock.md), [screenshot](screenshots/dark-lock.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Taildrive | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/taildrive.md), [screenshot](screenshots/dark-drive.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Certificates | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/certificates.md), [screenshot](screenshots/dark-certs.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Accounts | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/accounts.md), [screenshot](screenshots/dark-accounts.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Diagnostics | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/diagnostics.md), [screenshot](screenshots/dark-diagnostics.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
+| Admin console | built, proof pending | n/a | n/a | `src/renderer/pages/admin.js`, `src/shared/api-catalog.json`, [article](features/tailscale/admin-console.md), [screenshot](screenshots/dark-admin.png) | Not yet checked against a live admin API from the build machine. |
+| Raw console | built, proof pending | n/a | n/a | `src/renderer/pages/tailscale.js`, [article](features/tailscale/raw-console.md), [screenshot](screenshots/dark-console.png) | Not yet checked against a real tailnet: the build machine has no Tailscale daemon. |
 
-| End-to-end recording | yes | n/a | scripts/record.mjs | README.md | docs/recording/end-to-end.gif |
-| Clipping matrix | yes | n/a | scripts/clip-matrix.mjs | README.md | out/clipping (not committed) |
-| Postman collection | n/a | n/a | scripts/gen-postman.mjs | docs/api/ | — |
-| Extensions: manager, permission review, built-in extensions, any-language protocol | yes | n/a (runs programs; the articles are on the site) | main/extensions.js, ui/extensions-client.js, pages/extensions.js, extensions/ | features/extensions/extensions.md, features/extensions/writing-extensions.md | dark-extensions.png, dark-extensions-overlayext-consent.png |
-| Every-surface sweep (release check) | yes | yes | scripts/sweep.mjs, main/sweep.js, shared/sweep-probes.js | features/appearance/every-surface-sweep.md | docs/sweep/summary.md |
-| Windows title bar with system caption buttons (Snap layouts) | yes (Windows) | n/a | main.js titleBarOverlay, ui/shell.js | features/appearance/window-and-navigation.md | windows-title-bar.png on each release |
+## Language and personal touches
 
-Gaps are tracked as unchecked items in ROADMAP.md.
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Language modes | finished | finished | n/a | `src/renderer/core/i18n.js`, [article](features/language/language-modes.md), [screenshot](screenshots/dark-settings-language.png) |  |
+| Funny levels and dialog emojis | finished | finished | n/a | `src/renderer/core/i18n.js`, `src/renderer/ui/overlay.js`, [article](features/language/funny-levels.md), [screenshot](screenshots/dark-settings-language.png) |  |
+| Personal vocabulary | finished | finished | n/a | `src/renderer/core/i18n.js`, `src/renderer/ui/celebrate.js`, `src/renderer/pages/settings.js`, [article](features/language/personal-vocabulary.md) | Dropping the file on the window is an app feature; the website loads it from Settings. |
+| School mode | finished | finished | n/a | `src/main/main.js`, `src/renderer/pages/settings.js`, [article](features/language/school-mode.md), [screenshot](screenshots/dark-settings-school.png) |  |
+| Narrator and voices | finished | finished | n/a | `src/renderer/core/feedback.js`, [article](features/language/narrator.md) |  |
+| Action sounds | finished | finished | n/a | `src/renderer/core/feedback.js`, [article](features/language/action-sounds.md) |  |
+| Scheduled settings | finished | finished | n/a | `src/renderer/core/schedules.js`, [article](features/language/scheduled-settings.md), [screenshot](screenshots/dark-settings-schedules.png) | On the website a schedule runs while the page is open. |
+| Your name for the app | finished | n/a | n/a | `src/renderer/ui/shell.js`, [article](features/language/display-name.md) |  |
+| ADHD modes | finished | finished | n/a | `src/renderer/app.js`, `src/shared/momentum.js`, [article](features/language/adhd-modes.md) | Momentum suggestions follow commands, so they are in the app only. |
+| Dim sum surprise | finished | finished | n/a | `src/renderer/ui/dimsum.js`, [article](features/language/dim-sum-surprise.md) |  |
+| Job Experience Document wording | n/a | n/a | n/a | — | This app has no job-related workflows. |
+
+## Look and feel
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Material 3 design | finished | finished | n/a | `src/renderer/styles/app.css`, `src/renderer/styles/mesh2.css`, [article](features/appearance/material-design.md), [screenshot](screenshots/dark-settings-appearance.png) |  |
+| Motion with a reduced path | finished | finished | n/a | `src/renderer/styles/app.css`, [article](features/appearance/motion.md) |  |
+| Live charts | finished | n/a | n/a | `src/renderer/ui/livechart.js`, [article](features/appearance/live-charts.md), [screenshot](screenshots/dark-home.png) | The website has no live data to chart. |
+| Per-element appearance editor | finished | finished | n/a | `src/renderer/ui/appearance.js`, [article](features/appearance/appearance-editor.md) |  |
+| Colour picker and translator | finished | finished | n/a | `src/renderer/ui/colorpicker.js`, [article](features/appearance/color-picker.md) |  |
+| Logo presets and upload | finished | partly built | n/a | `src/renderer/ui/logo.js`, [article](features/appearance/logo.md), [screenshot](screenshots/dark-settings-appearance.png) | The website shows the app logo; choosing a logo is in the app. |
+| Overlays and resizable panels | finished | finished | n/a | `src/renderer/ui/overlay.js`, [article](features/navigation/context-menus.md) |  |
+| Collapsible filters and statistics | finished | finished | n/a | `src/renderer/ui/overlay.js`, [screenshot](screenshots/dark-peers.png) |  |
+| Accessibility tools | finished | finished | n/a | `src/renderer/app.js`, `site/site.js`, [article](features/appearance/accessibility.md) |  |
+| Truthful empty states | finished | finished | n/a | [screenshot](screenshots/dark-home.png) |  |
+| Browser-style tabs | finished | n/a | n/a | `src/renderer/ui/shell.js`, [article](features/appearance/window-and-navigation.md) | The website uses pages and links instead of tabs. |
+| Windows title bar with Snap layouts | built, proof pending | n/a | n/a | `src/main/main.js`, `src/renderer/ui/shell.js`, [article](features/appearance/window-and-navigation.md) | Photographed on a Windows runner for each release; not yet seen on a real Windows desktop. |
+
+## Finding and doing things
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Command palette | finished | finished | n/a | `src/renderer/ui/palette.js`, [article](features/navigation/command-palette.md), [screenshot](screenshots/light-palette.png) |  |
+| Context menus everywhere | finished | finished | n/a | `src/renderer/app.js`, `src/renderer/ui/overlay.js`, [article](features/navigation/context-menus.md) |  |
+| Rich controls and info buttons | finished | finished | n/a | `src/renderer/ui/controls.js`, `src/renderer/ui/command-form.js`, [article](features/navigation/rich-controls.md), [screenshot](screenshots/dark-cli-set.png) |  |
+| Guide me | finished | n/a | n/a | `src/renderer/ui/command-form.js`, [article](features/tailscale/cli-commands.md) | The website documents it; using it needs the app. |
+| Settings that explain themselves | finished | finished | n/a | `src/renderer/pages/settings.js`, `src/renderer/pages/settings-index.js`, [article](features/navigation/settings-explanations.md), [screenshot](screenshots/dark-settings.png) |  |
+| Regex builder beside every search | partly built | partly built | n/a | `src/renderer/ui/regex.js`, `src/shared/regex-flavors.js`, [article](features/navigation/regex-builder.md), [screenshot](screenshots/dark-regex.png) | A step-by-step backtracking view, other engines in the benchmark, and source-code editor integration are not built; the article lists each one. |
+| Search inside files | finished | n/a | n/a | `src/renderer/ui/regex.js`, `src/main/tools.js`, [article](features/navigation/regex-builder.md) | The website cannot read your folders. |
+| First-run setup | finished | n/a | n/a | `src/renderer/ui/onboarding.js`, [article](features/navigation/onboarding.md) | The website has nothing to set up. |
+| Progress and recovery where work happens | finished | partly built | n/a | `src/renderer/ui/jobs.js`, `src/renderer/ui/command-form.js`, [article](features/tools/minecraft.md) | The website runs only Base64 jobs, which show progress; it has no failures to hand on. |
+| This features page | finished | finished | n/a | `src/renderer/pages/features.js`, `src/shared/feature-inventory.js`, [article](features/records/features-page.md), [screenshot](screenshots/dark-features.png) |  |
+| Presets for blank editors | finished | finished | n/a | `src/renderer/ui/logo.js`, `src/renderer/ui/appearance.js` |  |
+
+## Safety and locks
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Two-key super confirmation | finished | finished | n/a | `src/renderer/ui/safety.js`, [article](features/safety/super-confirmation.md) |  |
+| Toy locks, ladder and Support Tickets | finished | finished | n/a | `src/renderer/ui/locks.js`, [article](features/safety/element-locks.md) |  |
+| Authenticator and QR pairing | finished | finished | n/a | `src/renderer/pages/tools.js`, `src/shared/totp.js`, [article](features/safety/authenticator.md), [screenshot](screenshots/dark-authenticator.png) |  |
+| Free, with no nagging | finished | finished | n/a | `LICENSE` |  |
+
+## Records and messages
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Local version history | finished | finished | n/a | `src/main/history.js`, [article](features/records/local-history.md), [screenshot](screenshots/dark-history.png) | On the website the history lives in this browser. |
+| Exports and editor hand-off | finished | finished | n/a | `src/renderer/ui/exporter.js`, [article](features/records/exports.md) | The website downloads exports instead of opening an editor. |
+| Bulk actions | finished | finished | n/a | `src/renderer/pages/tailscale.js`, `src/renderer/pages/admin.js`, [article](features/records/bulk-actions.md), [screenshot](screenshots/dark-peers.png) |  |
+| Changelog | finished | finished | n/a | `src/renderer/pages/meta.js`, [article](features/records/changelog.md), [screenshot](screenshots/dark-changelog.png) |  |
+| Offline documentation | finished | finished | n/a | `src/renderer/pages/meta.js`, `scripts/build-renderer.mjs`, [article](features/records/offline-docs.md), [screenshot](screenshots/dark-docs.png) |  |
+| Rendered provider text | finished | finished | n/a | `src/renderer/ui/markdown.js`, [article](features/records/offline-docs.md) |  |
+| Notices and their centre | finished | finished | n/a | `src/renderer/ui/overlay.js`, [article](features/records/notifications.md), [screenshot](screenshots/dark-notifications.png) |  |
+
+## Built-in tools
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Base64 toolkit | finished | finished | n/a | `src/shared/base64.js`, `src/main/base64-files.js`, `src/renderer/pages/base64.js`, [article](features/tools/base64.md), [screenshot](screenshots/dark-base64-overlayb64-demo.png) | The website downloads results under the same names instead of writing beside the file. |
+| File converter | partly built | partly built | n/a | `src/renderer/pages/tools.js`, [article](features/tools/file-converter.md), [screenshot](screenshots/dark-converter.png) | Not every format family in the shared list has an adapter yet; the article lists what is there. |
+| Drawing and annotation | finished | finished | n/a | `src/renderer/pages/tools.js`, [article](features/tools/drawing.md), [screenshot](screenshots/dark-draw.png) |  |
+| Ollama manager | partly built | n/a | n/a | `src/renderer/pages/tools.js`, [article](features/tools/ollama.md), [screenshot](screenshots/dark-ollama.png) | Listing and pulling models only; the rest of the suite is not built. |
+| Minecraft server manager | built, proof pending | n/a | n/a | `src/renderer/pages/minecraft.js`, `src/main/minecraft.js`, [article](features/tools/minecraft.md), [screenshot](screenshots/dark-minecraft.png) | Catalogues and downloads are checked live for all seven flavours; running a server has not been checked on the build machine. |
+| Minecraft world generator | built, proof pending | n/a | n/a | `src/renderer/pages/minecraft.js`, [article](features/tools/minecraft.md) | Not yet run on the build machine. |
+| Extensions | finished | n/a | n/a | `src/main/extensions.js`, `src/renderer/pages/extensions.js`, [article](features/extensions/extensions.md), [screenshot](screenshots/dark-extensions.png) | Extensions are programs on your computer; the website carries their articles. |
+| Virtual disk manager | not started | n/a | n/a | — | Not started. It needs Windows to build and prove, and the build machine runs Linux. |
+
+## Design and evidence
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Design reference and parity | finished | finished | n/a | `scripts/design-boards.mjs`, `scripts/design-parity.mjs`, [article](features/appearance/design-reference.md) |  |
+| Real screenshots and a recording | finished | finished | n/a | `src/main/main.js`, `scripts/record.mjs` |  |
+| Every-surface sweep | finished | finished | n/a | `scripts/sweep.mjs`, `src/main/sweep.js`, [article](features/appearance/every-surface-sweep.md) |  |
+| Clipping matrix | partly built | n/a | n/a | `scripts/clip-matrix.mjs` | The 125, 150 and 200 percent scales in every language mode are not run yet. |
+| Version on the front screen | finished | finished | n/a | `src/renderer/ui/shell.js`, `site/site.js` |  |
+| A picture for shared links | n/a | finished | n/a | `social-preview.png` |  |
+
+## Build, install and release
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| Installer and automatic updates | finished | n/a | n/a | `scripts/package-win.mjs`, `src/main/main.js`, [article](features/release/updates.md) |  |
+| A release on every push | n/a | n/a | finished | `.github/workflows/release.yml`, [article](features/release/release-pipeline.md) |  |
+| One-click build | n/a | n/a | finished | `build.bat`, `build-installer.bat`, `download-dependencies.bat`, [article](features/release/build-from-source.md) |  |
+| Build companion app | n/a | n/a | not started | — | Not started. |
+| Website as a portable app | n/a | n/a | not started | — | Not started. |
+| The website | n/a | finished | finished | `site/site.js`, `scripts/build-site.mjs`, `.github/workflows/pages.yml` |  |
+
+## Project records
+
+| Feature | App | Website | Repository | Evidence | Note |
+| --- | --- | --- | --- | --- | --- |
+| README | n/a | n/a | finished | `README.md` |  |
+| Roadmap checklist | n/a | n/a | finished | `ROADMAP.md` |  |
+| Handoff notes | n/a | n/a | finished | `HANDOFF.md`, `CLOSEOUT_PROMPT.md` |  |
+| One article per feature | n/a | n/a | finished | `docs/README.md` |  |
+| Postman collections | n/a | n/a | finished | `scripts/gen-postman.mjs` |  |
+| Wiki kept current | n/a | n/a | finished | — |  |
+| Contributor guide | n/a | n/a | finished | `AGENTS.md`, `scripts/check-instructions-lock.mjs` |  |
+| Wording lock | n/a | n/a | not started | — | Not wired in yet. |
+| Status hub registration | not started | n/a | not started | — | Not started: the hub is reachable only from the maintainer's own network. |
+
+Unfinished items are also unchecked items in `ROADMAP.md`.

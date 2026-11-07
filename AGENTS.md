@@ -64,6 +64,7 @@ This is a sanitised mirror of the maintainer's shared agent instructions. It was
 - A local file converter with a searchable adapter catalogue.
 - A local Base64 toolkit with every variant, strict error offsets, `data:` URLs, safe previews, exports and a history with undo. Dropping a file writes its Base64 beside it as the full name plus `.base64.txt`, and dropping that text writes the original back beside it with its name and extension restored, never overwriting; a website downloads the same names instead.
 - A local Ollama manager and a Minecraft server manager.
+- On Windows, a full virtual disk manager for VHD, VHDX and VHD Set files with ISO attach: every documented operation through a route that works on Windows Home, and Quick pack, which turns dropped files and folders into a new, automatically sized VHDX beside them, verifies every file and never overwrites.
 - A dim sum surprise and app-logo presets.
 - A personal-vocabulary JSON can be dropped on the window. It stays on the device.
 - Destructive actions need a super confirmation. Notices never block work, and a failed operation offers a copyable help request.

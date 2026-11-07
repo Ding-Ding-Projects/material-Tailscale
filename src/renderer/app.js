@@ -21,6 +21,7 @@ import { runMcSchedules } from './pages/minecraft.js';
 import { runSchedules } from './core/schedules.js';
 import { SETTINGS_INDEX } from './pages/settings-index.js';
 import './pages/meta.js';
+import './pages/features.js';
 import './pages/extensions.js';
 import * as extensions from './ui/extensions-client.js';
 import { settingLive } from './ui/setting-live.js';

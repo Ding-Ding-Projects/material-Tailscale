@@ -3,14 +3,14 @@
     "version": "1.0.0",
     "build": {
       "version": "1.0.0",
-      "commit": "17398e06ceec0dafd684d82c438421271d7f90a6",
-      "commitTime": "2026-11-07T06:27:50-05:00",
+      "commit": "bcd14cf849e1ec69f14b0088cb5ff79d84666eb1",
+      "commitTime": "2026-11-07T06:40:06-05:00",
       "codeName": null,
       "photoUrl": null,
       "builtBy": "local build",
       "dirtyTree": false
     },
-    "rendererBundleSha256": "dc63dc2899d8b80ccbb02d9fd4f59ef7acb5625b7bb79c3e52ae4a740a3ca375"
+    "rendererBundleSha256": "3b763f9ee1041db18b80125077d70328fe7132f071300f8703024230be863964"
   },
   "method": "Electron capturePage of the built renderer in capture mode (cloud Linux, Xvfb); screens show this machine's real state, except the Base64 state, which converts sample files the capture run creates in a temporary folder",
   "privacy": "No account is signed in on the capture machine; no tailnet, token or personal data appears in these captures.",
@@ -28,8 +28,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 208962,
-      "sha256": "cd140b67217071c2421f1e00d570356b9f241432faf4287d877cf6fe983d1526"
+      "bytes": 208868,
+      "sha256": "3eaab1330a792d3762eb2e29c4adca8910ac3ee67852eda4a40dc8e6d8fe0940"
     },
     {
       "file": "dark-peers.png",
@@ -44,8 +44,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 259331,
-      "sha256": "2e2702aa9718da9e86066f76bfa2aa71fe16c1bebe9c81386606bd6624ba05cb"
+      "bytes": 259222,
+      "sha256": "8353510c102ef472e3077148c0f5a0b71b7e1da806ccce22c7ad5e2a40e7dc03"
     },
     {
       "file": "dark-exit.png",
@@ -60,8 +60,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 265722,
-      "sha256": "835aeb6f33f76b43ddb436fa319d6eae1d2a3b7316b88e01523b9573a205fa2b"
+      "bytes": 265627,
+      "sha256": "9f2f7585a48ad119be26011ee8d388e64ad6aa01e1d0c5a6e24db3e994fc431e"
     },
     {
       "file": "dark-routes.png",
@@ -76,8 +76,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 238318,
-      "sha256": "e197889d2c3483e886ddf37f2b9bd3b234d097b8a211946bdd4ae5b68baa3116"
+      "bytes": 238220,
+      "sha256": "76ff870adbb62f47b89959b6c9d28208ed0cd0d7e3e98dbf3e153a6a7546667c"
     },
     {
       "file": "dark-serve.png",
@@ -92,8 +92,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 227003,
-      "sha256": "ccb1138e423ed8e68a419a83ca46a9ba368ff084788ad9eb2f564f1513c23c22"
+      "bytes": 226881,
+      "sha256": "84008f658b80b80bc42dd8bed0faf328b29506889cc252468eab8b9e4d727ede"
     },
     {
       "file": "dark-taildrop.png",
@@ -108,8 +108,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 252722,
-      "sha256": "f943ca962d701118b44abee98241bda50a35e1d68c8fab4efca8d5130794eee8"
+      "bytes": 252577,
+      "sha256": "2ae175891a0ce16d32b6f9e807cca92784ebb37c10260eea07b3d3939af1709c"
     },
     {
       "file": "dark-dns.png",
@@ -124,8 +124,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 219601,
-      "sha256": "ed6205bb01aec5ee5a18ead6e54f35f6d39b6828d5af8573c13afe6a8fbba5ff"
+      "bytes": 219480,
+      "sha256": "cf730e58909a1493f48fadc800a4e92a086ae18ce018eeb20bcedcfa0de0af93"
     },
     {
       "file": "dark-lock.png",
@@ -140,8 +140,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 205680,
-      "sha256": "150d60603f41d0e0ee69eee5dd3da725cf6696c9ca3b28ce8b71b46251ae0212"
+      "bytes": 205570,
+      "sha256": "e7cd80ac9c09eb0bc51ad4a74d799c3d5f00c33e2ad2023a5e5d83ac82486f3f"
     },
     {
       "file": "dark-drive.png",
@@ -156,8 +156,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 193362,
-      "sha256": "341a291bf976aafd8c12df61851287247a1146e5c396ce16daa592d34644cf76"
+      "bytes": 193227,
+      "sha256": "e92f5f70df3948dc57d40c23549b206ea694390a2daeb903b192713b7d66c5b1"
     },
     {
       "file": "dark-certs.png",
@@ -172,8 +172,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 206624,
-      "sha256": "20c669fdc428c7be91adc4ebfd723813ed32c28ae93f4681e8063721b7df1684"
+      "bytes": 206521,
+      "sha256": "eb7f807e9c65d4cdf4c8a119293582d341f856349944d18bb40742e063f7e36e"
     },
     {
       "file": "dark-accounts.png",
@@ -188,8 +188,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 211799,
-      "sha256": "034fbbebc18a5ebcc2ed9e09467907357e4524481126212358e40568f7d57ee7"
+      "bytes": 211691,
+      "sha256": "1d656a4da23ad3726debe4adb88807a8252641b695ce96cdce572110d1f062c0"
     },
     {
       "file": "dark-diagnostics.png",
@@ -204,8 +204,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 246013,
-      "sha256": "11f124e85339c6e47056f5b4b2e39c47b116baa463dd4e6558f0c87180f8549a"
+      "bytes": 245897,
+      "sha256": "d9b6d8891e6fd1d2d8f114673a15c8a796497216bd3ba453bb1423139a677796"
     },
     {
       "file": "dark-cli.png",
@@ -220,8 +220,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 228628,
-      "sha256": "5ff1b68200fe86ba90c7f5106fbe2d2aa41ca0f9db39f2c612dfa09054689114"
+      "bytes": 228365,
+      "sha256": "8fb13326d05ae698ec9164d903c027c8c9afc8c544e03c7c3eebca642f34e3c5"
     },
     {
       "file": "dark-cli-set.png",
@@ -236,8 +236,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 222723,
-      "sha256": "857839a316a09a883e308550118bbf9a4bf454a381140706050574c38cb39899"
+      "bytes": 222624,
+      "sha256": "bc9500cf982ac71248f787a0ca90b83494773a89dbeec395271afd963cc86a9b"
     },
     {
       "file": "dark-cli-serve.png",
@@ -252,8 +252,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 216580,
-      "sha256": "c9288336eed9e91462217c78a7c2fc658e116bec2412ad12bd2045a48e220211"
+      "bytes": 216483,
+      "sha256": "84cb28fc5d745b74fe56363ce35f63213149ceea79cc3475cc9898e380218c69"
     },
     {
       "file": "dark-admin.png",
@@ -268,8 +268,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 207389,
-      "sha256": "5a227d6faa5df193fc13a4ba2882289902eb6a76cb74bfc98cc976d4887a686b"
+      "bytes": 207270,
+      "sha256": "1248e5da7350f999e9c91489c7568503c56e4e494429f28206db275cf19f2f5a"
     },
     {
       "file": "dark-console.png",
@@ -284,8 +284,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 173992,
-      "sha256": "b783ada8dea297abe868d7e5cad932a19447ba82c909842d14542a2d6c52e9b7"
+      "bytes": 173875,
+      "sha256": "92a825bd47aa106151b010bdf98ebe938407c5962c92c34d4f5e5f3c49378064"
     },
     {
       "file": "dark-tools.png",
@@ -300,8 +300,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 269412,
-      "sha256": "48afe56f57af93196060e55a2a7473ac4284709d3525e028581e03a84c18cbe8"
+      "bytes": 269258,
+      "sha256": "cd7c2d52a1ce0fa21f4a29bdf4775895731af45c4890d048d441589a4cf3c7e1"
     },
     {
       "file": "dark-authenticator.png",
@@ -316,8 +316,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 200911,
-      "sha256": "f17cd1f28581006b52ec80094bd8539e79f84d60981ec2cb7dbf830867a20207"
+      "bytes": 200806,
+      "sha256": "b6c4eaa06127cce268a7cd99b35d6aac82038fee1692d9cb019e72a352a79f3e"
     },
     {
       "file": "dark-base64.png",
@@ -332,8 +332,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 453549,
-      "sha256": "be9af24e77fb6e3df5cc8e88e410a84aed6a38c879e3de10bfe077c2e1aadcd9"
+      "bytes": 453437,
+      "sha256": "fd8d8de381ef6e364f7f97afc0e4bc558e575d87cbd7c3ad0cc69a9d3733bd29"
     },
     {
       "file": "dark-base64-overlayb64-demo.png",
@@ -348,8 +348,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 465493,
-      "sha256": "8758e1d4e0ec829ef773cb7b12b299b9b72a4b47e78b53287102c64b06b79ee0"
+      "bytes": 465377,
+      "sha256": "87101348f2030080a6478b747d3487e6e1d3fb5ed8cecc442dd2c85738546a91"
     },
     {
       "file": "dark-converter.png",
@@ -364,8 +364,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 229308,
-      "sha256": "95b732ee31e8b7403b534fac511c871f91e0dedd3c4552dd6d58bad84d4705b3"
+      "bytes": 229166,
+      "sha256": "dc61dd66bd22faf295eee9b8932ec2c53214b7b88dad6dd528d97666eb3233e1"
     },
     {
       "file": "dark-regex.png",
@@ -380,8 +380,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 237159,
-      "sha256": "76b47d92c8634ce6f32b768d710c033a71d80a4f2821c7fa04e04cae3770239b"
+      "bytes": 237032,
+      "sha256": "48abc73b5adf866da94402140b4ae16c655d366a7dd91293ba784c215c18bb30"
     },
     {
       "file": "dark-draw.png",
@@ -396,8 +396,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 173130,
-      "sha256": "b9c8d3eba8009099ea7030de6d5a90974368fb929f82a221e9d9e339263c24d8"
+      "bytes": 173020,
+      "sha256": "529d93fafd511623b3b04be7a2312f2460960929a03b15230b81930b86f6a350"
     },
     {
       "file": "dark-ollama.png",
@@ -412,8 +412,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 219055,
-      "sha256": "32297fc1794318205b42d1b1ed12944b11d8ce16c69c9d9251e01fe4dea4ff33"
+      "bytes": 218946,
+      "sha256": "7365645a09004234fdaeb38575a4310a5db37563d0eed449eb3bc3f0cc559c2c"
     },
     {
       "file": "dark-minecraft.png",
@@ -428,8 +428,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 273560,
-      "sha256": "5ae23b3e666e98833170ac8c48c55a0bffd466dd6ae523bb2e9d91bb99c858bb"
+      "bytes": 273439,
+      "sha256": "98568319231f0f980692fa7b66bbcbc6e434e4e1b383d9bf59986961527906e1"
     },
     {
       "file": "dark-extensions.png",
@@ -444,8 +444,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 293479,
-      "sha256": "3c2c9b2a1d6d879892c96313a4aef11c02417e1aea182a17f4c04fcbcc222d7c"
+      "bytes": 293869,
+      "sha256": "96eb31c4a14de5795b5bc539779c126b8505937b3349a0c709162ca0d2330cdc"
     },
     {
       "file": "dark-extensions-overlayext-consent.png",
@@ -460,8 +460,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 310545,
-      "sha256": "37d66500a46a2cada5c81f74609523a93c9660e29621e793f5c9dd043269d458"
+      "bytes": 310541,
+      "sha256": "1ddc1961c73a5c65903ca39699377f9b1383a9dc364e2114d135e86b9ba33310"
     },
     {
       "file": "dark-docs.png",
@@ -476,8 +476,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 236352,
-      "sha256": "38ec34eadbb6f32d45e0d8f860c3fcf14a0b4231ecc8bfdbfadba6babe22543d"
+      "bytes": 236259,
+      "sha256": "83b104682479517224f1fdc273446a384f1a9e77de014623679eff0d7a10d902"
     },
     {
       "file": "dark-status.png",
@@ -492,8 +492,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 221311,
-      "sha256": "13e77525ef99ed0dd0816088e5c3ef075ec735a8bc496e38a37a2c50b45bd9a2"
+      "bytes": 221295,
+      "sha256": "f98cec3d762de9f588315410d12a994c5f7e03d612f5069804b99837c684daf3"
     },
     {
       "file": "dark-history.png",
@@ -508,8 +508,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 192471,
-      "sha256": "9208d3d4a104d104b06813b011c2b48297fc38d191fd0aa02f21a381b82fdb71"
+      "bytes": 192370,
+      "sha256": "5bd947e2512604414a8609125dedc2e39f13973af26c4b1aabe69db335f93888"
     },
     {
       "file": "dark-changelog.png",
@@ -524,8 +524,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 252797,
-      "sha256": "b83961f39ccf7fef373e4aa2d9fbaae83c1edfed9c05363def84be354d272be9"
+      "bytes": 252665,
+      "sha256": "a3994dc8fe8ae6aabb91c8d9442f4ebd15edf0f2d350ca7bb4327105966d0056"
     },
     {
       "file": "dark-notifications.png",
@@ -540,8 +540,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 224124,
-      "sha256": "e83d3240f8f557f6ac64ad59cb966d2933fdc248c82f5df6326adace8b0f979a"
+      "bytes": 224037,
+      "sha256": "c8256fb0a0d774be31ed6845a05f4227e25c8e975710497ce80c771461fe6c14"
     },
     {
       "file": "dark-settings.png",
@@ -556,8 +556,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 247310,
-      "sha256": "56695f94a7960d4d6ff699a88a75ddec15579b4d19b4a9485abfa8b34f3fe2fe"
+      "bytes": 247209,
+      "sha256": "735c029724eb496977c05a6408d1bf81285de1bbf85745290cdd96e634fd38cc"
     },
     {
       "file": "dark-settings-appearance.png",
@@ -572,8 +572,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 274522,
-      "sha256": "cc307495ba2fb3c208d1c102b6068f78466a8d28b7d9cd5962af0025561d6ad7"
+      "bytes": 274397,
+      "sha256": "abeb4630d95fb8edefa394dccb25f59950fa83be13ad36a8e1b90765cbfbc272"
     },
     {
       "file": "dark-settings-language.png",
@@ -588,8 +588,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 284274,
-      "sha256": "e8197d63595e9c132f4d4ba9272a88187da0ef535b94fd1add8b94ae42fe461e"
+      "bytes": 284149,
+      "sha256": "88ad92491169116969453a2ed618e6b8f9dd571018bb7b52f94bfbb822955e5c"
     },
     {
       "file": "dark-settings-school.png",
@@ -604,8 +604,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 245953,
-      "sha256": "a288c753c670945f081b9191e043bc8b85f3c1525f21e701a79b948b24676e7f"
+      "bytes": 245831,
+      "sha256": "dd2cdd216b7242226ef9eee6c6275d2658aa6ebb8022678d91aa462e48af6860"
     },
     {
       "file": "dark-settings-schedules.png",
@@ -620,8 +620,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 246170,
-      "sha256": "aa72b74c65f577376cef3bcd1686bb47702e7dec34f5b58419645d501d6e210a"
+      "bytes": 246065,
+      "sha256": "0bb5dfa2008e92373eca518ec022dcdc576498e3c8b2088a1dd0cabc1d1aca61"
     },
     {
       "file": "dark-about.png",
@@ -636,8 +636,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 244311,
-      "sha256": "f056b869e3bc4aba9d80633f91be42f18e1c6bf156194ade7210c80a7c4ebab0"
+      "bytes": 243888,
+      "sha256": "9c4226f96e2e2e77d6f78ac4a3ee49708659515b9927b2d4be3024020075f2b6"
     },
     {
       "file": "light-home.png",
@@ -652,8 +652,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 239108,
-      "sha256": "6c20664b569019d744a91da3dcf618f011f69557563c1824d5ccf1a32ac81419"
+      "bytes": 238973,
+      "sha256": "23616140eca91f4e6cd0eed765539abc2fa413c1e4af2c43a5c88fdae737b1d1"
     },
     {
       "file": "light-peers.png",
@@ -668,8 +668,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 279954,
-      "sha256": "1c9fe6431a75e76b74d9bbc42f9278677c421a32b17ff55a4b8d2b8837f0be7e"
+      "bytes": 279838,
+      "sha256": "dd81b061819e581221d1f5456467963a17bab75ca248b87f90b81171ac09995d"
     },
     {
       "file": "light-exit.png",
@@ -684,8 +684,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 289153,
-      "sha256": "23dc1a2bfcb00dd1df79834f103e094b0ac5014870c624b738baf806ded6dd28"
+      "bytes": 289025,
+      "sha256": "5f82559744784aa72049df5432ca0ad1ee7cb07277b5cc4abbc8355df8143075"
     },
     {
       "file": "light-routes.png",
@@ -700,8 +700,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 253804,
-      "sha256": "17e4baba90cbcd1676366b2dcfe5aa0e234bdbc646a73036c8e901fc80931cc5"
+      "bytes": 253700,
+      "sha256": "0797ac52655fbbc376614b27f77451979c516ac436f83f6e11134c3671576ccd"
     },
     {
       "file": "light-serve.png",
@@ -716,8 +716,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 249981,
-      "sha256": "415309284e79e36f7d0cded54ed728d0cb4feeb2fa88d1fdd05146e40d1a1ae6"
+      "bytes": 249820,
+      "sha256": "93ee81d4959a276bf17d81599c7a174736aa46ca421526c54053c53d4fc76592"
     },
     {
       "file": "light-taildrop.png",
@@ -732,8 +732,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 269318,
-      "sha256": "44c779571af0c0342bd742ec8fd9d196084538993f81b5f24d0a9c02f1722e76"
+      "bytes": 269191,
+      "sha256": "2b8cb8e055a2bf85a8aab4ec8dc1dd26411a8d3f540fb4d8485d5c9e89ed5b97"
     },
     {
       "file": "light-dns.png",
@@ -748,8 +748,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 241389,
-      "sha256": "b694ac33f157e210e23268f7f0d1093411a6e8ef72da1f15b59a1da13f6d580b"
+      "bytes": 241278,
+      "sha256": "af655a2ac18025dafb8fd9269db1133449c99f84457c281dac0cc12024222602"
     },
     {
       "file": "light-lock.png",
@@ -764,8 +764,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 223711,
-      "sha256": "a70adc233dbdbd8901f9d258c73689e85ae9ddb764473471539d9ad24a8e24b8"
+      "bytes": 223584,
+      "sha256": "5fffac24c942a60dfc74fbf3cc2933ff4256bc945484a134ff3917326f259e9d"
     },
     {
       "file": "light-drive.png",
@@ -780,8 +780,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 217454,
-      "sha256": "8148acb7bbb25d8e97d7b070eeebda7a48d4f0807f5e5b104008d34bd2183aa5"
+      "bytes": 217313,
+      "sha256": "6624386b4166778846c22ac61d934f6f2b125bf05316b8f23da59d48db04baaa"
     },
     {
       "file": "light-certs.png",
@@ -796,8 +796,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 227391,
-      "sha256": "c313d16a4010dcedf2ebe1cbc69bbef03a56640a5a7af00a2b8d188b92581e38"
+      "bytes": 227283,
+      "sha256": "d2b84a1b915550bf5f7835902bea43e0fb1cac657cc74aa71f42e6fc3d8c807f"
     },
     {
       "file": "light-accounts.png",
@@ -812,8 +812,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 234072,
-      "sha256": "356c311c0676cd5ea49e60a767553147db28df8e9058299fb7072cf9bfab665f"
+      "bytes": 233926,
+      "sha256": "21732ce2c8353b4436f5de4dd50e797fc8c4b5380b6d6e601f56850042d2f560"
     },
     {
       "file": "light-diagnostics.png",
@@ -828,8 +828,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 292459,
-      "sha256": "0659d71478d0cafb9b36a66a37695affde53c8e83e88ece58706819a038f3d37"
+      "bytes": 292362,
+      "sha256": "423e28020bae7f8ce91aa8ed111ca37dd5dc6f1bcdc97a1840abf2b8622ca452"
     },
     {
       "file": "light-cli.png",
@@ -844,8 +844,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 257369,
-      "sha256": "7c5bc0c523a114c200eab7290b7cd6f5c0db61b0c7fdf88c9302cdc5bebd11fe"
+      "bytes": 257381,
+      "sha256": "9ce858990b610e7203024a3eae9b49a897a029e3afcca009878b2c064aa675d7"
     },
     {
       "file": "light-cli-set.png",
@@ -860,8 +860,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 247418,
-      "sha256": "780281fc1f9aa30f7770998aeb31579c43d8d0a7a49e5077d0cdf79340091eb0"
+      "bytes": 247286,
+      "sha256": "86b665414e6d3b228b42ebe8c2d4637caa9c0d4a433e4412aadce86a30b22b13"
     },
     {
       "file": "light-cli-serve.png",
@@ -876,8 +876,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 241056,
-      "sha256": "1d10114f15d549aba73562ab3b43e80b501ed2f99da2f5eb6ce9877b1e846eaa"
+      "bytes": 240917,
+      "sha256": "2b02c52576f5b0b31f6b3d4ce0f09d048e3eaf985fca35b504ceba4ab68a583b"
     },
     {
       "file": "light-admin.png",
@@ -892,8 +892,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 225136,
-      "sha256": "594cf345128d5e4da66c657a89171065d9b6605430763ee025c957caea6dae9f"
+      "bytes": 225024,
+      "sha256": "52759d3c177d3ab405dd08c6fd64d6979314575ae8e18f352195df6c95d87cfb"
     },
     {
       "file": "light-console.png",
@@ -908,8 +908,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 227502,
-      "sha256": "1210118469a4cd525c87caac9cda755577235afde20b1729c7332cd105604c00"
+      "bytes": 227349,
+      "sha256": "2039da03e7d3b5742ba927de07d42e3678306a9cf37e2ebab16c25fc99a1808c"
     },
     {
       "file": "light-tools.png",
@@ -924,8 +924,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 306820,
-      "sha256": "e1ac8420ebd657d38a092522f0ab71a4a3c5a12a6da74b9893b92275bf812443"
+      "bytes": 306714,
+      "sha256": "e210e6efd8e81c83e7b191e86e6cf8fdb2d4d9a7cf2318da7a06172b3700c996"
     },
     {
       "file": "light-authenticator.png",
@@ -940,8 +940,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 217388,
-      "sha256": "e1e721e319ba38ba7d0a65d6f25b2374b338c41da0902f181b8d9ccb00cc14a2"
+      "bytes": 217260,
+      "sha256": "63b911d419009c09ba8c9b245fbc808408f88348c4c693b9601e311f04612e92"
     },
     {
       "file": "light-base64.png",
@@ -956,8 +956,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 475579,
-      "sha256": "afd347b899d9975b9880e4fbfdc24bbdab224434eef64e955421fc108e94f5a8"
+      "bytes": 475418,
+      "sha256": "bb4a72a39967fb17bda78e853811f31dd6727d1383a5e6a0f3ce25dd5f03cdd4"
     },
     {
       "file": "light-base64-overlayb64-demo.png",
@@ -972,8 +972,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 475586,
-      "sha256": "1e69534e13f5932fd709a19657e551b71c8133619e04bdb75cbec96ef9d08071"
+      "bytes": 475418,
+      "sha256": "bb4a72a39967fb17bda78e853811f31dd6727d1383a5e6a0f3ce25dd5f03cdd4"
     },
     {
       "file": "light-converter.png",
@@ -988,8 +988,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 282600,
-      "sha256": "7b1c06dff2cfc4f2be1ae8b4b13849edddea56b3c125ebd6a7119405338e7ff8"
+      "bytes": 282417,
+      "sha256": "e0dfa3b9e950f199f62fb3e161b64d49d1be70c180309144444d36889c22aa52"
     },
     {
       "file": "light-regex.png",
@@ -1004,8 +1004,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 252506,
-      "sha256": "af0789ad2f5ee90ba7114d6edc4952d61f639447c5ae23c1ff0229fcc6a26d2c"
+      "bytes": 252278,
+      "sha256": "d15cd2f8fc00428fb814065c9d05d8e680ef0bda5d84998af6237f77b4958033"
     },
     {
       "file": "light-draw.png",
@@ -1020,8 +1020,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 188231,
-      "sha256": "d7a20f0904420e23286424fdd1cbc63a4f6b5bca024781caa9d966f07bea3e76"
+      "bytes": 188116,
+      "sha256": "c231d8f4aa128f8862c4093634caa35ebd80ddb36746663729a0e5406bc2d75b"
     },
     {
       "file": "light-ollama.png",
@@ -1036,8 +1036,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 237269,
-      "sha256": "236c6b62d44976430e9b241584e7ccbc1967f1b59647ea350d134f4f4f546e21"
+      "bytes": 237076,
+      "sha256": "e7917ae10ad5007de43a36dff96d83afa111eadce9b8e1397754c1f897fed1d5"
     },
     {
       "file": "light-minecraft.png",
@@ -1052,8 +1052,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 288693,
-      "sha256": "da7d4e753535c7feb941f60fa1e3a24356d7fbeaa437684d6e1515fde0c02784"
+      "bytes": 288579,
+      "sha256": "36a09a8a6775618a9d85bd1269f6fb8071ea32397f7c76ab4d3ac3b45da2461a"
     },
     {
       "file": "light-extensions.png",
@@ -1068,8 +1068,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 310573,
-      "sha256": "04fd12e4edf9425ee3d44455de01da44a2376e6bbd59d09b5d5d47a9afc217dd"
+      "bytes": 310933,
+      "sha256": "212ec606b43e3498c63f1ea0880ee1d72cdf5ae15d7a38386168f824346aa88e"
     },
     {
       "file": "light-extensions-overlayext-consent.png",
@@ -1084,8 +1084,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 306751,
-      "sha256": "5aae3078fed57d200436819ff704e8e4fd216ae728c01d290ff0a95a1ba67504"
+      "bytes": 306748,
+      "sha256": "0311385542c9eef4576283886c009a273c5f016ededdcdaa93c1a55b06e3d65c"
     },
     {
       "file": "light-docs.png",
@@ -1100,8 +1100,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 256283,
-      "sha256": "9216df6de9a9be925c95c73cf7562b7120f518e9e33dd0bc528c0327529512b9"
+      "bytes": 256168,
+      "sha256": "77cc6b65fdc3193b63c9abf5c5824dd49491a28d1554510de225dbc423348eaf"
     },
     {
       "file": "light-status.png",
@@ -1116,8 +1116,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 238295,
-      "sha256": "7e8ce5e87454b6d5ad8d4716edb66f94e58d19c8e959898d008154175f05478c"
+      "bytes": 238118,
+      "sha256": "c08be0837a28e7ee4d121c5e2b45e50e88b22158e2ec17e16f91d3ffeadd477a"
     },
     {
       "file": "light-history.png",
@@ -1132,8 +1132,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 246817,
-      "sha256": "852cd033a0e1987888e303661b1ca8aa209e6dce00b24c158b79909263c6f9a2"
+      "bytes": 246658,
+      "sha256": "482a97e2312c4f6215a069962313eb8c6494af525af4135f81f4b6ad9b8a73cd"
     },
     {
       "file": "light-changelog.png",
@@ -1148,8 +1148,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 265796,
-      "sha256": "571a288919fd835cab1b441f8f97dfb5286cd7a02db2a4ba0ebb334513c9a1cc"
+      "bytes": 265703,
+      "sha256": "ce44c1a39366603df911322f8716429b3828c4f05efdc39f93ff49aa2fa869ee"
     },
     {
       "file": "light-notifications.png",
@@ -1164,8 +1164,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 240806,
-      "sha256": "5fa1a4d4b22d8da0f07afd4b597539eab5f02be8435d5aabf496b33af2d981e9"
+      "bytes": 240705,
+      "sha256": "31e136cc2e85f0beb06664665e5e425d715afd1b072d4121887252cda9a4c11c"
     },
     {
       "file": "light-settings.png",
@@ -1180,8 +1180,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 289817,
-      "sha256": "e70ec2920ab57526cf4eee0d581512ad15b80a4ba54917cc769ed7cc65be4b31"
+      "bytes": 289714,
+      "sha256": "358dd197e20a961933d8a375813c7568e665d9ee99dac20d78657224a68d59eb"
     },
     {
       "file": "light-settings-appearance.png",
@@ -1196,8 +1196,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 296058,
-      "sha256": "edd1fb6eea23dba5ee1351bdc962cb6c5acf19f2d606b865060c6e567cb20700"
+      "bytes": 295926,
+      "sha256": "3b355e8a2fc1fccf7c1b67fbc917d5bc63064b601e02dcef5ec337b08c4a456c"
     },
     {
       "file": "light-settings-language.png",
@@ -1212,8 +1212,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 305850,
-      "sha256": "a612c45886259ee17a4e69a360ebf159702996d505112cce79a7b63039386195"
+      "bytes": 305699,
+      "sha256": "9e4a54a56837c0151974637bc33a174260577b858bd2a2a49fe72b07c85ae738"
     },
     {
       "file": "light-settings-school.png",
@@ -1228,8 +1228,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 284474,
-      "sha256": "fb55854d7826cfe462709543b2d352fd16b0e5c661187e1e884df9bb69363704"
+      "bytes": 284361,
+      "sha256": "19e6aa687f7ff20214d7a0d1f4f278e9a973d116abe401e3dfd3f659a85a1a99"
     },
     {
       "file": "light-settings-schedules.png",
@@ -1244,8 +1244,8 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 292341,
-      "sha256": "8d4ad0dacfb0ce05981b6252575e32b396e30dc3a3fc05006bfa9183f30d7de6"
+      "bytes": 292223,
+      "sha256": "6eaf12a7984225fe465b9f167cb874bd525c7b93fafdd2044db9a524d4fff3b7"
     },
     {
       "file": "light-about.png",
@@ -1260,16 +1260,44 @@
       "zoom": 1,
       "motion": "reduced",
       "language": "both",
-      "bytes": 259261,
-      "sha256": "ee3bd57e16222ed60410e4fd58e8d66287947c1e8e62b62e24f4ae1e2f2373f0"
+      "bytes": 258748,
+      "sha256": "0b4d5101350988eb6189d054a8f83d60b6ac29a92c5e1913535140c752a81c8a"
+    },
+    {
+      "file": "dark-hero.png",
+      "route": "cli:set",
+      "theme": "dark",
+      "rendered": true,
+      "viewport": {
+        "width": 1120,
+        "height": 760
+      },
+      "zoom": 1,
+      "language": "both",
+      "bytes": 180963,
+      "sha256": "c091df071033fdf53f2f4b5af403011b8fee27af749420488ca38696445c0915"
+    },
+    {
+      "file": "light-hero.png",
+      "route": "cli:set",
+      "theme": "light",
+      "rendered": true,
+      "viewport": {
+        "width": 1120,
+        "height": 760
+      },
+      "zoom": 1,
+      "language": "both",
+      "bytes": 203245,
+      "sha256": "3ffc9d860674aa3524f5561642405def53f5743d354aa8f79eda96782f309036"
     },
     {
       "file": "light-palette.png",
       "route": "palette",
       "theme": "light",
       "zoom": 1,
-      "bytes": 260911,
-      "sha256": "97c3fb76ad1de2e04b6c04c9cb99cedee5c0764a2e18723bb9e641fc3f04a0e2"
+      "bytes": 247698,
+      "sha256": "67f78ad2a09e4c84e7a0c2ba2d20992ff1dd5d1ccd4d8465df30f6a5c0be4e1f"
     }
   ]
 }
