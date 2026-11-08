@@ -23,6 +23,10 @@ jobs:
         if: always()
         shell: powershell
         run: ./vdisk-api-probe.ps1 -Part mirror
+      - name: Writes past the parameter blocks
+        if: always()
+        shell: powershell
+        run: ./vdisk-api-probe.ps1 -Part sentinel
       - name: VHD Sets and checkpoints
         if: always()
         shell: powershell

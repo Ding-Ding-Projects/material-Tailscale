@@ -1,7 +1,7 @@
 # Probe of the Windows virtual disk API on a hosted Windows runner. It answers one question per
 # step: does this call work here without Hyper-V, and with which open mode? Every step prints its
 # Win32 result code; nothing here is used by the app. ASCII only (Windows PowerShell 5.1).
-param([ValidateSet('api', 'mirror', 'vhdset')][string]$Part = 'api')
+param([ValidateSet('api', 'mirror', 'vhdset', 'sentinel')][string]$Part = 'api')
 $ErrorActionPreference = 'Stop'
 $root = Join-Path $env:RUNNER_TEMP 'vdisk-probe'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
@@ -92,6 +92,34 @@ public static class Probe {
       return log;
     } finally { Marshal.FreeHGlobal(prm); Marshal.FreeHGlobal(path); Marshal.FreeHGlobal(ov); }
   }
+  [DllImport("virtdisk.dll", CharSet = CharSet.Unicode, EntryPoint = "CreateVirtualDisk")] public static extern uint CreateRaw(ref STORAGE_TYPE t, string path, uint access, IntPtr sd, uint flags, uint providerFlags, IntPtr p, IntPtr overlapped, out IntPtr h);
+  [DllImport("virtdisk.dll", CharSet = CharSet.Unicode, EntryPoint = "OpenVirtualDisk")] public static extern uint OpenRaw(ref STORAGE_TYPE t, string path, uint access, uint flags, IntPtr p, out IntPtr h);
+  static IntPtr Fill(int n) { IntPtr b = Marshal.AllocHGlobal(n); for (int i = 0; i < n; i++) Marshal.WriteByte(b, i, 0xCD); return b; }
+  static string Changed(IntPtr b, int from, int to) { for (int i = from; i < to; i++) if (Marshal.ReadByte(b, i) != 0xCD) return "first change at byte " + i; return "nothing written past byte " + from; }
+  // Creates a VHDX from a 512-byte buffer laid out like CREATE_VIRTUAL_DISK_PARAMETERS version 2
+  // and reports whether the call wrote anything past the 128 bytes that version 2 needs.
+  public static string CreateSentinel(string path) {
+    IntPtr b = Fill(512);
+    try {
+      for (int i = 0; i < 128; i++) Marshal.WriteByte(b, i, 0);
+      Marshal.WriteInt32(b, 0, 2); Marshal.WriteInt64(b, 24, 1073741824);
+      var t = Type(3); IntPtr h; uint r = CreateRaw(ref t, path, 0, IntPtr.Zero, 0, 0, b, IntPtr.Zero, out h);
+      if (r == 0) CloseHandle(h);
+      return "code=" + r + " " + Changed(b, 128, 512) + " inside=" + Changed2(b);
+    } finally { Marshal.FreeHGlobal(b); }
+  }
+  static string Changed2(IntPtr b) { var sb = new System.Text.StringBuilder(); for (int i = 0; i < 128; i += 8) sb.Append(Marshal.ReadInt64(b, i).ToString("x")).Append(i == 120 ? "" : ","); return sb.ToString(); }
+  // Opens a disk from a 256-byte buffer laid out like OPEN_VIRTUAL_DISK_PARAMETERS version 2 (28 bytes).
+  public static string OpenSentinel(string path) {
+    IntPtr b = Fill(256);
+    try {
+      for (int i = 0; i < 28; i++) Marshal.WriteByte(b, i, 0);
+      Marshal.WriteInt32(b, 0, 2);
+      var t = Type(0); IntPtr h; uint r = OpenRaw(ref t, path, 0, 0, b, out h);
+      if (r == 0) CloseHandle(h);
+      return "code=" + r + " " + Changed(b, 28, 256);
+    } finally { Marshal.FreeHGlobal(b); }
+  }
   // CreateVirtualDisk with explicit choices, for trying VHD Set creation several ways.
   public static uint CreateWith(string path, uint device, bool msVendor, uint block, uint sector, uint physical) {
     var t = new STORAGE_TYPE { DeviceId = device, VendorId = msVendor ? MS : Guid.Empty };
@@ -162,17 +190,25 @@ if ($Part -eq 'mirror') {
   Write-Host 'mirror part finished'
 }
 
+if ($Part -eq 'sentinel') {
+  foreach ($k in 1..3) { Row "create VHDX from a sentinel buffer ($k)" 'log' ([Probe]::CreateSentinel((Join-Path $root "sentinel-$k.vhdx"))) }
+  foreach ($k in 1..3) { Row "open VHDX from a sentinel buffer ($k)" 'log' ([Probe]::OpenSentinel((Join-Path $root "sentinel-1.vhdx"))) }
+  [GC]::Collect(); [GC]::WaitForPendingFinalizers(); $junk = 1..20000 | ForEach-Object { New-Object byte[] 256 }
+  Write-Host 'sentinel part finished'
+}
+
 if ($Part -eq 'vhdset') {
+  $newVhd = Get-Command New-VHD -ErrorAction SilentlyContinue
+  Write-Host ('New-VHD: ' + $(if ($newVhd) { $newVhd.Source } else { 'not available' }))
+  Row 'Hyper-V New-VHD available' ([int](-not $newVhd)) $(if ($newVhd) { $newVhd.Source } else { '' })
+  $set = Join-Path $root 'hv.vhds'
+  if ($newVhd) { Attempt 'New-VHD .vhds' { New-VHD -Path $set -SizeBytes 1GB -Dynamic | Out-Null; Row 'New-VHD .vhds' 0 ((Get-ChildItem $root -Filter 'hv*' | ForEach-Object { $_.Name + '=' + $_.Length }) -join ',') } }
   $i = 0
   foreach ($v in @(@(4, $true, 0, 0, 0), @(4, $true, 33554432, 512, 4096), @(4, $false, 0, 0, 0), @(0, $false, 0, 0, 0), @(3, $true, 0, 0, 0))) {
     $i++; $p = Join-Path $root ("set-$i.vhds")
     Attempt "create .vhds variant $i" { Row ("create .vhds variant $i (device " + $v[0] + ', ms vendor ' + $v[1] + ', block ' + $v[2] + ', sector ' + $v[3] + '/' + $v[4] + ')') ([Probe]::CreateWith($p, [uint32]$v[0], [bool]$v[1], [uint32]$v[2], [uint32]$v[3], [uint32]$v[4])) ((Get-ChildItem $root -Filter "set-$i*" | ForEach-Object { $_.Name + '=' + $_.Length }) -join ',') }
   }
-  $newVhd = Get-Command New-VHD -ErrorAction SilentlyContinue
-  Row 'Hyper-V New-VHD available' ([int](-not $newVhd)) $(if ($newVhd) { $newVhd.Source } else { '' })
-  $set = Join-Path $root 'hv.vhds'
-  if ($newVhd) { Attempt 'New-VHD .vhds' { New-VHD -Path $set -SizeBytes 1GB -Dynamic | Out-Null; Row 'New-VHD .vhds' 0 ((Get-ChildItem $root -Filter 'hv*' | ForEach-Object { $_.Name + '=' + $_.Length }) -join ',') } }
-  $made = Get-ChildItem $root -Filter '*.vhds' | Where-Object { $_.Length -gt 0 } | Select-Object -First 1
+  $made = Get-Item -LiteralPath (Join-Path $root 'hv.vhds') -ErrorAction SilentlyContinue
   if ($made) {
     foreach ($flags in @(0, 16)) {
       $h = [IntPtr]::Zero; $r = [Probe]::Open($made.FullName, 4, [uint32]$flags, [ref]$h); Row "open $($made.Name) (flags $flags)" $r
