@@ -1,41 +1,37 @@
 # Closeout prompt
 
 ```text
-Continue Material Tailscale (Ding-Ding-Projects/material-Tailscale). The work is on branch
-ai/polish/20261107-final-sweep, ahead of main. Read HANDOFF.md and ROADMAP.md first.
+Continue Material Tailscale (Ding-Ding-Projects/material-Tailscale). Read HANDOFF.md and
+ROADMAP.md first.
 
-State when this was written (2026-11-07, afternoon):
-- The last two Release runs on main failed in Squirrel packaging (the GitHub sync collided on
-  duplicate delta packages). This branch ships one full and one delta package per release,
-  which fixes it; nothing is merged into main yet.
-- Built in the app and the website: the Features page, the Ollama suite, the virtual disk
-  manager, the regex debugger, two portable companions, the wording lock, and the
-  instruction-mirror lock kept beside the private source instead of a hash in this repository.
-- A targeted sweep of every surface changed today found 443 findings (21 distinct problems).
-  All were fixed at the source, and a re-run of the same surfaces (744 checks) reports zero.
-- The clipping matrix was running. Its first configurations flagged only screen-reader-only
-  text, which the probe now skips, as the sweep's probe already did.
-- Design boards changed after the last parity run, so the two parity tests in npm test stay
-  red until the parity evidence is regenerated.
+State when this was written (2026-11-08):
+- Branch ai/polish/20261107-final-sweep is being merged into main by fast-forward in the commit
+  that carries this file. Main's last two Release runs had failed in Squirrel packaging; this
+  branch ships one full and one delta package per release, which is the fix. The Release,
+  install-proof, vdisk-proof and Website runs of this push still have to be watched.
+- The virtual disk manager is finished: every operation goes through the Windows virtual disk
+  API and the Storage module (DiskPart is no longer used), VHD Sets are created through the API
+  with CREATE_VIRTUAL_DISK_FLAG_CREATE_BACKING_STORAGE, and the Advanced section renews
+  identifiers, edits VHDX metadata, tracks changed blocks, manages VHD Set checkpoints and
+  mirrors a disk. Shrink can shrink the last partition first. The proof script ran on a hosted
+  Windows runner with 60 results and no failures (branch probe/vdisk-api).
+- A page-render race is fixed: an older page could paint over a newer one when navigation and
+  a view transition overlapped; captures now wait for the page they asked for.
+- Release sweep on the build of 04996f1: 3,816 checks, zero findings. The surfaces changed
+  since then were swept again on the final build: 456 checks, zero findings, and the changelog,
+  the notices demo and the Advanced view once more after the last fixes: 144 checks, zero.
+- Design canvases republished; design parity evidence regenerated for 66 views.
 
 Next, in order:
-1. Rebuild from a clean tree: npm run build && node scripts/build-site.mjs &&
-   node scripts/build-companions.mjs --stage-only
-2. Clipping matrix on every sweep route (MT_CAPTURE_DESTS from scripts/lib/sweep-routes.mjs,
-   MT_CLIP_THEMES=dark,light): 100, 125, 150 and 200 percent plus the minimum window, every
-   language mode. Fix anything real, then mark the clipping-matrix row done in
-   src/shared/feature-inventory.mjs (npm run gen:completeness) and tick ROADMAP.md.
-3. Fresh screenshots (MT_CAPTURE_DIR=docs/screenshots npm run screenshots, and
-   scripts/capture-companions.mjs), then rebuild the website.
-4. Full release sweep in three parts (desktop and small, tablet and mobile, website), merge,
-   zero findings; node scripts/sweep-history.mjs; npm run design:boards for the sweep board.
-5. npm run design:parity, node scripts/design-frames.mjs, npm test all green.
-6. Republish both design canvases, merge the branch into main, push, watch Release,
-   install-proof, vdisk-proof and Website, then read back the release (Setup.exe NotSigned,
-   both companions attached) and the live website.
-Still open after that: VHD Set creation and checkpoints, VHDX metadata, mirroring, change
-tracking and identity reset in the virtual disk manager; other engines in the regex benchmark
-and editor integration; Discussions (a repository settings change); a real tailnet on Windows.
+1. Run the full sweep on the release commit (three parts: desktop and small, tablet and mobile,
+   website; --resume if a part is stopped), node scripts/sweep-history.mjs, then
+   npm run design:boards, and tick the sweep item in ROADMAP.md.
+2. Watch the Release, install-proof, vdisk-proof and Website runs of every push to main; read
+   back each release (Setup.exe NotSigned, both companions attached) and the live website.
+Still open: a real tailnet on Windows (running a daemon needs the owner's permission), other
+engines in the regex benchmark and editor integration, adapters for the remaining
+file-converter format families, Discussions (a repository settings change), the status
+service (reachable only from the owner's network), Ollama and Minecraft runtime checks.
 Rules: ordinary professional English in committed files and commit messages; never
 force-push; never add code signing.
 ```
