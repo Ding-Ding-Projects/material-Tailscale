@@ -1,8 +1,8 @@
 {
   "tool": "scripts/capture-companions.mjs",
-  "commit": "dbc0b7ac577e8739a27f0edd28118a4785c4da50",
-  "dirtyTree": true,
-  "capturedAt": "2026-11-07T18:32:45.831Z",
+  "commit": "bea349c5b5487ef296bb7e1f3fac92442efeb1a4",
+  "dirtyTree": false,
+  "capturedAt": "2026-11-08T17:03:07.320Z",
   "viewport": {
     "width": 1180,
     "height": 820,
@@ -17,12 +17,12 @@
     {
       "file": "dark-companion-site-home.png",
       "theme": "dark",
-      "sha256": "abdecac393ed0c858b3692039f062ffb7e396a121a0c6876809210c528ddf668"
+      "sha256": "5a8b16cfb4115e6fff07c8d7b43751ebc9202dc4c1b743751084ac488617c43b"
     },
     {
       "file": "dark-companion-site-features.png",
       "theme": "dark",
-      "sha256": "a19fa1daa0274a8a53cf4d45070d220cb1c1be8aaf9804bf8fd217b4efd15ba2"
+      "sha256": "2fc13751a4c3c3e2bab6eb7db872cbbc7a3afcb5229dd971be2c466b86336adb"
     },
     {
       "file": "light-companion-build.png",
@@ -32,12 +32,12 @@
     {
       "file": "light-companion-site-home.png",
       "theme": "light",
-      "sha256": "4aecb645e07f472e3668878e7ca99aa066502c06cdf258b54bed04148e5e6fec"
+      "sha256": "3790db5d3290fd1484d035b152ce07d92a9549f97b219153ddaec46128c87e4f"
     },
     {
       "file": "light-companion-site-features.png",
       "theme": "light",
-      "sha256": "7ddd4ac786b7b9a1a2322372aa9b6d51878d2b40a162870be6a48cda42e37243"
+      "sha256": "49e8fae2283e3652489a31c7b9f56c8bc89d791587ee2781ed7ca351c1ac378e"
     }
   ]
 }
