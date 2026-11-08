@@ -1,7 +1,7 @@
 # Probe of the Windows virtual disk API on a hosted Windows runner. It answers one question per
 # step: does this call work here without Hyper-V, and with which open mode? Every step prints its
 # Win32 result code; nothing here is used by the app. ASCII only (Windows PowerShell 5.1).
-param([ValidateSet('api', 'mirror', 'vhdset', 'sentinel')][string]$Part = 'api')
+param([ValidateSet('api', 'mirror', 'vhdset', 'sentinel', 'vhdset-flags')][string]$Part = 'api', [int]$Variant = 1)
 $ErrorActionPreference = 'Stop'
 $root = Join-Path $env:RUNNER_TEMP 'vdisk-probe'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
@@ -120,6 +120,22 @@ public static class Probe {
       return "code=" + r + " " + Changed(b, 28, 256);
     } finally { Marshal.FreeHGlobal(b); }
   }
+  // CreateVirtualDisk for a VHD Set from a 512-byte buffer with a sentinel tail, laid out like
+  // CREATE_VIRTUAL_DISK_PARAMETERS version 2 (128 bytes), 3 (160) or 4 (184). Version 3 adds
+  // SourceLimitPath at 128 and BackingStorageType at 136. flags 0x8 is
+  // CREATE_VIRTUAL_DISK_FLAG_CREATE_BACKING_STORAGE.
+  public static string CreateSet(string path, uint version, uint flags, uint backing) {
+    IntPtr b = Fill(512);
+    int n = version == 2 ? 128 : version == 3 ? 160 : 184;
+    try {
+      for (int i = 0; i < n; i++) Marshal.WriteByte(b, i, 0);
+      Marshal.WriteInt32(b, 0, (int)version); Marshal.WriteInt64(b, 24, 1073741824L);
+      if (version >= 3 && backing != 0) { Marshal.WriteInt32(b, 136, (int)backing); Marshal.Copy(MS.ToByteArray(), 0, b + 140, 16); }
+      var t = Type(4); IntPtr h; uint r = CreateRaw(ref t, path, 0, IntPtr.Zero, flags, 0, b, IntPtr.Zero, out h);
+      if (r == 0) CloseHandle(h);
+      return "code=" + r + " " + Changed(b, n, 512);
+    } finally { Marshal.FreeHGlobal(b); }
+  }
   // CreateVirtualDisk with explicit choices, for trying VHD Set creation several ways.
   public static uint CreateWith(string path, uint device, bool msVendor, uint block, uint sector, uint physical) {
     var t = new STORAGE_TYPE { DeviceId = device, VendorId = msVendor ? MS : Guid.Empty };
@@ -133,7 +149,7 @@ public static class Probe {
 
 $results = New-Object System.Collections.ArrayList
 function Row([string]$step, $code, [string]$detail = '') {
-  $msg = if ($code -is [int] -or $code -is [uint32]) { if ([int64]$code -eq 0) { 'ok' } else { (New-Object System.ComponentModel.Win32Exception([int]$code)).Message } } else { [string]$code }
+  $msg = if ($code -is [int] -or $code -is [uint32]) { if ([int64]$code -eq 0) { 'ok' } else { (New-Object System.ComponentModel.Win32Exception([BitConverter]::ToInt32([BitConverter]::GetBytes([uint32]([int64]$code -band 0xFFFFFFFFL)), 0))).Message } } else { [string]$code }
   [void]$results.Add([pscustomobject]@{ Step = $step; Code = $code; Meaning = $msg; Detail = $detail })
   Write-Host ("{0,-46} {1,6}  {2}  {3}" -f $step, $code, $msg, $detail)
 }
@@ -227,6 +243,29 @@ if ($Part -eq 'vhdset') {
     Write-Host ('Files: ' + ((Get-ChildItem $root | ForEach-Object { $_.Name + '=' + $_.Length }) -join ', '))
   }
   Write-Host 'vhdset part finished'
+}
+
+if ($Part -eq 'vhdset-flags') {
+  # version, flags, backing storage type: each variant runs in its own process.
+  $v = @(@(2, 8, 0), @(3, 8, 3), @(3, 8, 0), @(4, 8, 3), @(3, 0, 3))[$Variant - 1]
+  $set = Join-Path $root ("api-set-$Variant.vhds")
+  $label = "create .vhds through the API (version $($v[0]), flags $($v[1]), backing $($v[2]))"
+  $log = [Probe]::CreateSet($set, [uint32]$v[0], [uint32]$v[1], [uint32]$v[2])
+  $code = [int64]($log -replace '^code=(\d+).*$', '$1')
+  Row $label 'log' ($log + ' files: ' + ((Get-ChildItem $root -Filter "api-set-$Variant*" | ForEach-Object { $_.Name + '=' + $_.Length }) -join ','))
+  if ($code -eq 0) {
+    $h = [IntPtr]::Zero; $r = [Probe]::Open($set, 4, 0, [ref]$h); Row "open the API-made set (variant $Variant)" $r
+    if ($r -eq 0) {
+      try {
+        $snap = [Guid]::NewGuid(); $t = New-Object Probe+SNAP_TAKE; $t.Version = 1; $t.SnapshotId = $snap
+        $tr = [Probe]::TakeSnapshotVhdSet($h, [ref]$t, 0); Row "take a checkpoint on the API-made set (variant $Variant)" $tr $snap
+        if ($tr -eq 0) { $d = New-Object Probe+SNAP_DELETE; $d.Version = 1; $d.SnapshotId = $snap; Row "delete it (variant $Variant)" ([Probe]::DeleteSnapshotVhdSet($h, [ref]$d, 0)) }
+      } finally { [void][Probe]::CloseHandle($h) }
+    }
+    try { Mount-DiskImage -ImagePath $set -PassThru | Out-Null; Row "attach the API-made set (variant $Variant)" 0; Dismount-DiskImage -ImagePath $set | Out-Null; Row "detach it (variant $Variant)" 0 } catch { Row "attach the API-made set (variant $Variant)" 'exception' $_.Exception.Message }
+  }
+  [GC]::Collect(); [GC]::WaitForPendingFinalizers(); $junk = 1..20000 | ForEach-Object { New-Object byte[] 256 }
+  Write-Host "vhdset-flags variant $Variant finished"
 }
 
 $md = @("### Part $Part", '', '| Step | Code | Meaning | Detail |', '| --- | --- | --- | --- |') + ($results | ForEach-Object { "| $($_.Step) | $($_.Code) | $($_.Meaning) | $($_.Detail) |" })

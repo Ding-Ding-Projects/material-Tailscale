@@ -20,3 +20,12 @@ jobs:
         run: |
           ./scripts/vdisk-proof.ps1 -Out vdisk-proof.md
           Get-Content vdisk-proof.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+      - name: VHD Set through the API with the backing storage flag, one process per variant
+        if: always()
+        continue-on-error: true
+        shell: powershell
+        run: |
+          foreach ($v in 1..5) {
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./vdisk-api-probe.ps1 -Part vhdset-flags -Variant $v
+            Write-Host "variant $v exit $LASTEXITCODE"
+          }

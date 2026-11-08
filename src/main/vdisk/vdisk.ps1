@@ -160,7 +160,19 @@ public static class MtVirtDisk {
       return sb.ToString();
     } finally { CloseHandle(h); }
   }
-  static void Check(uint r, string what) { if (r != 0) throw new Exception(what + ": " + new System.ComponentModel.Win32Exception((int)r).Message + " (code " + r + ")."); }
+  /// Plain words for a result code. The virtual disk codes start at 0xC03A0000 and do not fit an
+  /// Int32, so PowerShell cannot hand them to Win32Exception itself.
+  public static string Say(uint r) {
+    switch (r) {
+      case 0xC03A0025u: return "That size would cut into a partition, so nothing was changed";
+      case 0xC03A0026u: return "Windows could not work out the smallest safe size of this disk";
+      case 0xC03A0027u: return "The disk is already as small as it can safely be: a partition reaches its end";
+      default: return new System.ComponentModel.Win32Exception(unchecked((int)r)).Message.TrimEnd('.', ' ');
+    }
+  }
+  public static string Code(uint r) { return r > 0xFFFFu ? "0x" + r.ToString("X8") : r.ToString(); }
+  public static bool AtSmallest(uint r) { return r == 0xC03A0027u; }
+  static void Check(uint r, string what) { if (r != 0) throw new Exception(what + ": " + Say(r) + " (code " + Code(r) + ")."); }
   /// Opens a disk with version 2 parameters (no access mask), which every call below accepts.
   public static IntPtr Open(string path) {
     bool set = path.EndsWith(".vhds", StringComparison.OrdinalIgnoreCase);
@@ -324,25 +336,51 @@ try {
       Step 'Grow the disk' { [MtVirtDisk]::Grow($req.path, [uint64]([int64]$req.sizeMB * 1MB)); "$($req.sizeMB) MB" } | Out-Null
       if ($req.extend) {
         Step 'Attach' { Attach $req.path $false $false } | Out-Null
-        Step 'Extend the last partition' {
-          $disk = Image $req.path | Get-Disk
-          $part = Get-Partition -DiskNumber $disk.Number | Where-Object { $_.Type -ne 'Reserved' } | Sort-Object Offset | Select-Object -Last 1
-          $max = (Get-PartitionSupportedSize -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber).SizeMax
-          Resize-Partition -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber -Size $max
-          "partition $($part.PartitionNumber) to $max bytes"
-        } | Out-Null
-        Step 'Detach' { Dismount-DiskImage -ImagePath $req.path | Out-Null } | Out-Null
+        try {
+          Step 'Extend the last partition' {
+            $disk = Image $req.path | Get-Disk
+            $part = Get-Partition -DiskNumber $disk.Number | Where-Object { $_.Type -ne 'Reserved' } | Sort-Object Offset | Select-Object -Last 1
+            $max = (Get-PartitionSupportedSize -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber).SizeMax
+            Resize-Partition -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber -Size $max
+            "partition $($part.PartitionNumber) to $max bytes"
+          } | Out-Null
+        } finally { Step 'Detach' { Dismount-DiskImage -ImagePath $req.path | Out-Null } | Out-Null }
       }
       $data.disk = Info $req.path
     }
     'shrink' {
       NeedFile $req.path; NeedDetached $req.path
       if ($req.path -notmatch '\.vhdx$') { throw 'Only a VHDX file can be shrunk.' }
+      UseVirtDisk
+      if ($req.partition) {
+        # Windows works out how small the last partition can get without moving anything it cannot
+        # move (Get-PartitionSupportedSize), the same check Disk Management uses before Shrink Volume.
+        # Files stay where they are; the disk then shrinks to the new end of that partition.
+        Step 'Attach' { Attach $req.path $false $false } | Out-Null
+        try {
+          Step 'Shrink the last partition' {
+            $disk = Image $req.path | Get-Disk
+            $part = Get-Partition -DiskNumber $disk.Number | Where-Object { $_.Type -ne 'Reserved' } | Sort-Object Offset | Select-Object -Last 1
+            if (-not $part) { throw 'The disk has no partition to shrink.' }
+            $min = [uint64](Get-PartitionSupportedSize -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber).SizeMin
+            $want = [uint64]([math]::Ceiling(($min + [uint64]$req.keepMB * 1MB) / 1MB) * 1MB)
+            if ($want -ge [uint64]$part.Size) { "partition $($part.PartitionNumber) stays at $([math]::Round($part.Size / 1MB)) MB, already no larger than it needs to be" }
+            else {
+              Resize-Partition -DiskNumber $disk.Number -PartitionNumber $part.PartitionNumber -Size $want
+              "partition $($part.PartitionNumber) from $([math]::Round($part.Size / 1MB)) MB to $([math]::Round($want / 1MB)) MB"
+            }
+          } | Out-Null
+        } finally { Step 'Detach' { Dismount-DiskImage -ImagePath $req.path | Out-Null } | Out-Null }
+      }
       Step 'Shrink the disk' {
-        UseVirtDisk
+        $before = WithDisk $req.path { param($h) [MtVirtDisk]::VirtualSize($h) }
         $code = [MtVirtDisk]::Shrink($req.path, [uint64]$(if ($req.sizeMB) { [int64]$req.sizeMB * 1MB } else { 0 }))
-        if ($code -ne 0) { throw "The VirtDisk API refused the shrink: $((New-Object ComponentModel.Win32Exception([int]$code)).Message) (code $code)." }
-        'smallest safe size'
+        if ($code -ne 0) {
+          $hint = if ([MtVirtDisk]::AtSmallest($code) -and -not $req.partition) { ' Choose to shrink the last partition first to make room.' } else { '' }
+          throw "Windows did not shrink the disk: $([MtVirtDisk]::Say($code)) (code $([MtVirtDisk]::Code($code))).$hint"
+        }
+        $after = WithDisk $req.path { param($h) [MtVirtDisk]::VirtualSize($h) }
+        "from $([math]::Round($before / 1MB)) MB to $([math]::Round($after / 1MB)) MB"
       } | Out-Null
       $data.disk = Info $req.path
     }
@@ -419,7 +457,7 @@ try {
             while ($true) {
               $p = [MtVirtDisk]::MirrorPoll($h, $mem[0])
               Note 'mirror' @{ done = [int64]$p[1]; total = [int64]$p[2] }
-              if ($p[0] -ne 997) { throw "The mirror stopped: $((New-Object ComponentModel.Win32Exception([int]$p[0])).Message) (code $($p[0]))." }
+              if ($p[0] -ne 997) { throw "The mirror stopped: $([MtVirtDisk]::Say([uint32]$p[0])) (code $([MtVirtDisk]::Code([uint32]$p[0])))." }
               if ($p[2] -gt 0 -and $p[1] -ge $p[2]) { break }
               Start-Sleep -Milliseconds 500
             }

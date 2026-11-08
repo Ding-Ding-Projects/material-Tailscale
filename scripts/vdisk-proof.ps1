@@ -37,7 +37,24 @@ if ($r.ok) {
 Run 'refuse to create over an existing file' @{ op = 'create'; path = $vhdx; type = 'dynamic'; sizeMB = 64 } | ForEach-Object { if (-not $_.ok -and $_.error -match 'overwritten') { $script:failed--; $lines[$lines.Count - 1] = "- PASS refused to create over an existing file: $($_.error)" } }
 Run 'detach' @{ op = 'detach'; path = $vhdx } | Out-Null
 Run 'grow to 512 MB and extend the partition' @{ op = 'expand'; path = $vhdx; sizeMB = 512; extend = $true } | Out-Null
-Run 'shrink to the smallest safe size (VirtDisk)' @{ op = 'shrink'; path = $vhdx } | Out-Null
+# The partition now reaches the end, so the disk alone cannot shrink; the script must say so in
+# plain words. Shrinking the last partition first makes room, and the file written earlier must
+# still read back afterwards.
+$r = Run 'shrink the disk alone while its partition reaches the end' @{ op = 'shrink'; path = $vhdx }
+if (-not $r.ok -and $r.error -match 'already as small as it can safely be') { $script:failed--; $lines[$lines.Count - 1] = "- PASS refused to cut into the partition: $($r.error)" }
+$s = Run 'shrink the last partition (16 MB left free), then the disk' @{ op = 'shrink'; path = $vhdx; partition = $true; keepMB = 16 }
+if ($s.ok) {
+  $lines.Add("- Shrink steps: $((@($s.steps) | ForEach-Object { "$($_.name): $($_.detail)" }) -join '; ')")
+  $now = [math]::Round($s.data.disk.virtualSize / 1MB)
+  if ($now -lt 512) { $lines.Add("- PASS the disk is now $now MB instead of 512 MB") } else { $script:failed++; $lines.Add("- FAIL the disk is still $now MB after shrinking") }
+  $ro = Run 'attach read-only to read the file back' @{ op = 'attach'; path = $vhdx; readOnly = $true }
+  if ($ro.ok) {
+    $l = @($ro.data.disk.letters)[0]
+    $text = Get-Content -LiteralPath "$($l):\hello.txt" -Raw -ErrorAction SilentlyContinue
+    if ($text -match 'written inside the virtual disk') { $lines.Add('- PASS the file written before the shrink reads back unchanged') } else { $script:failed++; $lines.Add("- FAIL the file written before the shrink did not read back from $($l):") }
+    Run 'detach after reading' @{ op = 'detach'; path = $vhdx } | Out-Null
+  }
+}
 Run 'compact (attached read-only while it runs)' @{ op = 'compact'; path = $vhdx } | Out-Null
 $vhd = Join-Path $disks 'Proof disk (VHD).vhd'
 Run 'convert the VHDX into a new dynamic VHD' @{ op = 'convert'; path = $vhdx; dest = $vhd; type = 'dynamic' } | Out-Null
