@@ -1,0 +1,20 @@
+name: Virtual disk API probe
+
+# Runs only for probe/* branches: an experiment on a hosted Windows runner that records which
+# virtual disk API calls work without Hyper-V. It publishes nothing.
+on:
+  push:
+    branches: ['probe/**']
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe the virtual disk API
+        shell: powershell
+        run: ./vdisk-api-probe.ps1
