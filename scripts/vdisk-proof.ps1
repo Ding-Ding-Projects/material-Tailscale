@@ -118,24 +118,31 @@ $mi = Run 'mirror the VHDX into a new file and switch' @{ op = 'mirror'; path = 
 if ($mi.ok -and (Test-Path -LiteralPath $mirror)) { $lines.Add("- PASS the mirror is a separate file of $((Get-Item -LiteralPath $mirror).Length) bytes") }
 Run 'refuse to mirror over an existing file' @{ op = 'mirror'; path = $vhdx; dest = $mirror } | ForEach-Object { if (-not $_.ok -and $_.error -match 'overwritten') { $script:failed--; $lines[$lines.Count - 1] = "- PASS refused to mirror over an existing file: $($_.error)" } }
 $set = Join-Path $disks 'Proof set.vhds'
-if ($probe.data.hyperv) {
-  $cs = Run 'create a 256 MB dynamic VHD Set (Hyper-V New-VHD)' @{ op = 'create'; path = $set; type = 'dynamic'; sizeMB = 256 }
-  if ($cs.ok) {
-    $tk = Run 'take a checkpoint' @{ op = 'checkpoint'; path = $set; action = 'take' }
-    if ($tk.ok) {
-      $ap = Run 'return to the checkpoint, keeping the current state' @{ op = 'checkpoint'; path = $set; action = 'apply'; id = $tk.data.id; keep = $true }
-      if ($ap.ok -and $ap.data.kept) { $lines.Add("- PASS returned to $($tk.data.id); the current state was kept as $($ap.data.kept)") }
-      Run 'delete the checkpoint' @{ op = 'checkpoint'; path = $set; action = 'delete'; id = $tk.data.id } | Out-Null
-      $ls = Run 'list the checkpoints' @{ op = 'advanced'; path = $set }
-      if ($ls.ok) { $lines.Add("- Checkpoints listed by Hyper-V: $(@($ls.data.advanced.checkpoints).Count)") }
-    }
-    Run 'attach the VHD Set, then detach' @{ op = 'attach'; path = $set } | Out-Null
-    Run 'detach the VHD Set' @{ op = 'detach'; path = $set } | Out-Null
+# A VHD Set through the virtual disk API, on every edition: dynamic with checkpoints, then a
+# fixed one partitioned and formatted like any other disk.
+$cs = Run 'create a 256 MB dynamic VHD Set (virtual disk API)' @{ op = 'create'; path = $set; type = 'dynamic'; sizeMB = 256 }
+if ($cs.ok) {
+  $files = @(Get-ChildItem -LiteralPath $disks -Filter 'Proof set*' | ForEach-Object { $_.Name })
+  if ($files.Count -ge 2) { $lines.Add("- PASS the set has its first data file beside it: $($files -join ', ')") } else { $script:failed++; $lines.Add("- FAIL expected the set and its first data file, found: $($files -join ', ')") }
+  $tk = Run 'take a checkpoint' @{ op = 'checkpoint'; path = $set; action = 'take' }
+  if ($tk.ok) {
+    $ap = Run 'return to the checkpoint, keeping the current state' @{ op = 'checkpoint'; path = $set; action = 'apply'; id = $tk.data.id; keep = $true }
+    if ($ap.ok -and $ap.data.kept) { $lines.Add("- PASS returned to $($tk.data.id); the current state was kept as $($ap.data.kept)") }
+    Run 'delete the checkpoint' @{ op = 'checkpoint'; path = $set; action = 'delete'; id = $tk.data.id } | Out-Null
+    $ls = Run 'list the checkpoints' @{ op = 'advanced'; path = $set }
+    if ($ls.ok) { $lines.Add("- Checkpoints listed: $(if ($ls.data.advanced.checkpointsListed) { "$(@($ls.data.advanced.checkpoints).Count) by the Hyper-V module" } else { 'the Hyper-V module is not here, so the app lists the ones it took' })") }
   }
-} else {
-  $r = Run 'refuse a VHD Set where Hyper-V is missing' @{ op = 'create'; path = $set; type = 'dynamic'; sizeMB = 256 }
-  if (-not $r.ok -and $r.error -match 'Hyper-V') { $script:failed--; $lines[$lines.Count - 1] = "- PASS refused a VHD Set without Hyper-V: $($r.error)" }
+  Run 'attach the VHD Set, then detach' @{ op = 'attach'; path = $set } | Out-Null
+  Run 'detach the VHD Set' @{ op = 'detach'; path = $set } | Out-Null
 }
+$fixedSet = Join-Path $disks 'Proof fixed set.vhds'
+$fs = Run 'create a 64 MB fixed VHD Set, partition, format NTFS and attach' @{ op = 'create'; path = $fixedSet; type = 'fixed'; sizeMB = 64; prepare = @{ style = 'GPT'; fs = 'NTFS'; label = 'Set' }; attach = $true }
+if ($fs.ok) {
+  $l = @($fs.data.disk.letters)[0]
+  if ($l) { Set-Content -LiteralPath "$($l):\in the set.txt" -Value 'inside a VHD Set'; $lines.Add("- PASS wrote a file inside the fixed VHD Set at $($l):") }
+  Run 'detach the fixed VHD Set' @{ op = 'detach'; path = $fixedSet } | Out-Null
+}
+Run 'refuse to create a VHD Set over an existing one' @{ op = 'create'; path = $set; type = 'dynamic'; sizeMB = 64 } | ForEach-Object { if (-not $_.ok -and $_.error -match 'overwritten') { $script:failed--; $lines[$lines.Count - 1] = "- PASS refused to create over an existing VHD Set: $($_.error)" } }
 
 $lines.Insert(0, "Ran the app's disk script on this runner: $($lines.Count - 1) results, $failed failed.")
 $lines | Set-Content -LiteralPath $Out -Encoding UTF8

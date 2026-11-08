@@ -3,9 +3,10 @@
 # and for identity, custom metadata, change tracking, VHD Set checkpoints and live mirroring; and
 # the Storage module for attach, detach, ISO images, partitioning and formatting. DiskPart is not
 # used: it reads its script in the console code page, so a path with letters outside that page
-# (Chinese, for one) reached it as a command it did not know. Creating a VHD Set is the one
-# operation that needs Hyper-V's New-VHD: the VirtDisk API refuses it on every edition (verified
-# on a hosted Windows Server 2025 runner). The app runs this script
+# (Chinese, for one) reached it as a command it did not know. A VHD Set is created through the
+# VirtDisk API too, with CREATE_VIRTUAL_DISK_FLAG_CREATE_BACKING_STORAGE; without that flag Windows
+# answers "The parameter is incorrect" (both verified on a hosted Windows Server 2025 runner).
+# Only listing a VHD Set's checkpoints uses the Hyper-V module, where it is installed. The app runs this script
 # elevated, after Windows asks for permission, with a JSON request file; it writes a JSON result
 # file and appends progress lines to a progress file. Never overwrites a file and never deletes one.
 param(
@@ -122,16 +123,21 @@ public static class MtVirtDisk {
     string e = System.IO.Path.GetExtension(path).ToLowerInvariant();
     return new STORAGE_TYPE { DeviceId = e == ".vhdx" ? 3u : e == ".vhd" ? 2u : e == ".vhds" ? 4u : 0u, VendorId = MS };
   }
-  /// Creates a VHD or VHDX: dynamic, fixed (every byte allocated now), a differencing child of
-  /// parent, or a new disk filled from source (a conversion).
+  /// Creates a VHD, VHDX or VHD Set: dynamic, fixed (every byte allocated now), a differencing
+  /// child of parent, or a new disk filled from source (a conversion). A VHD Set needs
+  /// CREATE_VIRTUAL_DISK_FLAG_CREATE_BACKING_STORAGE (0x8), which also makes its first data file
+  /// beside it; without the flag Windows refuses with "The parameter is incorrect".
   public static void Create(string path, ulong size, bool fixedSize, string parent, string source) {
     var t = TypeOf(path);
-    if (t.DeviceId != 2u && t.DeviceId != 3u) throw new ArgumentException("The virtual disk API creates only VHD and VHDX files here. A VHD Set is made with New-VHD.");
+    if (t.DeviceId == 0) throw new ArgumentException("A virtual disk ends in .vhd, .vhdx or .vhds.");
     if (string.IsNullOrEmpty(parent)) parent = null; if (string.IsNullOrEmpty(source)) source = null;
+    bool set = t.DeviceId == 4u;
+    if (set && (parent != null || source != null)) throw new ArgumentException("A VHD Set is created empty, dynamic or fixed.");
+    uint flags = (fixedSize ? 1u : 0u) | (set ? 8u : 0u);
     IntPtr pp = parent == null ? IntPtr.Zero : Marshal.StringToHGlobalUni(parent), sp = source == null ? IntPtr.Zero : Marshal.StringToHGlobalUni(source);
     try {
       var p = new CREATE_V2 { Version = 2, MaximumSize = parent != null || source != null ? 0 : size, ParentPath = pp, SourcePath = sp };
-      IntPtr h; Check(CreateVirtualDisk(ref t, path, 0, IntPtr.Zero, fixedSize ? 1u : 0u, 0, ref p, IntPtr.Zero, out h), "Create the disk");
+      IntPtr h; Check(CreateVirtualDisk(ref t, path, 0, IntPtr.Zero, flags, 0, ref p, IntPtr.Zero, out h), set ? "Create the VHD Set" : "Create the disk");
       CloseHandle(h);
     } finally { if (pp != IntPtr.Zero) Marshal.FreeHGlobal(pp); if (sp != IntPtr.Zero) Marshal.FreeHGlobal(sp); }
   }
@@ -303,19 +309,15 @@ try {
       $data.build = $os.BuildNumber
       $data.storage = [bool](Get-Command Mount-DiskImage -ErrorAction SilentlyContinue)
       $data.virtdisk = Test-Path -LiteralPath "$env:SystemRoot\System32\virtdisk.dll"
-      $data.hyperv = [bool](Get-Command New-VHD -ErrorAction SilentlyContinue)
+      $data.hyperv = [bool](Get-Command Get-VHDSnapshot -ErrorAction SilentlyContinue)
       $data.elevated = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     }
     'info' { $data.disks = @($req.paths | ForEach-Object { if (Test-Path -LiteralPath $_ -PathType Leaf) { Info $_ } else { [ordered]@{ path = $_; exists = $false } } }) }
     'create' {
       NeedNew $req.path
       if ($req.path -match '\.vhds$') {
-        if (-not (Get-Command New-VHD -ErrorAction SilentlyContinue)) { throw 'Creating a VHD Set needs the Hyper-V module (Windows Pro, Enterprise or Education with Hyper-V turned on). The virtual disk API refuses it on every edition.' }
-        Step 'Create the VHD Set (Hyper-V New-VHD)' {
-          $nv = @{ Path = $req.path; SizeBytes = [int64]$req.sizeMB * 1MB }
-          if ($req.type -eq 'fixed') { $nv.Fixed = $true } else { $nv.Dynamic = $true }
-          New-VHD @nv | Out-Null; "$($req.sizeMB) MB $($req.type) VHD Set"
-        } | Out-Null
+        UseVirtDisk
+        Step 'Create the VHD Set and its first data file' { [MtVirtDisk]::Create($req.path, [uint64]([int64]$req.sizeMB * 1MB), ($req.type -eq 'fixed'), '', ''); "$($req.sizeMB) MB $($req.type) VHD Set" } | Out-Null
       } elseif ($req.type -eq 'differencing') {
         NeedFile $req.parent; UseVirtDisk
         Step 'Create the disk' { [MtVirtDisk]::Create($req.path, 0, $false, [string]$req.parent, ''); 'differencing' } | Out-Null
