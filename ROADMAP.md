@@ -76,7 +76,7 @@
 - [x] Final polish: Home and Minecraft first-run states follow their boards; About rebuilt (build table, licences, working update check); Status shows dot markers, folded search paths, This device and Health; changelog lists every published release and marks unreleased work
 - [x] Fixed: About printed a stray "null"; help requests said "App version: unknown"; the changelog read "Unreleased: Midnight Mesh 2" as version 2
 - [x] Release packaging ships one full package and one delta per release instead of every historic package (Squirrel's GitHub sync collided on the duplicates and failed releases 13 and 14)
-- [ ] Every-surface sweep reports zero findings in a full run (4 window sizes, 2 themes, 3 language modes; every app surface and every website page), bound to the release commit
+- [x] Every-surface sweep reports zero findings in a full run (4 window sizes, 2 themes, 3 language modes; every app surface and every website page), bound to the release commit: 3,840 checks on the build of `c116078` (v1.0.15), zero findings
 - [x] Sweep tooling: axe-core WCAG 2.2 AA and best practices, console and blocked content, clipped, off-screen and overlapping text, and a keyboard walk, with a throwaway profile and a before and after board on the design canvas
 - [x] Fixed at the source: icon names read aloud, nested controls in menus and the palette, tab list holding buttons, unnamed popovers, dialogs that let Tab leave, missing focus rings, skipped heading levels, sideways scrolling on narrow windows, an unreachable Settings list on short windows, light-theme contrast, desktop-only website routes
 - [x] Windows title bar keeps the system caption buttons through the title-bar overlay (Snap layouts), with overlay colours that follow the theme through validated IPC

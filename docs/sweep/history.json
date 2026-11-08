@@ -22,7 +22,7 @@
       },
       "after": {
         "date": "2026-11-08",
-        "checks": 70,
+        "checks": 71,
         "findings": 0,
         "distinct": 0
       }
@@ -50,7 +50,7 @@
       },
       "after": {
         "date": "2026-11-08",
-        "checks": 210,
+        "checks": 213,
         "findings": 0,
         "distinct": 0
       }
@@ -77,7 +77,7 @@
       },
       "after": {
         "date": "2026-11-08",
-        "checks": 140,
+        "checks": 142,
         "findings": 0,
         "distinct": 0
       }
@@ -140,8 +140,8 @@
   ],
   "final": {
     "date": "2026-11-08",
-    "generated": "2026-11-08T17:57:26.578Z",
-    "seconds": 3192,
+    "generated": "2026-11-08T19:17:49.752Z",
+    "seconds": 2794,
     "tuples": {
       "sizes": [
         "desktop",
@@ -159,11 +159,11 @@
         "both"
       ]
     },
-    "checks": 3816,
+    "checks": 3840,
     "findings": 0,
     "distinct": 0,
     "byType": {},
-    "app": 1680,
+    "app": 1704,
     "site": 2136
   }
 }

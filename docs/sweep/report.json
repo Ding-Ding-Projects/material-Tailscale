@@ -1,7 +1,7 @@
 {
-  "generated": "2026-11-08T17:57:26.578Z",
-  "seconds": 3192,
-  "resumed": 2,
+  "generated": "2026-11-08T19:17:49.752Z",
+  "seconds": 2794,
+  "resumed": 0,
   "parts": 3,
   "tuples": {
     "sizes": [
@@ -20,7 +20,7 @@
       "both"
     ]
   },
-  "surfacesChecked": 3816,
+  "surfacesChecked": 3840,
   "findings": 0,
   "distinct": 0,
   "byType": {},
