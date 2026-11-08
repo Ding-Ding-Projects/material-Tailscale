@@ -176,16 +176,23 @@ export function openDest(dest, arg) {
 
 export function currentDest() { if (external) return external.current(); return tabs.find((x) => x.id === active)?.dest; }
 
+// Each render gets a number. With motion on, a view transition runs its update a frame later; with
+// motion off it runs at once. A later render can therefore finish first, and the earlier one must
+// not paint its page over it afterwards (it once left the Home page under a Virtual disks tab).
+let renderSeq = 0;
 export function render() {
   if (external) return external.render();
+  const seq = ++renderSeq;
   const tb = tabs.find((x) => x.id === active) || tabs[0];
   const fn = pages.get(tb.dest) || pages.get('home');
   transition(() => {
+    if (seq !== renderSeq) return;
     currentCleanup?.(); currentCleanup = null;
     clear(outlet);
     const ctx = { arg: tb.arg, onCleanup: (f) => { currentCleanup = f; } };
     try { outlet.append(fn(ctx)); } catch (e) { outlet.append(h('div.card', h('h2', pair('This page failed to render', '呢頁顯示唔到')), h('div.out', String(e.stack || e)))); console.error(e); }
     outlet.scrollTop = 0;
+    outlet.dataset.dest = tb.dest;
     window.dispatchEvent(new CustomEvent('mt:rendered', { detail: tb.dest }));
   });
 }

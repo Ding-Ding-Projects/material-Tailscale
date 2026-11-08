@@ -314,7 +314,8 @@ async function captureAll(dir) {
   await wc.executeJavaScript(`window.__mtSet('lang', ${JSON.stringify(captureLang)}); true`);
   const clipping = [];
   const provenance = [];
-  const RENDERED = `(() => { for (const a of document.getAnimations()) { try { a.finish(); } catch { /* infinite */ } } const p = document.querySelector('.outlet .page'); if (!p || p.getBoundingClientRect().height < 40) return false; const first = p.firstElementChild; return !first || Number(getComputedStyle(first).opacity) > 0.98; })()`;
+  // The page must be the one asked for (the outlet records which page it shows), present and opaque.
+  const RENDERED = (d) => `(() => { for (const a of document.getAnimations()) { try { a.finish(); } catch { /* infinite */ } } if (document.getElementById('outlet')?.dataset.dest !== ${JSON.stringify(d.split('>')[0].split(':')[0])}) return false; const p = document.querySelector('.outlet .page'); if (!p || p.getBoundingClientRect().height < 40) return false; const first = p.firstElementChild; return !first || Number(getComputedStyle(first).opacity) > 0.98; })()`;
   // Finds visible text that is cut off: horizontal overflow without a scroll
   // container, or an element that extends past the window's right edge where no
   // scrolling box can bring it back into view (a sideways-scrolling tab strip is fine).
@@ -329,7 +330,7 @@ async function captureAll(dir) {
       // in front may never tick them, which once left a page at zero opacity in a capture. The
       // page must be present and opaque; the manifest records it if it never was.
       let rendered = false;
-      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED).catch(() => false)); i++) await wait(250);
+      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED(d)).catch(() => false)); i++) await wait(250);
       await wait(80);
       if (process.env.MT_CAPTURE_CLIP) { const found = await wc.executeJavaScript(CLIP_PROBE).catch(() => []); if (found.length) clipping.push({ theme, dest: d, found }); }
       const img = await wc.capturePage();
@@ -350,7 +351,7 @@ async function captureAll(dir) {
       await wc.executeJavaScript(`window.__mtSet('theme', ${JSON.stringify(theme)}); true`);
       await openRoute(wc, 'cli:set');
       let rendered = false;
-      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED).catch(() => false)); i++) await wait(250);
+      for (let i = 0; i < 8 && !(rendered = await wc.executeJavaScript(RENDERED('cli:set')).catch(() => false)); i++) await wait(250);
       await wait(120);
       const png = (await wc.capturePage()).toPNG();
       const file = `${theme}-hero.png`;
