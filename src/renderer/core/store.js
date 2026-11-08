@@ -35,6 +35,7 @@ export const DEFAULTS = Object.freeze({
   ollamaCart: [],
   ollamaFit: { numCtx: 4096, perK: 0.125 },
   vdiskLibrary: [],
+  vdiskCheckpoints: {},
   panelSizes: {},
   editor: '',
   onboarded: false,

@@ -43,7 +43,7 @@
 - [x] Ollama model list and pull
 - [x] Full Ollama suite: models, every-tag store with fit verdicts, download cart, chat, create, harnesses with rollback, offline help (pulling and chatting against a running Ollama not tried on the build machine, which has none)
 - [x] Regex debugger with every backtracking step, checked against the browser engine on 32 patterns
-- [ ] Virtual disk manager: built for create, attach, detach, grow, shrink, compact, convert, differencing, merge, ISO and Quick pack, proven per release on a Windows runner; VHD Set creation and checkpoints, metadata, mirroring, change tracking and identity reset still to build
+- [x] Virtual disk manager: create, attach, detach, grow, shrink (partition first or disk only), compact, convert, differencing, merge, ISO, Quick pack, VHD Sets with checkpoints, identifiers, metadata, change tracking and a live mirror, all through routes Windows Home has, proven on a Windows runner in every release
 - [x] Minecraft Java version discovery
 - [x] Bundled converters for documents, audio, video and archives
 - [x] One-click managed Ollama installer

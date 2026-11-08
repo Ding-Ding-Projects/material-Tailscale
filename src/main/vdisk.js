@@ -15,13 +15,15 @@ let dataDir = () => '';
 function setup({ userData }) { dataDir = typeof userData === 'function' ? userData : () => userData; }
 
 const windowsOnly = () => { const e = new Error('Virtual disks are a Windows feature, and this computer is not running Windows.'); e.code = 'WINDOWS_ONLY'; return e; };
-function diskPath(p, { exists = true, ext = EXT } = {}) {
+function diskPath(p, { exists = true, ext = EXT, need } = {}) {
   if (typeof p !== 'string' || !path.isAbsolute(p) || /[\0*?"<>|]/.test(p) || p.length > 1000) throw new Error('Choose the disk file with the file picker.');
-  if (!ext.test(p)) throw new Error('A virtual disk ends in .vhd, .vhdx, .vhds or .iso.');
+  if (!ext.test(p)) throw new Error(need || 'A virtual disk ends in .vhd, .vhdx, .vhds or .iso.');
   if (exists === true && !fs.statSync(p, { throwIfNoEntry: false })?.isFile()) throw new Error(`There is no file at ${p}.`);
   if (exists === false && fs.existsSync(p)) throw new Error(`A file already exists at ${p}; nothing is ever overwritten. Choose another name.`);
   return p;
 }
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const guid = (g, what) => { if (typeof g !== 'string' || !GUID.test(g)) throw new Error(`${what} is not a valid ID.`); return g.toLowerCase(); };
 const mb = (n, min, max) => { const v = Math.round(Number(n)); if (!Number.isFinite(v) || v < min || v > max) throw new Error(`The size must be between ${min} MB and ${max.toLocaleString('en-US')} MB.`); return v; };
 
 /** Checks a request and returns the clean object handed to the script. */
@@ -31,8 +33,9 @@ function validate(op, r = {}) {
     case 'info': if (!Array.isArray(r.paths) || r.paths.length > 200) throw new Error('At most 200 disks at a time.'); return { op, paths: r.paths.map((p) => diskPath(p, { exists: null })) };
     case 'create': {
       const vhd = /\.vhd$/i.test(r.path);
-      const out = { op, path: diskPath(r.path, { exists: false, ext: /\.(vhd|vhdx)$/i }), type: r.type };
+      const out = { op, path: diskPath(r.path, { exists: false, ext: /\.(vhd|vhdx|vhds)$/i }), type: r.type };
       if (!['dynamic', 'fixed', 'differencing'].includes(r.type)) throw new Error('Choose dynamic, fixed or differencing.');
+      if (/\.vhds$/i.test(r.path) && r.type === 'differencing') throw new Error('A VHD Set is dynamic or fixed; it keeps its own checkpoints instead of a parent.');
       if (r.type === 'differencing') out.parent = diskPath(r.parent, { ext: /\.(vhd|vhdx)$/i });
       else out.sizeMB = mb(r.sizeMB, 3, vhd ? 2040 * 1024 : 64 * 1024 * 1024);
       if (r.prepare) {
@@ -45,12 +48,41 @@ function validate(op, r = {}) {
     case 'attach': return { op, path: diskPath(r.path), readOnly: !!r.readOnly || /\.iso$/i.test(r.path), noLetter: !!r.noLetter };
     case 'detach': case 'compact': case 'detail': return { op, path: diskPath(r.path) };
     case 'expand': return { op, path: diskPath(r.path, { ext: /\.(vhd|vhdx)$/i }), sizeMB: mb(r.sizeMB, 3, /\.vhd$/i.test(r.path) ? 2040 * 1024 : 64 * 1024 * 1024), extend: !!r.extend };
-    case 'shrink': return { op, path: diskPath(r.path, { ext: /\.vhdx$/i }), sizeMB: r.sizeMB ? mb(r.sizeMB, 3, 64 * 1024 * 1024) : 0 };
+    case 'shrink': {
+      const out = { op, path: diskPath(r.path, { ext: /\.vhdx$/i, need: 'Only a VHDX file can be shrunk.' }), sizeMB: r.sizeMB ? mb(r.sizeMB, 3, 64 * 1024 * 1024) : 0, partition: r.partition === true };
+      if (out.partition) { const k = Math.round(Number(r.keepMB ?? 0)); if (!Number.isFinite(k) || k < 0 || k > 1024 * 1024) throw new Error('Leave between 0 MB and 1,048,576 MB free in the partition.'); out.keepMB = k; }
+      return out;
+    }
     case 'convert': {
       if (!['dynamic', 'fixed'].includes(r.type)) throw new Error('Choose dynamic or fixed for the copy.');
       return { op, path: diskPath(r.path, { ext: /\.(vhd|vhdx)$/i }), dest: diskPath(r.dest, { exists: false, ext: /\.(vhd|vhdx)$/i }), type: r.type };
     }
     case 'merge': { const d = Math.round(Number(r.depth)); if (!(d >= 1 && d <= 16)) throw new Error('Merge between 1 and 16 parent levels.'); return { op, path: diskPath(r.path, { ext: /\.(vhd|vhdx)$/i }), depth: d }; }
+    case 'advanced': return { op, path: diskPath(r.path, { ext: /\.(vhd|vhdx|vhds)$/i }) };
+    case 'identity': if (!['identifier', 'virtualDiskId'].includes(r.which)) throw new Error('Choose the disk identifier or the virtual disk ID.'); return { op, path: diskPath(r.path, { ext: /\.(vhd|vhdx)$/i, need: 'Identifiers can be renewed on VHD and VHDX files.' }), which: r.which };
+    case 'meta-set': {
+      const text = typeof r.text === 'string' ? r.text : '';
+      if (!text.length || text.length > 32768) throw new Error('Write between 1 and 32,768 characters.');
+      return { op, path: diskPath(r.path, { ext: /\.vhdx$/i, need: 'Custom metadata lives in VHDX files only.' }), item: r.item ? guid(r.item, 'The metadata item') : null, text };
+    }
+    case 'meta-delete': return { op, path: diskPath(r.path, { ext: /\.vhdx$/i, need: 'Custom metadata lives in VHDX files only.' }), item: guid(r.item, 'The metadata item') };
+    case 'rct': return { op, path: diskPath(r.path, { ext: /\.vhdx$/i, need: 'Change tracking works on VHDX files only.' }), enabled: r.enabled === true };
+    case 'rct-changes': {
+      if (typeof r.since !== 'string' || !/^rct[a-z]?:[0-9a-f:]{8,120}$/i.test(r.since)) throw new Error('Paste a change-tracking point, such as rctX:… from this disk.');
+      return { op, path: diskPath(r.path, { ext: /\.vhdx$/i, need: 'Change tracking works on VHDX files only.' }), since: r.since };
+    }
+    case 'checkpoint': {
+      if (!['take', 'apply', 'delete'].includes(r.action)) throw new Error('Take, return to or delete a checkpoint.');
+      const out = { op, path: diskPath(r.path, { ext: /\.vhds$/i, need: 'Checkpoints belong to VHD Set (.vhds) files.' }), action: r.action };
+      if (r.action !== 'take') out.id = guid(r.id, 'The checkpoint');
+      if (r.action === 'apply') out.keep = r.keep !== false;
+      return out;
+    }
+    case 'mirror': {
+      const src = diskPath(r.path, { ext: /\.(vhd|vhdx)$/i, need: 'A live mirror copies a VHD or VHDX file.' });
+      const ext = path.extname(src).toLowerCase();
+      return { op, path: src, dest: diskPath(r.dest, { exists: false, ext: new RegExp(`\\${ext}$`, 'i'), need: `The mirror keeps the disk's format, so it ends in ${ext}.` }) };
+    }
     case 'pack': {
       if (!Array.isArray(r.items) || !r.items.length || r.items.length > 500) throw new Error('Drop between 1 and 500 files or folders.');
       const items = r.items.map((p) => { if (typeof p !== 'string' || !path.isAbsolute(p) || !fs.existsSync(p)) throw new Error(`${p} is not there any more.`); return p; });
@@ -61,7 +93,7 @@ function validate(op, r = {}) {
   }
   throw new Error(`${op} is not a virtual disk operation.`);
 }
-const ELEVATED = new Set(['create', 'attach', 'detach', 'expand', 'shrink', 'compact', 'convert', 'merge', 'detail', 'pack']);
+const ELEVATED = new Set(['create', 'attach', 'detach', 'expand', 'shrink', 'compact', 'convert', 'merge', 'detail', 'pack', 'advanced', 'identity', 'meta-set', 'meta-delete', 'rct', 'rct-changes', 'checkpoint', 'mirror']);
 
 const stripBom = (s) => s.replace(/^﻿/, '');
 /** Runs one operation. onProgress receives each progress line the script writes. */
@@ -125,4 +157,4 @@ function measure(items) {
   return { files, bytes, sizeMB, dest };
 }
 
-module.exports = { setup, run, validate, measure, windowsOnly, SCRIPT };
+module.exports = { setup, run, validate, measure, windowsOnly, SCRIPT, ELEVATED };

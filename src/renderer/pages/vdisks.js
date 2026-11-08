@@ -1,14 +1,16 @@
 // Virtual disks: a library of VHD, VHDX, VHD Set and ISO files with attach, detach, grow,
 // shrink, compact, convert, merge and details; a guided Create form that shows exactly what will
-// run; and Quick pack, which turns dropped files and folders into a new, automatically sized
-// VHDX beside them, copies everything in and checks every file before it says done.
+// run; Quick pack, which turns dropped files and folders into a new, automatically sized VHDX
+// beside them, copies everything in and checks every file before it says done; and Advanced:
+// identifiers, custom metadata, change tracking, VHD Set checkpoints and a live mirror.
 import { h, icon, clear, fmtBytes, uid, append } from '../core/dom.js';
 import { pair } from '../core/i18n.js';
 import * as store from '../core/store.js';
 import { registerPage } from '../ui/shell.js';
 import { pageHero, heroStats } from '../ui/hero.js';
 import { mtabs } from '../ui/mtabs.js';
-import { toast, dialog, menu } from '../ui/overlay.js';
+import { toast, dialog, menu, confirmDialog } from '../ui/overlay.js';
+import { superConfirm } from '../ui/safety.js';
 import { regexField } from '../ui/regex.js';
 import { helpRequest } from '../ui/jobs.js';
 
@@ -18,6 +20,7 @@ const put = (el, ...kids) => append(el, kids);
 const isWin = () => window.__MT_PLATFORM__ === 'win32';
 const WIN_ONLY = pair('Virtual disks are a Windows feature. This computer is not running Windows, so the buttons that change disks are off; everything else here still explains what they do.', '虛擬磁碟係 Windows 功能。呢部電腦唔係 Windows，所以改磁碟嘅掣會停用；其他說明照睇得到。');
 const card = (title, ico, ...kids) => h('section.card.stack', h('div.card-head', h('span.ic', icon(ico)), h('h2.h3', title)), ...kids);
+const gcard = (span, title, ico, ...kids) => h(`section.card.span-${span}.stack`, h('div.card-head', h('span.ic', icon(ico)), h('h2.h3', title)), ...kids);
 const seg = (opts, v, label, onPick) => { const el = h('div.seg', { role: 'radiogroup', 'aria-label': label }, opts.map(([k, l]) => h('button', { type: 'button', role: 'radio', 'aria-checked': String(k === v), on: { click: (e) => { for (const b of el.children) b.setAttribute('aria-checked', String(b === e.currentTarget)); onPick(k); } } }, l))); return el; };
 
 /** Runs one operation with a progress dialog; resolves with the result or null. */
@@ -34,6 +37,7 @@ function runOp(title, op, request, { onDone } = {}) {
     if (p.msg === 'done') rows.get(p.step)?.setAttribute('class', 'done');
     if (p.msg === 'fail') rows.get(p.step)?.setAttribute('class', 'fail');
     if (p.msg === 'plan') note.textContent = pair(`${p.files} files, ${fmtBytes(p.bytes)}: a ${Math.round(p.sizeMB / 102.4) / 10} GB dynamic VHDX at ${p.dest}`, `${p.files} 個檔案，${fmtBytes(p.bytes)}：${p.dest}`);
+    if (p.msg === 'mirror' && p.total > 0) { bar.firstChild.style.width = `${Math.max(2, Math.round((p.done / p.total) * 100))}%`; note.textContent = pair(`Copying into the mirror: ${fmtBytes(p.done)} of ${fmtBytes(p.total)}`, `複製緊去鏡像：${fmtBytes(p.total)} 入面 ${fmtBytes(p.done)}`); }
     if (p.msg === 'copy' || p.msg === 'verify') { const pct = Math.round((p.done / p.total) * 100); bar.firstChild.style.width = `${Math.max(2, (p.msg === 'copy' ? 0 : 50) + pct / 2)}%`; note.textContent = p.msg === 'copy' ? pair(`Copying: ${p.done} of ${p.total} files`, `複製緊：${p.total} 個入面 ${p.done} 個`) : pair(`Checking: ${p.done} of ${p.total} files match so far`, `檢查緊：${p.total} 個入面 ${p.done} 個`); }
   });
   return window.mt.vdisk.run(op, request, job).then((r) => {
@@ -57,8 +61,9 @@ registerPage('vdisks', (ctx) => {
   let infos = {};
   const stats = h('div.hero-stats');
   const body = h('div.stack');
-  const tabs = mtabs([{ value: 'library', icon: 'hard_drive', label: pair('Library', '磁碟庫') }, { value: 'create', icon: 'add_circle', label: pair('Create a disk', '建立磁碟') }, { value: 'pack', icon: 'inventory_2', label: pair('Quick pack', '快速打包') }],
-    ['library', 'create', 'pack'].includes(ctx.arg) ? ctx.arg : 'library', { label: pair('Virtual disk sections', '虛擬磁碟分區') });
+  const tabs = mtabs([{ value: 'library', icon: 'hard_drive', label: pair('Library', '磁碟庫') }, { value: 'create', icon: 'add_circle', label: pair('Create a disk', '建立磁碟') }, { value: 'pack', icon: 'inventory_2', label: pair('Quick pack', '快速打包') }, { value: 'advanced', icon: 'tune', label: pair('Advanced', '進階') }],
+    ['library', 'create', 'pack', 'advanced'].includes(ctx.arg) ? ctx.arg : 'library', { label: pair('Virtual disk sections', '虛擬磁碟分區') });
+  let probe = null;
   const drawStats = () => stats.replaceChildren(...heroStats([
     { value: String(Object.values(infos).filter((x) => x.attached).length), label: pair('attached', '已掛載'), tone: 'ok' },
     { value: String(lib().length), label: pair('in the library', '喺磁碟庫') },
@@ -68,6 +73,7 @@ registerPage('vdisks', (ctx) => {
     if (!isWin() || !lib().length) { drawStats(); drawLibrary(); return; }
     try { const r = await window.mt.vdisk.run('info', { paths: lib() }, uid('vd')); infos = Object.fromEntries((r.data.disks || []).map((d) => [d.path, d])); } catch { /* shown per disk */ }
     drawStats(); drawLibrary();
+    if (tabs.get() === 'advanced') drawAdvanced();
   };
 
   // ---------- library ----------
@@ -86,15 +92,32 @@ registerPage('vdisks', (ctx) => {
   };
   const more = (e, p, info) => menu(e.currentTarget, [
     { icon: 'open_in_full', label: pair('Grow…', '擴大…'), run: () => sizeDialog(pair('Grow the disk', '擴大磁碟'), p, info?.virtualSize, 'expand', pair('Raises the maximum while the disk is detached. Growing never deletes anything.', '喺未掛載時提高上限，唔會刪除任何嘢。')) },
-    { icon: 'close_fullscreen', label: pair('Shrink to the smallest safe size', '縮到最細安全大小'), run: () => act(pair('Shrink the disk', '縮細磁碟'), 'shrink', { path: p }) },
+    /\.vhdx$/i.test(p) ? { icon: 'close_fullscreen', label: pair('Shrink…', '縮細…'), run: () => shrinkDialog(p) } : null,
     { icon: 'compress', label: pair('Compact', '壓縮'), run: () => act(pair('Compact the disk', '壓縮磁碟'), 'compact', { path: p }) },
     { icon: 'swap_horiz', label: pair('Convert to a new file…', '轉換成新檔案…'), run: () => convertDialog(p) },
     { icon: 'merge', label: pair('Merge into its parent…', '合併入父磁碟…'), run: () => mergeDialog(p) },
     { icon: 'info', label: pair('Details', '詳情'), run: () => act(pair('Disk details', '磁碟詳情'), 'detail', { path: p }).then((r) => r && dialog({ title: p, wide: true, body: h('div.out', r.data.detail) })) },
     { icon: 'lock', label: pair('Attach read-only', '唯讀掛載'), run: () => act(pair('Attach read-only', '唯讀掛載'), 'attach', { path: p, readOnly: true }) },
+    /\.(vhd|vhdx|vhds)$/i.test(p) ? { icon: 'tune', label: pair('Advanced: identity, metadata, tracking, checkpoints, mirror', '進階：識別碼、元資料、追蹤、檢查點、鏡像'), run: () => { adv.path = p; adv.data = null; adv.changes = null; tabs.set('advanced'); } } : null,
     { icon: 'folder_open', label: pair('Show in folder', '喺資料夾顯示'), run: () => window.mt.shell.showItem(p) },
     { icon: 'playlist_remove', label: pair('Remove from the library (the file stays)', '由磁碟庫移除（檔案保留）'), run: () => { setLib(lib().filter((x) => x !== p)); delete infos[p]; drawLibrary(); drawStats(); } }
-  ]);
+  ].filter(Boolean));
+  const shrinkDialog = (p) => {
+    let mode = 'partition';
+    const keep = h('input.input', { type: 'number', min: 0, max: 1048576, step: 64, value: 256, style: { width: '120px' }, 'aria-label': pair('Free space to leave inside the partition, in MB', '分割區入面要留幾多可用空間（MB）') });
+    const keepRow = h('div.row', keep, 'MB', h('span.small', pair('left free inside the partition', '留喺分割區入面')));
+    const note = h('div.small');
+    const upd = () => {
+      keepRow.hidden = mode !== 'partition';
+      note.textContent = mode === 'partition'
+        ? pair('Windows first works out how small the last partition can get without moving anything it cannot move, the same check Disk Management makes before Shrink Volume. The disk then shrinks to the new end of that partition. Your files stay where they are.', 'Windows 會先計出最後一個分割區最細可以縮到幾多，而唔使搬郁搬唔到嘅嘢，同磁碟管理「壓縮磁碟區」之前做嘅檢查一樣。然後磁碟就縮到分割區嘅新尾。你啲檔案原封不動。')
+        : pair('Cuts only the unused space after the last partition. When a partition reaches the end of the disk there is nothing to cut, and the disk stays exactly as it is.', '只剪走最後一個分割區後面冇用到嘅空間。如果分割區已經去到磁碟尾，就冇嘢好剪，磁碟保持原狀。');
+    };
+    dialog({ title: pair('Shrink the disk', '縮細磁碟'), body: h('div.stack', h('div.small', pair('VHDX only, and only while the disk is detached. Shrinking never cuts into a partition.', '只限 VHDX，而且要喺未掛載時做。縮細永遠唔會切到分割區。')),
+      seg([['partition', pair('The last partition, then the disk', '先縮最後分割區，再縮磁碟')], ['disk', pair('The disk only', '只縮磁碟')]], mode, pair('What to shrink', '縮乜嘢'), (k) => { mode = k; upd(); }), keepRow, note),
+    actions: [{ label: pair('Cancel', '取消'), kind: 'text', value: null }, { label: pair('Shrink', '縮細'), run: () => { act(pair('Shrink the disk', '縮細磁碟'), 'shrink', mode === 'partition' ? { path: p, partition: true, keepMB: Number(keep.value) } : { path: p }); } }] });
+    upd();
+  };
   const convertDialog = (p) => {
     let to = /\.vhd$/i.test(p) ? 'vhdx' : 'vhd', type = 'dynamic';
     const dest = () => p.replace(/\.(vhdx?|VHDX?)$/, '') + (to === 'vhdx' ? ' (VHDX).vhdx' : ' (VHD).vhd');
@@ -131,16 +154,17 @@ registerPage('vdisks', (ctx) => {
       })))));
   };
   const libraryView = h('div.stack',
-    card(pair('Routes on this PC', '呢部電腦用嘅方法'), 'route', h('p.small.muted', { style: { margin: 0 } }, pair('Every operation here uses a route that Windows Home has: DiskPart, the Storage module and the virtual disk API. Windows asks for permission before anything changes a disk; cancelling changes nothing.', '呢度每個操作都用 Windows Home 都有嘅方法：DiskPart、Storage 模組同虛擬磁碟 API。改磁碟之前 Windows 會問你攞權限；取消就乜都唔改。')), routesBox, isWin() ? null : h('div.flag-card', h('b', icon('desktop_windows'), ' ', pair('Windows only', '只限 Windows')), h('div.small', WIN_ONLY))),
+    card(pair('Routes on this PC', '呢部電腦用嘅方法'), 'route', h('p.small.muted', { style: { margin: 0 } }, pair('Every operation here uses a route that Windows Home has: the virtual disk API and the Storage module, VHD Sets included. Where the Hyper-V module is installed it also lists the checkpoints of VHD Sets made elsewhere. Windows asks for permission before anything changes a disk; cancelling changes nothing.', '呢度每個操作都用 Windows Home 都有嘅方法：虛擬磁碟 API 同 Storage 模組，VHD Set 都係。裝咗 Hyper-V 模組嘅話，仲可以列出喺第度整嘅 VHD Set 嘅檢查點。改磁碟之前 Windows 會問你攞權限；取消就乜都唔改。')), routesBox, isWin() ? null : h('div.flag-card', h('b', icon('desktop_windows'), ' ', pair('Windows only', '只限 Windows')), h('div.small', WIN_ONLY))),
     h('section.card.stack', h('div.row', search.el, seg([['all', pair('All', '全部')], ['attached', pair('Attached', '已掛載')], ['detached', pair('Detached', '未掛載')]], show, pair('Show', '顯示'), (k) => { show = k; drawLibrary(); }),
       h('button.btn.small.outline', { type: 'button', on: { click: addFiles } }, icon('note_add'), pair('Add files', '加檔案'))), libBox),
     card(pair('What each action does', '每個動作做乜'), 'help', h('ul.small', { style: { margin: 0, paddingLeft: '18px' } },
       h('li', h('b', pair('Grow', '擴大')), pair(': raises the maximum while detached, then can extend the last partition.', '：未掛載時提高上限，之後可以延伸最後一個分割區。')),
-      h('li', h('b', pair('Shrink', '縮細')), pair(': VHDX only, to the smallest size that cuts no partition.', '：只限 VHDX，縮到唔會切到分割區嘅最細大小。')),
+      h('li', h('b', pair('Shrink', '縮細')), pair(': VHDX only. Either the last partition first, as far as Windows says it safely can, and then the disk, or the disk alone, to the smallest size that cuts no partition.', '：只限 VHDX。可以先縮最後一個分割區（Windows 話安全縮到幾多就幾多）再縮磁碟，又可以淨係縮磁碟，縮到唔會切到分割區嘅最細大小。')),
       h('li', h('b', pair('Compact', '壓縮')), pair(': frees empty blocks of a dynamic disk; it is attached read-only while that runs.', '：釋放動態磁碟入面嘅空白區；進行期間會唯讀掛載。')),
       h('li', h('b', pair('Convert', '轉換')), pair(': copies the disk into a new VHD or VHDX file; the original stays.', '：複製成新嘅 VHD 或 VHDX 檔；原本嗰個保留。')),
       h('li', h('b', pair('Merge', '合併')), pair(': folds a differencing disk into its parent; other children of that parent stop working.', '：將差異磁碟併入父磁碟；同一父磁碟嘅其他子磁碟會失效。')),
-      h('li', h('b', 'VHD Set'), pair(': attach and detach work here; creating one needs Hyper-V on Windows Pro or Enterprise.', '：呢度可以掛載同卸載；建立要 Windows Pro 或 Enterprise 嘅 Hyper-V。')))));
+      h('li', h('b', pair('Advanced', '進階')), pair(': new identifiers, custom metadata and change tracking for VHDX, checkpoints for VHD Sets, and a live mirror into a new file.', '：VHDX 嘅新識別碼、自訂元資料同變更追蹤，VHD Set 嘅檢查點，仲有即時鏡像去新檔案。')),
+      h('li', h('b', 'VHD Set'), pair(': create, attach, detach and checkpoints work on every edition, Windows Home included.', '：建立、掛載、卸載同檢查點喺所有版本都得，Windows Home 都得。')))));
 
   // ---------- create ----------
   const c = { format: 'vhdx', type: 'dynamic', size: 64, unit: 'GB', path: '', parent: '', prepare: true, style: 'GPT', fs: 'NTFS', label: 'New volume', attach: true };
@@ -151,20 +175,23 @@ registerPage('vdisks', (ctx) => {
   const sizeMB = () => Math.round(c.size * { MB: 1, GB: 1024, TB: 1024 * 1024 }[c.unit]);
   const drawPlan = () => {
     const maxMB = c.format === 'vhd' ? 2040 * 1024 : 64 * 1024 * 1024;
+    const set = c.format === 'vhds';
     pathOut.textContent = c.path || pair('No file chosen yet', '未揀檔案');
-    const lines = ['diskpart', c.type === 'differencing' ? `  create vdisk file="${c.path || '…'}" parent="${c.parent || '…'}"` : `  create vdisk file="${c.path || '…'}" maximum=${sizeMB()} type=${c.type === 'fixed' ? 'fixed' : 'expandable'}`];
+    const lines = set ? ['Virtual disk API', `  CreateVirtualDisk "${c.path || '…'}" ${sizeMB()} MB, ${c.type === 'fixed' ? 'fixed' : 'dynamic'} VHD Set, with its first data file beside it`]
+      : ['Virtual disk API', c.type === 'differencing' ? `  CreateVirtualDisk "${c.path || '…'}" with parent "${c.parent || '…'}"` : `  CreateVirtualDisk "${c.path || '…'}" ${sizeMB()} MB, ${c.type === 'fixed' ? 'fixed: every byte allocated now' : 'dynamic'}`];
     if (c.prepare || c.attach) lines.push('PowerShell (Storage module)', `  Mount-DiskImage -ImagePath "${c.path || '…'}"`);
     if (c.prepare) lines.push(`  Initialize-Disk -PartitionStyle ${c.style}`, '  New-Partition -UseMaximumSize -AssignDriveLetter', `  Format-Volume -FileSystem ${c.fs} -NewFileSystemLabel "${c.label}"`);
     if (c.prepare && !c.attach) lines.push(`  Dismount-DiskImage -ImagePath "${c.path || '…'}"`);
     steps.textContent = lines.join('\n');
-    const problem = !isWin() ? pair('Windows only.', '只限 Windows。') : !c.path ? pair('Choose where to save the disk.', '揀儲存位置。') : c.type === 'differencing' && !c.parent ? pair('Choose the parent disk.', '揀父磁碟。') : c.type !== 'differencing' && (sizeMB() < 3 || sizeMB() > maxMB) ? pair(`The size must be between 3 MB and ${c.format === 'vhd' ? '2,040 GB' : '64 TB'} for ${c.format.toUpperCase()}.`, `${c.format.toUpperCase()} 嘅大小要喺 3 MB 至 ${c.format === 'vhd' ? '2,040 GB' : '64 TB'} 之間。`) : c.prepare && c.fs === 'FAT32' && sizeMB() > 32 * 1024 ? pair('Windows formats FAT32 up to 32 GB; choose exFAT or NTFS for a bigger disk.', 'Windows 只會格式化 32 GB 以內嘅 FAT32；大啲就揀 exFAT 或 NTFS。') : '';
+    const problem = !isWin() ? pair('Windows only.', '只限 Windows。') : set && c.type === 'differencing' ? pair('A VHD Set is dynamic or fixed.', 'VHD Set 只可以係動態或者固定。') : !c.path ? pair('Choose where to save the disk.', '揀儲存位置。') : c.type === 'differencing' && !c.parent ? pair('Choose the parent disk.', '揀父磁碟。') : c.type !== 'differencing' && (sizeMB() < 3 || sizeMB() > maxMB) ? pair(`The size must be between 3 MB and ${c.format === 'vhd' ? '2,040 GB' : '64 TB'} for ${c.format.toUpperCase()}.`, `${c.format.toUpperCase()} 嘅大小要喺 3 MB 至 ${c.format === 'vhd' ? '2,040 GB' : '64 TB'} 之間。`) : c.prepare && c.fs === 'FAT32' && sizeMB() > 32 * 1024 ? pair('Windows formats FAT32 up to 32 GB; choose exFAT or NTFS for a bigger disk.', 'Windows 只會格式化 32 GB 以內嘅 FAT32；大啲就揀 exFAT 或 NTFS。') : '';
     createBtn.disabled = !!problem; why.textContent = problem;
   };
   const sizeIn = h('input.input', { type: 'number', min: 1, value: c.size, style: { width: '110px' }, 'aria-label': pair('Maximum size', '最大容量'), on: { input: (e) => { c.size = Number(e.target.value); drawPlan(); } } });
-  const pickPath = async () => { const p = await window.mt.dialog.save({ defaultPath: `New disk.${c.format}`, filters: [{ name: c.format.toUpperCase(), extensions: [c.format] }] }); if (p) { c.path = p.replace(/\.(vhdx?|VHDX?)$/, '') + '.' + c.format; drawPlan(); } };
+  const pickPath = async () => { const p = await window.mt.dialog.save({ defaultPath: `New disk.${c.format}`, filters: [{ name: c.format === 'vhds' ? 'VHD Set' : c.format.toUpperCase(), extensions: [c.format] }] }); if (p) { c.path = p.replace(/\.(vhd[xs]?|VHD[XS]?)$/, '') + '.' + c.format; drawPlan(); } };
   const pickParent = async () => { const r = await window.mt.dialog.open({ filters: [{ name: 'VHD, VHDX', extensions: ['vhd', 'vhdx'] }], title: pair('Choose the parent disk', '揀父磁碟') }); if (r) { c.parent = r[0]; drawPlan(); } };
   const typeRows = h('div.stack', { role: 'radiogroup', 'aria-label': pair('Disk type', '磁碟類型') });
   const drawTypes = () => put(clear(typeRows), ...[['dynamic', 'expand', pair('Dynamic (recommended)', '動態（建議）'), pair('Starts small and grows as you write, up to the maximum.', '開頭好細，寫入先慢慢變大，最多到上限。')], ['fixed', 'crop_square', pair('Fixed', '固定'), pair('Takes the whole size on the drive now; slower to create, a little faster to use.', '一開始就佔用全部空間；建立慢啲，用起嚟快少少。')], ['differencing', 'account_tree', pair('Differencing', '差異'), pair('Records changes on top of a parent disk you choose; the parent becomes read-only.', '喺你揀嘅父磁碟上面記錄改動；父磁碟會變唯讀。')]]
+    .filter(([k]) => !(c.format === 'vhds' && k === 'differencing'))
     .map(([k, ic, t, d]) => h('button.pick-row', { type: 'button', role: 'radio', 'aria-checked': String(c.type === k), on: { click: () => { c.type = k; drawTypes(); drawCreate(); drawPlan(); } } }, h('span.ava', icon(ic)), h('span.meta', h('b', t), h('span', d)), h('span.radio-dot'))));
   const sizeBox = h('div.flag-card');
   const drawCreate = () => {
@@ -178,8 +205,8 @@ registerPage('vdisks', (ctx) => {
   const sw = (label, desc, key) => h('div.switch-row', h('div.txt', h('b', label), h('span.small.muted', desc)), h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(c[key]), 'aria-label': label, on: { click: (e) => { c[key] = !c[key]; e.currentTarget.setAttribute('aria-checked', String(c[key])); drawPlan(); } } }));
   const createView = h('div.grid',
     h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('tune')), h('h2.h3', pair('Format and type', '格式同類型'))),
-      h('div.flag-card', h('b', pair('Format', '格式')), seg([['vhdx', pair('VHDX (recommended)', 'VHDX（建議）')], ['vhd', 'VHD']], c.format, pair('Format', '格式'), (k) => { c.format = k; if (c.path) c.path = c.path.replace(/\.\w+$/, '.' + k); drawPlan(); }),
-        h('div.small.muted', pair('VHDX holds up to 64 TB and survives a power cut during a metadata update. VHD tops out at 2,040 GB and is for older systems.', 'VHDX 最大 64 TB，更新資料期間斷電都唔會壞。VHD 最大 2,040 GB，俾舊系統用。'))), typeRows),
+      h('div.flag-card', h('b', pair('Format', '格式')), seg([['vhdx', pair('VHDX (recommended)', 'VHDX（建議）')], ['vhd', 'VHD'], ['vhds', 'VHD Set']], c.format, pair('Format', '格式'), (k) => { c.format = k; if (k === 'vhds' && c.type === 'differencing') c.type = 'dynamic'; if (c.path) c.path = c.path.replace(/\.\w+$/, '.' + k); drawTypes(); drawPlan(); }),
+        h('div.small.muted', pair('VHDX holds up to 64 TB and survives a power cut during a metadata update. VHD tops out at 2,040 GB and is for older systems. A VHD Set is a VHDX that keeps checkpoints you can return to.', 'VHDX 最大 64 TB，更新資料期間斷電都唔會壞。VHD 最大 2,040 GB，俾舊系統用。VHD Set 係會保留檢查點嘅 VHDX，可以返去之前嘅狀態。'))), typeRows),
     h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('straighten')), h('h2.h3', pair('Size and place', '大小同位置'))), sizeBox,
       h('div.flag-card', h('b', pair('File', '檔案')), h('div.row', h('button.btn.small.outline', { type: 'button', on: { click: pickPath } }, icon('folder_open'), pair('Choose where to save', '揀儲存位置')), pathOut), h('div.small.muted', pair('An existing file is never replaced; pick another name if this one is taken.', '唔會覆蓋現有檔案；個名用咗就揀第二個。')))),
     h('section.card.span-6.stack', h('div.card-head', h('span.ic', icon('storage')), h('h2.h3', pair('Ready to use', '即刻用得'))),
@@ -224,10 +251,103 @@ registerPage('vdisks', (ctx) => {
     h('section.card.span-4.tonal.stack', h('div.card-head', h('span.ic.alt', icon('checklist')), h('h2.h3', pair('How it works', '點運作'))), h('ol.steps', h('li', pair('Create a dynamic VHDX sized to fit', '建立啱啱好大細嘅動態 VHDX')), h('li', pair('Attach and format NTFS', '掛載同格式化 NTFS')), h('li', pair('Copy every file', '複製每個檔案')), h('li', pair('Check every file against its original (SHA-256)', '逐個檔案同原本核對（SHA-256）')), h('li', pair('Detach', '卸載'))),
       h('div.small.muted', pair('A mismatch stops the pack and keeps the disk attached so you can look.', '有唔一樣就會停，磁碟會保持掛載俾你睇。'))));
 
-  const views = { library: libraryView, create: createView, pack: packView };
-  const showTab = (v) => put(clear(body), views[v]);
+  // ---------- advanced ----------
+  // One disk at a time: identifiers, custom metadata and change tracking (VHDX), checkpoints (VHD
+  // Set) and a live mirror. Each change re-reads the details in the same elevated run, so Windows
+  // asks once per action.
+  const adv = { path: '', data: null, changes: null, since: '', mirrorDest: '' };
+  const advBox = h('div.stack');
+  const advDisks = () => lib().filter((p) => /\.(vhd|vhdx|vhds)$/i.test(p));
+  const remembered = (p) => (store.get('vdiskCheckpoints') || {})[p] || [];
+  const remember = (p, list) => store.set('vdiskCheckpoints', { ...(store.get('vdiskCheckpoints') || {}), [p]: list.slice(0, 200) }, { record: false });
+  const advRun = (title, op, req, after) => runOp(title, op, { path: adv.path, ...req }, { onDone: (r, b) => { if (r.data.advanced) adv.data = r.data.advanced; after?.(r, b); drawAdvanced(); refreshInfo(); } });
+  const when = (iso) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleString(); };
+  const idRow = (label, value, which, locked) => h('tr', h('td', label), h('td', h('code.small', value || '—')), h('td', h('button.btn.small.outline', { type: 'button', disabled: !isWin() || locked, 'aria-label': pair(`New value for ${label}`, `${label} 換新值`), on: { click: async (e) => {
+    const ok = which === 'identifier'
+      ? await superConfirm({ action: pair('Give this disk a new identifier', '俾呢個磁碟一個新識別碼'), affects: pair('Differencing disks made from this disk find it by its identifier and stop working.', '由呢個磁碟整出嚟嘅差異磁碟靠識別碼搵佢，會用唔到。'), anchor: e.currentTarget })
+      : await confirmDialog(pair('New virtual disk ID', '新虛擬磁碟 ID'), pair('Windows and virtual machines see the disk as a different disk afterwards. Nothing inside it changes.', '之後 Windows 同虛擬機會當佢係另一個磁碟；入面嘅資料唔會變。'), { okLabel: pair('Give it a new ID', '俾佢新 ID') });
+    if (ok) advRun(pair('New identifier', '新識別碼'), 'identity', { which });
+  } } }, icon('autorenew'), pair('New…', '新…'))));
+  const mirrorCard = (fmt) => {
+    if (!['VHD', 'VHDX'].includes(fmt)) return null;
+    const ext = fmt.toLowerCase();
+    return gcard(12, pair('Live mirror', '即時鏡像'), 'move_down',
+      h('div.row', h('button.btn.small.outline', { type: 'button', on: { click: async () => { const p = await window.mt.dialog.save({ defaultPath: adv.path.replace(/(\.\w+)$/, ' (mirror)$1'), filters: [{ name: fmt, extensions: [ext] }] }); if (p) { adv.mirrorDest = p.replace(/\.\w+$/, '') + '.' + ext; drawAdvanced(); } } } }, icon('folder_open'), pair('Choose the new file', '揀新檔案')),
+        h('code.small', adv.mirrorDest || pair('No file chosen yet', '未揀檔案')),
+        h('button.btn', { type: 'button', disabled: !isWin() || !adv.mirrorDest, on: { click: () => advRun(pair('Live mirror', '即時鏡像'), 'mirror', { dest: adv.mirrorDest }, () => { setLib([...lib(), adv.mirrorDest]); adv.mirrorDest = ''; }) } }, icon('move_down'), pair('Mirror and switch', '鏡像並切換'))),
+      h('p.small.muted', { style: { margin: 0 } }, pair('Copies the disk block by block into a new file while it stays in use. When the copy is complete, an attached disk carries on from the new file, and the original keeps the state it had at that moment. An existing file is never replaced.', '一邊用一邊逐塊複製去新檔案。複製完之後，已掛載嘅磁碟會轉用新檔案，原本嗰個停喺嗰一刻嘅狀態。唔會覆蓋現有檔案。')));
+  };
+  const drawAdvanced = () => {
+    clear(advBox);
+    const disks = advDisks();
+    if (!disks.includes(adv.path)) { adv.path = disks[0] || ''; adv.data = null; adv.changes = null; }
+    if (!disks.length) {
+      put(advBox, h('div.empty', icon('tune'), h('p', pair('Add a VHD, VHDX or VHD Set file to the library first, then pick it here.', '先加一個 VHD、VHDX 或 VHD Set 檔去磁碟庫，再喺度揀佢。')),
+        h('button.btn.tonal', { type: 'button', on: { click: addFiles } }, icon('note_add'), pair('Add disk files', '加磁碟檔'))), isWin() ? null : h('div.flag-card', h('b', icon('desktop_windows'), ' ', pair('Windows only', '只限 Windows')), h('div.small', WIN_ONLY)));
+      return;
+    }
+    const info = infos[adv.path] || {};
+    const fmt = ((adv.path.match(/\.(\w+)$/) || [])[1] || '').toUpperCase();
+    const locked = !!info.attached;
+    const d = adv.data;
+    const select = h('select.input', { 'aria-label': pair('Disk from the library', '磁碟庫入面嘅磁碟'), on: { change: (e) => { adv.path = e.target.value; adv.data = null; adv.changes = null; adv.mirrorDest = ''; drawAdvanced(); } } }, disks.map((p) => h('option', { value: p, selected: p === adv.path }, p)));
+    put(advBox, card(pair('Disk', '磁碟'), 'hard_drive',
+      h('div.row', h('label.field', { style: { flex: '1' } }, h('span', pair('Disk from the library', '磁碟庫入面嘅磁碟')), select), h('span.badge.info', fmt === 'VHDS' ? 'VHD Set' : fmt), h(`span.badge${locked ? '.ok' : ''}`, locked ? pair('Attached', '已掛載') : pair('Detached', '未掛載')),
+        h('button.btn.tonal', { type: 'button', disabled: !isWin(), on: { click: () => advRun(pair('Read advanced details', '讀取進階資料'), 'advanced', {}) } }, icon('refresh'), pair('Read details', '讀取資料'))),
+      h('p.small.muted', { style: { margin: 0 } }, pair('New identifiers, metadata changes and returning to a checkpoint need the disk detached. Change tracking and a live mirror work either way. Windows asks for permission each time.', '換識別碼、改元資料同返去檢查點要先卸載。變更追蹤同即時鏡像掛唔掛載都得。每次 Windows 都會問權限。')),
+      isWin() ? null : h('div.flag-card', h('b', icon('desktop_windows'), ' ', pair('Windows only', '只限 Windows')), h('div.small', WIN_ONLY))));
+    const grid = h('div.grid');
+    if (!d) put(grid, gcard(12, pair('Details', '資料'), 'info', h('p.small', { style: { margin: 0 } }, pair("Read details to see this disk's identifiers, custom metadata, change tracking and checkpoints.", '撳「讀取資料」睇呢個磁碟嘅識別碼、自訂元資料、變更追蹤同檢查點。'))));
+    if (d && fmt !== 'VHDS') put(grid, gcard(6, pair('Identity', '識別碼'), 'fingerprint',
+      d.identityError ? h('div.err-text', d.identityError) : h('div.tbl-wrap', h('table.tbl', h('tbody', idRow(pair('Disk identifier', '磁碟識別碼'), d.identifier, 'identifier', locked), idRow(pair('Virtual disk ID', '虛擬磁碟 ID'), d.virtualDiskId, 'virtualDiskId', locked)))),
+      h('div.flag-card', h('b', icon('warning'), ' ', pair('Children follow the disk identifier', '子磁碟靠識別碼搵返佢')), h('div.small', pair('Differencing disks made from this one find it by its identifier. A new identifier makes them stop working, so it takes the two-key confirmation.', '由呢個磁碟整出嚟嘅差異磁碟靠識別碼搵佢。換咗新識別碼佢哋就用唔到，所以要兩條鎖匙確認。')))));
+    if (d && fmt === 'VHDX') {
+      const r = d.rct;
+      const sinceIn = h('input.input', { value: adv.since || r?.id || '', 'aria-label': pair('Changes since this point', '由呢個點起嘅變更'), on: { input: (e) => { adv.since = e.target.value; } } });
+      put(grid, gcard(6, pair('Change tracking', '變更追蹤'), 'difference',
+        d.rctError ? h('div.err-text', d.rctError) : [
+          h('div.switch-row', h('div.txt', h('b', pair('Track changed blocks', '追蹤改咗嘅區塊')), h('span.small.muted', pair('Lets backup tools copy only what changed since a point you name.', '俾備份工具淨係複製某個點之後改咗嘅部分。'))),
+            h('button.switch', { type: 'button', role: 'switch', 'aria-checked': String(!!r?.enabled), 'aria-label': pair('Track changed blocks', '追蹤改咗嘅區塊'), disabled: !isWin(), on: { click: () => advRun(r?.enabled ? pair('Turn change tracking off', '關閉變更追蹤') : pair('Turn change tracking on', '開啟變更追蹤'), 'rct', { enabled: !r?.enabled }) } })),
+          r?.enabled ? h('div.flag-card', h('b', pair('Most recent point', '最近嘅點')), h('code.small', r.id), h('div.small.muted', r.newer ? pair('Newer changes since then: yes', '之後有新變更：有') : pair('Newer changes since then: none', '之後有新變更：冇'))) : null,
+          r?.enabled ? h('div.row', sinceIn, h('button.btn.tonal', { type: 'button', disabled: !isWin(), on: { click: () => advRun(pair('Find changed blocks', '搵改咗嘅區塊'), 'rct-changes', { since: sinceIn.value.trim() }, (res) => { adv.changes = res.data.changes; }) } }, icon('difference'), pair('Show changes', '顯示變更'))) : null,
+          adv.changes ? h('div.row', h('span.badge.info', icon('difference'), pair(`${adv.changes.ranges} ranges · ${fmtBytes(adv.changes.bytes)} changed`, `${adv.changes.ranges} 段 · 改咗 ${fmtBytes(adv.changes.bytes)}`))) : null]));
+      const valIn = h('input.input', { placeholder: pair('New value (text)', '新數值（文字）'), 'aria-label': pair('New metadata value', '新元資料數值'), maxlength: 32768 });
+      put(grid, gcard(12, pair('Custom metadata', '自訂元資料'), 'sell',
+        d.metadataError ? h('div.err-text', d.metadataError) : (d.metadata || []).length
+          ? h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', [pair('Item', '項目'), pair('Value', '數值'), pair('Size', '大小'), ''].map((x) => h('th', x)))),
+            h('tbody', d.metadata.map((m) => h('tr', h('td', h('code.small', m.id)), h('td', m.text ?? h('code.small', m.hex + (m.size > 48 ? '…' : ''))), h('td', fmtBytes(m.size)),
+              h('td', h('button.btn.small.text', { type: 'button', disabled: !isWin() || locked, on: { click: async () => { if (await confirmDialog(pair('Delete this metadata item?', '刪除呢個元資料項目？'), m.id, { okLabel: pair('Delete', '刪除'), danger: true })) advRun(pair('Delete the metadata item', '刪除元資料項目'), 'meta-delete', { item: m.id }); } } }, icon('delete'), pair('Delete', '刪除'))))))))
+          : h('p.small.muted', { style: { margin: 0 } }, pair('No custom metadata yet.', '未有自訂元資料。')),
+        h('div.row', valIn, h('button.btn', { type: 'button', disabled: !isWin() || locked, on: { click: () => { if (!valIn.value.trim()) { toast(pair('Write a value first.', '先寫個數值。'), { kind: 'warn' }); return; } advRun(pair('Add a metadata item', '加元資料項目'), 'meta-set', { text: valIn.value }); } } }, icon('add'), pair('Add item', '加項目'))),
+        h('p.small.muted', { style: { margin: 0 } }, pair('VHDX only. Each item has its own ID and holds up to 64 KB; the app writes and reads text, and shows anything else as bytes.', '只限 VHDX。每個項目有自己嘅 ID，最多 64 KB；程式讀寫文字，其他就顯示位元組。'))));
+    }
+    if (d && fmt === 'VHDS') {
+      let keep = true;
+      const listed = d.checkpointsListed ? (d.checkpoints || []) : remembered(adv.path);
+      const back = async (e, id) => {
+        const ok = keep ? await confirmDialog(pair('Return to this checkpoint?', '返去呢個檢查點？'), pair('The disk goes back to this checkpoint. Its current state becomes a new checkpoint, so nothing is lost.', '磁碟會返去呢個檢查點；而家嘅狀態會變成新檢查點，乜都唔會唔見。'), { okLabel: pair('Return', '返去') })
+          : await superConfirm({ action: pair('Return to this checkpoint and throw away the current state', '返去呢個檢查點，掉咗而家嘅狀態'), affects: pair('Everything written since this checkpoint is gone.', '呢個檢查點之後寫入嘅嘢會冇晒。'), anchor: e.currentTarget });
+        if (ok) advRun(pair('Return to the checkpoint', '返去檢查點'), 'checkpoint', { action: 'apply', id, keep }, (res) => { if (res.data.kept) remember(adv.path, [{ id: res.data.kept, at: new Date().toISOString() }, ...remembered(adv.path)]); });
+      };
+      put(grid, gcard(12, pair('Checkpoints', '檢查點'), 'history',
+        d.checkpointsError ? h('div.err-text', d.checkpointsError) : null,
+        listed.length ? h('div.tbl-wrap', h('table.tbl', h('thead', h('tr', [pair('Checkpoint', '檢查點'), pair('Taken', '影嘅時間'), ''].map((x) => h('th', x)))),
+          h('tbody', listed.map((c2) => h('tr', h('td', h('code.small', c2.id)), h('td', when(c2.at)), h('td', h('div.row.nowrap',
+            h('button.btn.small.outline', { type: 'button', disabled: !isWin() || locked, on: { click: (e) => back(e, c2.id) } }, icon('history'), pair('Return to…', '返去…')),
+            h('button.btn.small.text', { type: 'button', disabled: !isWin() || locked, on: { click: async () => { if (await confirmDialog(pair('Delete this checkpoint?', '刪除呢個檢查點？'), c2.id, { okLabel: pair('Delete', '刪除'), danger: true })) advRun(pair('Delete the checkpoint', '刪除檢查點'), 'checkpoint', { action: 'delete', id: c2.id }, () => remember(adv.path, remembered(adv.path).filter((x) => x.id !== c2.id))); } } }, icon('delete'), pair('Delete', '刪除'))))))))) : h('p.small.muted', { style: { margin: 0 } }, pair('No checkpoints yet.', '未有檢查點。')),
+        d.checkpointsListed ? null : h('div.small.muted', pair("Listing every checkpoint of a VHD Set needs the Hyper-V module, which is not installed here, so this list shows the checkpoints taken on this computer.", '要列出 VHD Set 嘅全部檢查點就要 Hyper-V 模組，呢度冇裝，所以呢個清單顯示喺呢部電腦影嘅檢查點。')),
+        h('div.row', h('button.btn.tonal', { type: 'button', disabled: !isWin(), on: { click: () => advRun(pair('Take a checkpoint', '影一個檢查點'), 'checkpoint', { action: 'take' }, (res) => remember(adv.path, [{ id: res.data.id, at: new Date().toISOString() }, ...remembered(adv.path)])) } }, icon('add_a_photo'), pair('Take a checkpoint', '影一個檢查點'))),
+        h('div.switch-row', h('div.txt', h('b', pair('Keep the current state when returning', '返去嗰陣保留而家嘅狀態')), h('span.small.muted', pair('The current state becomes a new checkpoint instead of being thrown away.', '而家嘅狀態會變成新檢查點，唔會掉咗佢。'))),
+          h('button.switch', { type: 'button', role: 'switch', 'aria-checked': 'true', 'aria-label': pair('Keep the current state when returning', '返去嗰陣保留而家嘅狀態'), on: { click: (e) => { keep = !keep; e.currentTarget.setAttribute('aria-checked', String(keep)); } } }))));
+    }
+    put(grid, mirrorCard(fmt));
+    put(advBox, grid);
+  };
+
+  const views = { library: libraryView, create: createView, pack: packView, advanced: advBox };
+  const showTab = (v) => { if (v === 'advanced') drawAdvanced(); put(clear(body), views[v]); };
   tabs.onChange(showTab); showTab(tabs.get());
-  if (isWin()) window.mt.vdisk.run('probe', {}, uid('vd')).then((r) => { const d = r.data; put(clear(routesBox), ...[[d.diskpart, 'DiskPart'], [d.storage, pair('Storage module', 'Storage 模組')], [d.virtdisk, pair('Virtual disk API', '虛擬磁碟 API')], [d.hyperv, d.hyperv ? pair('Hyper-V module', 'Hyper-V 模組') : pair('Hyper-V module: not on this edition', 'Hyper-V 模組：呢個版本冇')]].map(([ok, l]) => h(`span.badge${ok ? '.ok' : ''}`, icon(ok ? 'check_circle' : 'block'), l)), h('span.small.muted', d.edition || '')); }).catch((e) => put(clear(routesBox), h('span.err-text', e.message)));
+  if (isWin()) window.mt.vdisk.run('probe', {}, uid('vd')).then((r) => { const d = r.data; probe = d; drawPlan(); put(clear(routesBox), ...[[d.virtdisk, pair('Virtual disk API', '虛擬磁碟 API')], [d.storage, pair('Storage module', 'Storage 模組')], [d.hyperv, d.hyperv ? pair('Hyper-V module (lists VHD Set checkpoints)', 'Hyper-V 模組（列出 VHD Set 檢查點）') : pair('Hyper-V module: not here; only listing checkpoints of VHD Sets made elsewhere uses it', 'Hyper-V 模組：呢度冇；淨係列出喺第度整嘅 VHD Set 檢查點先用到')]].map(([ok, l]) => h(`span.badge${ok ? '.ok' : ''}`, icon(ok ? 'check_circle' : 'block'), l)), h('span.small.muted', d.edition || '')); }).catch((e) => put(clear(routesBox), h('span.err-text', e.message)));
   else put(clear(routesBox), h('span.badge', icon('block'), pair('Not Windows: no disk routes', '唔係 Windows：冇磁碟方法')));
   refreshInfo();
   return h('div.page',
