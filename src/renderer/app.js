@@ -212,7 +212,9 @@ window.mt.onTray(({ id, r }) => toast(r.code === 0 ? (id === 'up' ? pair('Connec
   window.__mtContext = (elId) => { const el = document.querySelector(`[data-el="${CSS.escape(elId)}"]`); if (!el) return false; const r = el.getBoundingClientRect(); contextFor(el, { x: r.left + 24, y: r.top + 24 }); return true; };
   // Capture hooks for overlays, each opening the real component with neutral sample wording.
   // Automation hook: closes the palette, popovers, panels and dialogs between captured states.
-  window.__mtCloseOverlays = () => { closePalette(); closePopover(); document.querySelectorAll('.panel-float, .scrim').forEach((x) => x.remove()); return true; };
+  // Captures and the sweep open one state after another: notices raised by a demo state (the
+  // sample error notice of the toasts overlay, for one) must not ride along into the next picture.
+  window.__mtCloseOverlays = () => { closePalette(); closePopover(); document.querySelectorAll('.panel-float, .scrim, .toasts > *').forEach((x) => x.remove()); return true; };
   window.__mtOverlay = async (kind, arg) => {
     if (kind === 'palette') { openPalette(); await new Promise((r) => setTimeout(r, 80)); const i = document.querySelector('input[role="combobox"]'); if (i && arg) { i.value = arg; i.dispatchEvent(new Event('input', { bubbles: true })); } return true; }
     if (kind === 'onboarding') { onboarding(); return true; }
