@@ -1,9 +1,11 @@
-# Virtual disk operations for Material Tailscale, through routes every Windows edition has:
-# DiskPart for create, grow, compact, convert and merge; the Storage module for attach, detach,
-# ISO images, partitioning and formatting; and the VirtDisk API (virtdisk.dll) for shrinking a
-# VHDX, identity, custom metadata, change tracking, VHD Set checkpoints and live mirroring.
-# Creating a VHD Set is the one operation that needs Hyper-V's New-VHD: the VirtDisk API refuses
-# it on every edition (verified on a hosted Windows Server 2025 runner). The app runs this script
+# Virtual disk operations for Material Tailscale, through routes every Windows edition has: the
+# VirtDisk API (virtdisk.dll) to create, grow, shrink, compact, convert, merge and describe a disk,
+# and for identity, custom metadata, change tracking, VHD Set checkpoints and live mirroring; and
+# the Storage module for attach, detach, ISO images, partitioning and formatting. DiskPart is not
+# used: it reads its script in the console code page, so a path with letters outside that page
+# (Chinese, for one) reached it as a command it did not know. Creating a VHD Set is the one
+# operation that needs Hyper-V's New-VHD: the VirtDisk API refuses it on every edition (verified
+# on a hosted Windows Server 2025 runner). The app runs this script
 # elevated, after Windows asks for permission, with a JSON request file; it writes a JSON result
 # file and appends progress lines to a progress file. Never overwrites a file and never deletes one.
 param(
@@ -34,16 +36,6 @@ function Step([string]$name, [scriptblock]$body) {
     Note "fail" @{ step = $name; error = $_.Exception.Message }
     throw
   }
-}
-function DiskPart([string[]]$lines) {
-  $f = Join-Path ([IO.Path]::GetTempPath()) ("mt-diskpart-" + [guid]::NewGuid().ToString('N') + '.txt')
-  # DiskPart reads its script as Unicode, so paths with any letters survive.
-  [IO.File]::WriteAllLines($f, $lines, [Text.Encoding]::Unicode)
-  try {
-    $out = & "$env:SystemRoot\System32\diskpart.exe" /s $f 2>&1 | Out-String
-    if ($LASTEXITCODE -ne 0) { throw "DiskPart stopped with code $LASTEXITCODE. $($out.Trim() -split "`r?`n" | Select-Object -Last 3)" }
-    return $out
-  } finally { Remove-Item -LiteralPath $f -Force -ErrorAction SilentlyContinue }
 }
 function NeedNew([string]$p) { if (Test-Path -LiteralPath $p) { throw "A file already exists at $p, and nothing is ever overwritten." } }
 function NeedFile([string]$p) { if (-not (Test-Path -LiteralPath $p -PathType Leaf)) { throw "There is no file at $p." } }
@@ -80,8 +72,8 @@ function Info([string]$p) {
   return $o
 }
 
-# The VirtDisk API, for what DiskPart and the Storage module lack on Windows Home. Every block
-# below is laid out exactly as virtdisk.h declares it for 64-bit Windows.
+# The VirtDisk API. Every block below is laid out exactly as virtdisk.h declares it for 64-bit
+# Windows.
 $virtDisk = @'
 using System; using System.Runtime.InteropServices; using System.Threading; using System.Collections.Generic;
 public static class MtVirtDisk {
@@ -112,6 +104,62 @@ public static class MtVirtDisk {
   [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr h);
   [DllImport("kernel32.dll")] static extern IntPtr CreateEvent(IntPtr a, bool manual, bool initial, IntPtr name);
 
+  [StructLayout(LayoutKind.Explicit, Size = 128)] public struct CREATE_V2 {
+    [FieldOffset(0)] public uint Version; [FieldOffset(8)] public Guid UniqueId; [FieldOffset(24)] public ulong MaximumSize;
+    [FieldOffset(32)] public uint BlockSizeInBytes; [FieldOffset(36)] public uint SectorSizeInBytes; [FieldOffset(40)] public uint PhysicalSectorSizeInBytes;
+    [FieldOffset(48)] public IntPtr ParentPath; [FieldOffset(56)] public IntPtr SourcePath; [FieldOffset(64)] public uint OpenFlags;
+    [FieldOffset(68)] public uint ParentDeviceId; [FieldOffset(72)] public Guid ParentVendorId;
+    [FieldOffset(88)] public uint SourceDeviceId; [FieldOffset(92)] public Guid SourceVendorId; [FieldOffset(108)] public Guid ResiliencyGuid; }
+  [StructLayout(LayoutKind.Explicit)] public struct EXPAND_V1 { [FieldOffset(0)] public uint Version; [FieldOffset(8)] public ulong NewSize; }
+  [StructLayout(LayoutKind.Sequential)] public struct COMPACT_V1 { public uint Version; public uint Reserved; }
+  [StructLayout(LayoutKind.Sequential)] public struct MERGE_V2 { public uint Version; public uint MergeSourceDepth; public uint MergeTargetDepth; }
+  [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)] static extern uint CreateVirtualDisk(ref STORAGE_TYPE t, string path, uint access, IntPtr sd, uint flags, uint providerFlags, ref CREATE_V2 p, IntPtr overlapped, out IntPtr h);
+  [DllImport("virtdisk.dll")] static extern uint ExpandVirtualDisk(IntPtr h, uint flags, ref EXPAND_V1 p, IntPtr overlapped);
+  [DllImport("virtdisk.dll")] static extern uint CompactVirtualDisk(IntPtr h, uint flags, ref COMPACT_V1 p, IntPtr overlapped);
+  [DllImport("virtdisk.dll")] static extern uint MergeVirtualDisk(IntPtr h, uint flags, ref MERGE_V2 p, IntPtr overlapped);
+
+  static STORAGE_TYPE TypeOf(string path) {
+    string e = System.IO.Path.GetExtension(path).ToLowerInvariant();
+    return new STORAGE_TYPE { DeviceId = e == ".vhdx" ? 3u : e == ".vhd" ? 2u : e == ".vhds" ? 4u : 0u, VendorId = MS };
+  }
+  /// Creates a VHD or VHDX: dynamic, fixed (every byte allocated now), a differencing child of
+  /// parent, or a new disk filled from source (a conversion).
+  public static void Create(string path, ulong size, bool fixedSize, string parent, string source) {
+    var t = TypeOf(path);
+    if (t.DeviceId != 2u && t.DeviceId != 3u) throw new ArgumentException("The virtual disk API creates only VHD and VHDX files here. A VHD Set is made with New-VHD.");
+    if (string.IsNullOrEmpty(parent)) parent = null; if (string.IsNullOrEmpty(source)) source = null;
+    IntPtr pp = parent == null ? IntPtr.Zero : Marshal.StringToHGlobalUni(parent), sp = source == null ? IntPtr.Zero : Marshal.StringToHGlobalUni(source);
+    try {
+      var p = new CREATE_V2 { Version = 2, MaximumSize = parent != null || source != null ? 0 : size, ParentPath = pp, SourcePath = sp };
+      IntPtr h; Check(CreateVirtualDisk(ref t, path, 0, IntPtr.Zero, fixedSize ? 1u : 0u, 0, ref p, IntPtr.Zero, out h), "Create the disk");
+      CloseHandle(h);
+    } finally { if (pp != IntPtr.Zero) Marshal.FreeHGlobal(pp); if (sp != IntPtr.Zero) Marshal.FreeHGlobal(sp); }
+  }
+  /// Raises the maximum size: ResizeVirtualDisk for VHDX, ExpandVirtualDisk for VHD.
+  public static void Grow(string path, ulong newSize) {
+    IntPtr h = Open(path);
+    try {
+      if (path.EndsWith(".vhdx", StringComparison.OrdinalIgnoreCase)) { var r = new RESIZE_V1 { Version = 1, NewSize = newSize }; Check(ResizeVirtualDisk(h, 0, ref r, IntPtr.Zero), "Grow the disk"); }
+      else { var e = new EXPAND_V1 { Version = 1, NewSize = newSize }; Check(ExpandVirtualDisk(h, 0, ref e, IntPtr.Zero), "Grow the disk"); }
+    } finally { CloseHandle(h); }
+  }
+  public static void Compact(string path) { IntPtr h = Open(path); try { var c = new COMPACT_V1 { Version = 1 }; Check(CompactVirtualDisk(h, 0, ref c, IntPtr.Zero), "Compact the disk"); } finally { CloseHandle(h); } }
+  /// Folds the child into its parents, depth levels up.
+  public static void Merge(string path, uint depth) { IntPtr h = Open(path); try { var m = new MERGE_V2 { Version = 2, MergeSourceDepth = 1, MergeTargetDepth = depth + 1 }; Check(MergeVirtualDisk(h, 0, ref m, IntPtr.Zero), "Merge into the parent"); } finally { CloseHandle(h); } }
+  /// A readable summary: format, kind, sizes, sector sizes, identifier and parent.
+  public static string Detail(string path) {
+    IntPtr h = Open(path);
+    try {
+      var sb = new System.Text.StringBuilder();
+      IntPtr b = Info(h, 1);
+      try { sb.AppendLine("Virtual size:   " + (ulong)Marshal.ReadInt64(b, 8) + " bytes"); sb.AppendLine("Size on disk:   " + (ulong)Marshal.ReadInt64(b, 16) + " bytes"); sb.AppendLine("Block size:     " + (uint)Marshal.ReadInt32(b, 24) + " bytes"); sb.AppendLine("Sector size:    " + (uint)Marshal.ReadInt32(b, 28) + " bytes"); } finally { Marshal.FreeHGlobal(b); }
+      b = Info(h, 6); try { uint d = (uint)Marshal.ReadInt32(b, 8); sb.AppendLine("Format:         " + (d == 2 ? "VHD" : d == 3 ? "VHDX" : d == 4 ? "VHD Set" : d == 1 ? "ISO" : "unknown (" + d + ")")); } finally { Marshal.FreeHGlobal(b); }
+      uint kind = 0; b = Info(h, 7); try { kind = (uint)Marshal.ReadInt32(b, 8); sb.AppendLine("Kind:           " + (kind == 2 ? "Fixed" : kind == 3 ? "Dynamic" : kind == 4 ? "Differencing" : "unknown (" + kind + ")")); } finally { Marshal.FreeHGlobal(b); }
+      sb.AppendLine("Identifier:     " + Id(h, 2));
+      if (kind == 4) { b = Info(h, 3); try { sb.AppendLine("Parent:         " + Marshal.PtrToStringUni(b + 12) + (Marshal.ReadInt32(b, 8) != 0 ? "" : " (not found)")); } finally { Marshal.FreeHGlobal(b); } }
+      return sb.ToString();
+    } finally { CloseHandle(h); }
+  }
   static void Check(uint r, string what) { if (r != 0) throw new Exception(what + ": " + new System.ComponentModel.Win32Exception((int)r).Message + " (code " + r + ")."); }
   /// Opens a disk with version 2 parameters (no access mask), which every call below accepts.
   public static IntPtr Open(string path) {
@@ -241,7 +289,6 @@ try {
       $os = Get-CimInstance Win32_OperatingSystem
       $data.edition = $os.Caption
       $data.build = $os.BuildNumber
-      $data.diskpart = Test-Path -LiteralPath "$env:SystemRoot\System32\diskpart.exe"
       $data.storage = [bool](Get-Command Mount-DiskImage -ErrorAction SilentlyContinue)
       $data.virtdisk = Test-Path -LiteralPath "$env:SystemRoot\System32\virtdisk.dll"
       $data.hyperv = [bool](Get-Command New-VHD -ErrorAction SilentlyContinue)
@@ -250,7 +297,6 @@ try {
     'info' { $data.disks = @($req.paths | ForEach-Object { if (Test-Path -LiteralPath $_ -PathType Leaf) { Info $_ } else { [ordered]@{ path = $_; exists = $false } } }) }
     'create' {
       NeedNew $req.path
-      $type = @{ dynamic = 'expandable'; fixed = 'fixed' }[$req.type]
       if ($req.path -match '\.vhds$') {
         if (-not (Get-Command New-VHD -ErrorAction SilentlyContinue)) { throw 'Creating a VHD Set needs the Hyper-V module (Windows Pro, Enterprise or Education with Hyper-V turned on). The virtual disk API refuses it on every edition.' }
         Step 'Create the VHD Set (Hyper-V New-VHD)' {
@@ -259,10 +305,11 @@ try {
           New-VHD @nv | Out-Null; "$($req.sizeMB) MB $($req.type) VHD Set"
         } | Out-Null
       } elseif ($req.type -eq 'differencing') {
-        NeedFile $req.parent
-        Step 'Create the disk' { DiskPart @("create vdisk file=`"$($req.path)`" parent=`"$($req.parent)`"") | Out-Null; 'differencing' } | Out-Null
+        NeedFile $req.parent; UseVirtDisk
+        Step 'Create the disk' { [MtVirtDisk]::Create($req.path, 0, $false, [string]$req.parent, ''); 'differencing' } | Out-Null
       } else {
-        Step 'Create the disk' { DiskPart @("create vdisk file=`"$($req.path)`" maximum=$([int64]$req.sizeMB) type=$type") | Out-Null; "$($req.sizeMB) MB $type" } | Out-Null
+        UseVirtDisk
+        Step 'Create the disk' { [MtVirtDisk]::Create($req.path, [uint64]([int64]$req.sizeMB * 1MB), ($req.type -eq 'fixed'), '', ''); "$($req.sizeMB) MB $($req.type)" } | Out-Null
       }
       if ($req.prepare -or $req.attach) { Step 'Attach' { Attach $req.path $false (-not $req.attach -and -not $req.prepare) } | Out-Null }
       if ($req.prepare) { Step 'Partition and format' { Prepare $req.path $req.prepare.style $req.prepare.fs $req.prepare.label } | Out-Null }
@@ -273,7 +320,8 @@ try {
     'detach' { NeedFile $req.path; Step 'Detach' { Dismount-DiskImage -ImagePath $req.path | Out-Null } | Out-Null; $data.disk = Info $req.path }
     'expand' {
       NeedFile $req.path; NeedDetached $req.path
-      Step 'Grow the disk' { DiskPart @("select vdisk file=`"$($req.path)`"", "expand vdisk maximum=$([int64]$req.sizeMB)") | Out-Null; "$($req.sizeMB) MB" } | Out-Null
+      UseVirtDisk
+      Step 'Grow the disk' { [MtVirtDisk]::Grow($req.path, [uint64]([int64]$req.sizeMB * 1MB)); "$($req.sizeMB) MB" } | Out-Null
       if ($req.extend) {
         Step 'Attach' { Attach $req.path $false $false } | Out-Null
         Step 'Extend the last partition' {
@@ -301,21 +349,27 @@ try {
     'compact' {
       NeedFile $req.path; NeedDetached $req.path
       Step 'Attach read-only' { Attach $req.path $true $true } | Out-Null
-      try { Step 'Compact' { DiskPart @("select vdisk file=`"$($req.path)`"", 'compact vdisk') | Out-Null; 'compacted' } | Out-Null }
+      UseVirtDisk
+      try { Step 'Compact' { [MtVirtDisk]::Compact($req.path); 'compacted' } | Out-Null }
       finally { Step 'Detach' { Dismount-DiskImage -ImagePath $req.path | Out-Null } | Out-Null }
       $data.disk = Info $req.path
     }
     'convert' {
       NeedFile $req.path; NeedDetached $req.path; NeedNew $req.dest
-      $type = @{ dynamic = 'expandable'; fixed = 'fixed' }[$req.type]
-      Step 'Copy into the new format' { DiskPart @("create vdisk file=`"$($req.dest)`" source=`"$($req.path)`" type=$type") | Out-Null; "$($req.dest)" } | Out-Null
+      UseVirtDisk
+      Step 'Copy into the new format' { [MtVirtDisk]::Create($req.dest, 0, ($req.type -eq 'fixed'), '', [string]$req.path); "$($req.dest)" } | Out-Null
       $data.disk = Info $req.dest
     }
     'merge' {
       NeedFile $req.path; NeedDetached $req.path
-      Step 'Merge into the parent' { DiskPart @("select vdisk file=`"$($req.path)`"", "merge vdisk depth=$([int]$req.depth)") | Out-Null; "depth $($req.depth)" } | Out-Null
+      UseVirtDisk
+      Step 'Merge into the parent' { [MtVirtDisk]::Merge($req.path, [uint32]$req.depth); "depth $($req.depth)" } | Out-Null
     }
-    'detail' { NeedFile $req.path; $data.detail = (Step 'Read the details' { DiskPart @("select vdisk file=`"$($req.path)`"", 'detail vdisk') }) }
+    'detail' {
+      NeedFile $req.path
+      if ($req.path -match '\.iso$') { $img = Image $req.path; $data.detail = "Format:         ISO`r`nSize:           $($img.Size) bytes`r`nAttached:       $($img.Attached)" }
+      else { UseVirtDisk; $data.detail = (Step 'Read the details' { [MtVirtDisk]::Detail($req.path) }) }
+    }
     'advanced' { NeedFile $req.path; $data.disk = Info $req.path; $data.advanced = (Step 'Read the details' { Advanced $req.path }) }
     'identity' {
       NeedFile $req.path; NeedDetached $req.path
@@ -384,13 +438,14 @@ try {
       # Content, one 4 KB cluster of slack per file, file-system overhead and 10% to spare.
       $mb = [math]::Ceiling(($bytes + $files.Count * 4096 + [math]::Max(64MB, $bytes * 0.03)) * 1.10 / 1MB)
       $mb = [math]::Max($mb, 64)
-      $dir = Split-Path -LiteralPath $items[0].FullName -Parent
+      $dir = [IO.Path]::GetDirectoryName($items[0].FullName)
       $base = if ($items[0].PSIsContainer) { $items[0].Name } else { [IO.Path]::GetFileNameWithoutExtension($items[0].Name) }
       $dest = Join-Path $dir "$base.vhdx"; $n = 2
       while (Test-Path -LiteralPath $dest) { $dest = Join-Path $dir "$base ($n).vhdx"; $n++ }
       $data.dest = $dest; $data.files = $files.Count; $data.bytes = $bytes; $data.sizeMB = $mb
       Note 'plan' @{ dest = $dest; files = $files.Count; bytes = $bytes; sizeMB = $mb }
-      Step 'Create the disk' { DiskPart @("create vdisk file=`"$dest`" maximum=$mb type=expandable") | Out-Null; "$mb MB" } | Out-Null
+      UseVirtDisk
+      Step 'Create the disk' { [MtVirtDisk]::Create($dest, [uint64]([int64]$mb * 1MB), $false, '', ''); "$mb MB" } | Out-Null
       Step 'Attach' { Attach $dest $false $false } | Out-Null
       $label = ($base -replace '[^A-Za-z0-9 _-]', '').Trim(); if (-not $label) { $label = 'Packed' }; if ($label.Length -gt 32) { $label = $label.Substring(0, 32) }
       Step 'Partition and format NTFS' { Prepare $dest 'GPT' 'NTFS' $label } | Out-Null
@@ -399,7 +454,7 @@ try {
       Step 'Copy files' {
         foreach ($f in $files) {
           $to = Join-Path $root $f.Rel
-          New-Item -ItemType Directory -Force -Path (Split-Path -LiteralPath $to -Parent) | Out-Null
+          New-Item -ItemType Directory -Force -Path ([IO.Path]::GetDirectoryName($to)) | Out-Null
           Copy-Item -LiteralPath $f.Src -Destination $to -Force
           $done++; if ($done % 25 -eq 0 -or $done -eq $files.Count) { Note 'copy' @{ done = $done; total = $files.Count } }
         }

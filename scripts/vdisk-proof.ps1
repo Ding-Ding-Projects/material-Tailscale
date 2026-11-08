@@ -27,7 +27,7 @@ function Run($label, $request) {
 
 $vhdx = Join-Path $disks 'Proof disk.vhdx'
 $probe = Run 'probe the routes' @{ op = 'probe' }
-$lines.Add("- Host: $($probe.data.edition) build $($probe.data.build); DiskPart $($probe.data.diskpart), Storage module $($probe.data.storage), VirtDisk $($probe.data.virtdisk), Hyper-V module $($probe.data.hyperv), elevated $($probe.data.elevated)")
+$lines.Add("- Host: $($probe.data.edition) build $($probe.data.build); VirtDisk $($probe.data.virtdisk), Storage module $($probe.data.storage), Hyper-V module $($probe.data.hyperv), elevated $($probe.data.elevated)")
 $r = Run 'create a 256 MB dynamic VHDX, partition, format NTFS and attach' @{ op = 'create'; path = $vhdx; type = 'dynamic'; sizeMB = 256; prepare = @{ style = 'GPT'; fs = 'NTFS'; label = 'Proof' }; attach = $true }
 if ($r.ok) {
   $letter = @($r.data.disk.letters)[0]
@@ -46,7 +46,8 @@ Run 'create a differencing disk on the VHDX' @{ op = 'create'; path = $child; ty
 Run 'attach the child read-only, then detach' @{ op = 'attach'; path = $child; readOnly = $true } | Out-Null
 Run 'detach the child' @{ op = 'detach'; path = $child } | Out-Null
 Run 'merge the child into its parent' @{ op = 'merge'; path = $child; depth = 1 } | Out-Null
-Run 'read DiskPart details' @{ op = 'detail'; path = $vhdx } | Out-Null
+$dt = Run 'read the details' @{ op = 'detail'; path = $vhdx }
+if ($dt.ok) { $lines.Add('- Details: ' + (($dt.data.detail -split "`r?`n" | Where-Object { $_ }) -join '; ')) }
 # An ISO made here with the Windows image-mastering API, attached read-only and detached again.
 try {
   $iso = Join-Path $disks 'Proof image.iso'
