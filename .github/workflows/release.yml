@@ -203,7 +203,8 @@ jobs:
   vdisk-proof:
     # Runs every virtual disk operation of the app's own disk script on a clean Windows
     # runner (create, attach, detach, grow, shrink, compact, convert, differencing,
-    # merge, ISO and Quick pack) and appends the results to the release notes. Evidence
+    # merge, ISO, Quick pack, identifiers, metadata, change tracking, a live mirror, and
+    # VHD Sets with checkpoints) and appends the results to the release notes. Evidence
     # only: the release is already published and nothing waits on this job.
     needs: [release, install-proof]
     if: ${{ always() && needs.release.result == 'success' }}

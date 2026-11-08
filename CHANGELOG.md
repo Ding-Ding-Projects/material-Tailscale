@@ -13,6 +13,7 @@ Every push to `main` publishes the next release. A section headed "Unreleased" i
 - The check for the contributor guide's mirror of the maintainer's instructions keeps its lock beside the private source as well; the repository no longer stores a hash of those instructions.
 - A second design canvas, "Everything added", designs each of these before it was built; design parity now covers both canvases and the companions.
 - The release sweep now covers the new pages too, and what it found is fixed at the source: card headings on the Ollama, virtual disk and regex debugger pages follow the page title in order, choice rows announce themselves as radio buttons in a named group, Features cards are proper list items, the debugger's pattern and text are named groups, section tabs that run past an edge show their arrow beside the tabs instead of over one, and the chat buttons wrap on a phone instead of running off the screen.
+- Switching pages quickly can no longer leave an older page under a newer tab: with animation on, a page change waits one frame for its transition, and an earlier change could finish last. Each change now carries a number and an older one steps aside.
 - The website hero shows the whole command window; the docs reader has an "On this page" outline.
 - Every screen redesigned on a design canvas, with the boards generated from the app's own stylesheets.
 - Page hero bands with animated illustrations, two-pane Settings, in-page tabs with a sliding indicator, a setup state with steps, live status dots.

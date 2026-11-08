@@ -79,7 +79,7 @@ Installers are built with Squirrel.Windows (`Setup.exe`, `RELEASES`, full and de
 | `npm run clip-matrix` | Checks every destination for cut-off text at 100, 125, 150 and 200% scale, in English, Cantonese and both, and at the minimum window size |
 | `npm run sweep` | The release check: every app surface and website page in both themes, three language modes and four window sizes (axe-core, console, layout, keyboard walk); run under `xvfb-run` on Linux after building the app and the website |
 | `npm run gen:postman` | Writes a Postman collection of every admin API operation to `docs/api/` |
-| `npm run wiki` | Builds the GitHub wiki from `docs/` (`-- --push` to publish it) |
+| `npm run wiki` | Builds the GitHub wiki from `docs/` (`-- --push` to publish it, `-- --stage` to keep the pages in `docs/wiki/pending/` until it can be) |
 | `npm test` | Catalogue, argument builder, RFC 4226 and RFC 6238 vectors, settings explanations |
 
 All `.bat` scripts accept `/s`, `--silent` or `SILENT=1`.
