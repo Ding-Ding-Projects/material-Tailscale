@@ -21,7 +21,7 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "bd31c7261c5bf8ce9488e6703754392da607bc3c7660c607633179946d2fd07e",
+  "boardSha256": "035e3093bc4b0b6c8f6a3cce0719cd53123e01f374caec24ffd23af04756b272",
   "captureSha256": {
     "reference": "1c248d56e5ff3aa5dcd8ff0cf43125c1a2a76bdac69c86388263e959b05094f8",
     "app": "79ea6c877f771c227b24056fe39a49af88e3b846e0184ae5c29e846b46765c76"

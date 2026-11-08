@@ -21,14 +21,14 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "360359070d2f530fcb4ab2846f702fbbb02dbd4ef19228e8d7df3b148a03ec64",
+  "boardSha256": "9235df2586f18532d8191857ba3d6012a51db2ec386356fbca52c2e4895de874",
   "captureSha256": {
     "reference": "3d7f21a1101115f279282634dc53a57be86112bd94c6cf3ba6ba5f04ac1701e4",
-    "app": "d6661294987286c1768e9bb0bf28fddb686c3082bc048f56b9685519c0b3fb25"
+    "app": "2f4d115ae9154842948dd3acafef89cde3d00a3a875219fc9bcb36d8a1464d35"
   },
-  "changedPixels": 164616,
+  "changedPixels": 155325,
   "totalPixels": 1382400,
-  "changedRatio": 0.1191,
+  "changedRatio": 0.1124,
   "threshold": "any channel delta above 40 of 255",
   "heatmap": "docs/design-parity/captures/add-ollama-harness/diff.webp"
 }

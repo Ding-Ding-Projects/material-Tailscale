@@ -21,14 +21,14 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "360359070d2f530fcb4ab2846f702fbbb02dbd4ef19228e8d7df3b148a03ec64",
+  "boardSha256": "9235df2586f18532d8191857ba3d6012a51db2ec386356fbca52c2e4895de874",
   "captureSha256": {
     "reference": "8a63e602c11aca41ff5b4aaff4f73417e3cc45aa24b8fd98696ee3c35628fddd",
-    "app": "9ef793b5dc8eaff93c80e8a1bf8ab8039a72151cbfb860a72e906a9820a93d14"
+    "app": "30f710349c9910c8d35856e97d0c02857e3f3dbe69e69493f459f15fcd15db93"
   },
-  "changedPixels": 134324,
+  "changedPixels": 129771,
   "totalPixels": 1382400,
-  "changedRatio": 0.0972,
+  "changedRatio": 0.0939,
   "threshold": "any channel delta above 40 of 255",
   "heatmap": "docs/design-parity/captures/add-ollama-create/diff.webp"
 }

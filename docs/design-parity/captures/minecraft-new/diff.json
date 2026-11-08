@@ -21,10 +21,10 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "13c150ccc134b72993d8c2f18345ff924c1d22335896d32bafa8c87c1e4a2824",
+  "boardSha256": "e79138ad43163ad677e7a16ba754344e1965f459ecfa6259bea764dbcfad082f",
   "captureSha256": {
     "reference": "3032e7182bfed316ddb162ec3bcdde4947e43da753902c26faaeab8e2de7ad69",
-    "app": "af22cb2011ff5ad5810b60b72a4027e3737fa0771acf30e3cf2c7cf8e80abd8e"
+    "app": "d9ff1b387e543d2066f08b3de8e7ef8677f21fc03cb31f7574d1a08da751253f"
   },
   "changedPixels": 95222,
   "totalPixels": 1382400,

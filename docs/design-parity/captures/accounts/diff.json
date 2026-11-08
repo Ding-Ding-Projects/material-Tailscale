@@ -21,12 +21,12 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "d36a72619f12ac7ab89e1246835b1e1b7c18dbad03c82bf07e56802874ffc9d0",
+  "boardSha256": "2f22f966f3ddf4e87bba2ecc6eac3bdccd5764960479703fb8faac5c55973b2e",
   "captureSha256": {
     "reference": "b8d914a4e8c2f3ff6bb8cdb1485a7f83412dc6710c3654b798b6cc3158464e4b",
-    "app": "281329b214bf1ad979a4bb37b5dcf580031c02c4f73f395370759abb7ba9cc2b"
+    "app": "147df3b1a9d27e34fa017dacebf4d0ef3782d902695fe6fd87c94ff9232b1f79"
   },
-  "changedPixels": 125801,
+  "changedPixels": 125798,
   "totalPixels": 1382400,
   "changedRatio": 0.091,
   "threshold": "any channel delta above 40 of 255",

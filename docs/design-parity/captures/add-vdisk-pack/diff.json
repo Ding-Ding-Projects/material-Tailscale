@@ -21,14 +21,14 @@
     "scale": 1,
     "motion": "off"
   },
-  "boardSha256": "af79ba540be90975bb27a58af51b3be75e9461f472a413065aec53e3e9ec6c57",
+  "boardSha256": "632970f7dc7fd4e3d8a6ab71e22c2483628160e277b166066cd0568231effe12",
   "captureSha256": {
-    "reference": "683e370ea8bae15d5dca423e943930c539c3bf2f1e07afce98c7ae53aac2272f",
-    "app": "c89a5f744aab595bb614c2c7c4f8e3eab98d768ce73aefab9308b111251fce71"
+    "reference": "7187ec0011ca9990bb8101b6fbd9874a250c0bea72e35acd8fd04c4f6e288293",
+    "app": "5df19583b1e2ed0c18c9824e52b22fb0c1ad71f30bd486e29b77d1f3f3f8e5b0"
   },
-  "changedPixels": 169886,
+  "changedPixels": 169592,
   "totalPixels": 1382400,
-  "changedRatio": 0.1229,
+  "changedRatio": 0.1227,
   "threshold": "any channel delta above 40 of 255",
   "heatmap": "docs/design-parity/captures/add-vdisk-pack/diff.webp"
 }
