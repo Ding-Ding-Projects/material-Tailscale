@@ -1,0 +1,28 @@
+{
+  "generated": "2026-11-08T17:57:26.578Z",
+  "seconds": 3192,
+  "resumed": 2,
+  "parts": 3,
+  "tuples": {
+    "sizes": [
+      "desktop",
+      "small",
+      "tablet",
+      "mobile"
+    ],
+    "themes": [
+      "dark",
+      "light"
+    ],
+    "langs": [
+      "en",
+      "yue",
+      "both"
+    ]
+  },
+  "surfacesChecked": 3816,
+  "findings": 0,
+  "distinct": 0,
+  "byType": {},
+  "problems": []
+}

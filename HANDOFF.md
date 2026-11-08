@@ -92,6 +92,16 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - `MT_CAPTURE_PROFILE` lets screenshot, clipping and recording runs use their own profile folder, so runs can go side by side without the single-instance lock closing one of them.
 - The instruction-mirror check keeps its lock beside the private source; `.instructions-lock` is removed from the repository, and the mirror in AGENTS.md and README.md now names the portable companions and the regex builder's full feature target.
 
+## Virtual disks finished and the release sweep (2026-11-08)
+
+- The first run of the app's own disk script on a Windows runner showed the DiskPart route was broken: DiskPart reads its script in the console code page, so the proof folder's Chinese letters reached it as unknown commands, and Windows PowerShell 5.1 could not resolve `Split-Path -LiteralPath ... -Parent`. Every operation now goes through the virtual disk API and the Storage module; DiskPart is not used at all.
+- The Advanced section is built: renew the disk identifier or virtual disk ID, VHDX custom metadata, change tracking with the blocks changed since a point, VHD Set checkpoints (take, return to with or without keeping the current state, delete), and a live mirror into a new file.
+- VHD Sets are created through the virtual disk API on every edition. A probe found the missing piece: `CREATE_VIRTUAL_DISK_FLAG_CREATE_BACKING_STORAGE`. Without it Windows answers "The parameter is incorrect" (what every earlier attempt got); with it, structure versions 2, 3 and 4 all create the set and its first data file. The Hyper-V module is only used to list the checkpoints of a set made elsewhere.
+- Shrink now offers the last partition first (to Windows' own minimum from `Get-PartitionSupportedSize`) and then the disk, or the disk alone. Shrinking the disk alone while a partition reaches its end is refused in words; before, PowerShell failed converting the result code `0xC03A0027` to a 32-bit integer.
+- Proof on the probe branch (`probe/vdisk-api`, runs 42505436738, 42506029433 and 42506420828 on `windows-latest`): the final run reports 60 results and no failures, including a fixed VHD Set partitioned, formatted and written into, and a file that read back unchanged after shrinking a 512 MB disk to 163 MB.
+- A page-render race is fixed: with motion on, a page swap waits a frame for its view transition, so an older render could land after a newer one; a capture that started on Virtual disks once showed the Home page under the Virtual disks tab. Each render now carries a number, the outlet records which page it shows, and captures wait for the page they asked for.
+- Release sweep on the build of `04996f1`: 3,816 checks (70 app routes and 89 website routes, four window sizes, two themes, three language modes), zero findings, zero distinct problems, recorded in `docs/sweep/`. It ran in three parts; the two app parts were stopped by the session's two-hour limit for background commands and finished with `--resume`.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.
@@ -101,12 +111,12 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - Extension actions in a populated device menu and extension checks against a running daemon: the capture machine has no Tailscale daemon, so the menus have no devices and the checks report that status is unavailable. The host, the built-ins and the samples are proven by the tests.
 - The title-bar overlay and Snap layouts on a person's own Windows desktop; the release's install-proof photographs come from a clean CI runner, whose edition may not offer Snap layouts.
 - Ollama pulling, chatting, creating and harness launches against a running Ollama: the build machine has none. The catalogue, fit, allowlist and rollback are proven by tests and by the real catalogue.
-- Virtual disk operations on Windows Home itself: the release proof runs on a Windows Server runner with the same DiskPart, Storage module and VirtDisk routes.
+- Virtual disk operations on Windows Home itself: the release proof runs on a Windows Server runner, using only the Storage module and virtual disk API routes that Home also has.
 - Running a build through the build companion and opening the offline website .exe on Windows.
 
 ## Remaining work
 
-See unchecked items in `ROADMAP.md`: VHD Set creation and checkpoints, VHDX metadata, mirroring, change tracking and identity reset for the virtual disk manager (VirtDisk-only on Windows Home); other engines in the regex benchmark and editor integration; Discussions (needs a repository settings change the build machine cannot make).
+See unchecked items in `ROADMAP.md`: other engines in the regex benchmark and editor integration; adapters for the remaining file-converter format families; Discussions (needs a repository settings change the build machine cannot make).
 
 ## Blockers
 
