@@ -1,6 +1,7 @@
 # Probe of the Windows virtual disk API on a hosted Windows runner. It answers one question per
 # step: does this call work here without Hyper-V, and with which open mode? Every step prints its
 # Win32 result code; nothing here is used by the app. ASCII only (Windows PowerShell 5.1).
+param([ValidateSet('api', 'mirror', 'vhdset')][string]$Part = 'api')
 $ErrorActionPreference = 'Stop'
 $root = Join-Path $env:RUNNER_TEMP 'vdisk-probe'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
@@ -67,23 +68,37 @@ public static class Probe {
       return "used=" + used;
     } finally { Marshal.FreeHGlobal(buf); }
   }
-  // Starts a mirror, waits for the copy to finish, then switches to the mirror. Returns a step log.
+  [DllImport("virtdisk.dll", EntryPoint = "MirrorVirtualDisk")] public static extern uint MirrorPtr(IntPtr h, uint flags, IntPtr p, IntPtr overlapped);
+  // Starts a mirror, waits for the copy to finish, then switches to the mirror. The parameters,
+  // the path and the OVERLAPPED stay in unmanaged memory until the operation is over.
   public static string Mirror(IntPtr h, string dest) {
-    IntPtr ov = Marshal.AllocHGlobal(64);
-    for (int i = 0; i < 64; i++) Marshal.WriteByte(ov, i, 0);
-    Marshal.WriteIntPtr(ov, IntPtr.Size == 8 ? 24 : 16, CreateEvent(IntPtr.Zero, true, false, IntPtr.Zero));
-    var p = new MIRROR_V1 { Version = 1, Path = dest };
-    uint r = MirrorVirtualDisk(h, 0, ref p, ov);
-    string log = "start=" + r;
-    if (r != 0 && r != 997) return log;
-    for (int i = 0; i < 600; i++) {
-      PROGRESS pr; uint g = GetVirtualDiskOperationProgress(h, ov, out pr);
-      if (g != 0) { log += " progress=" + g; break; }
-      if (pr.OperationStatus != 997 || (pr.CompletionValue > 0 && pr.CurrentValue >= pr.CompletionValue)) { log += " status=" + pr.OperationStatus + " " + pr.CurrentValue + "/" + pr.CompletionValue; break; }
-      Thread.Sleep(200);
-    }
-    log += " break=" + BreakMirrorVirtualDisk(h);
-    return log;
+    IntPtr ov = Marshal.AllocHGlobal(64), prm = Marshal.AllocHGlobal(16), path = Marshal.StringToHGlobalUni(dest);
+    try {
+      for (int i = 0; i < 64; i++) Marshal.WriteByte(ov, i, 0);
+      for (int i = 0; i < 16; i++) Marshal.WriteByte(prm, i, 0);
+      Marshal.WriteIntPtr(ov, IntPtr.Size == 8 ? 24 : 16, CreateEvent(IntPtr.Zero, true, false, IntPtr.Zero));
+      Marshal.WriteInt32(prm, 0, 1); Marshal.WriteIntPtr(prm, 8, path);
+      uint r = MirrorPtr(h, 0, prm, ov);
+      string log = "start=" + r;
+      if (r != 0 && r != 997) return log;
+      for (int i = 0; i < 900; i++) {
+        PROGRESS pr; uint g = GetVirtualDiskOperationProgress(h, ov, out pr);
+        if (g != 0) { log += " progress=" + g; break; }
+        if (pr.OperationStatus != 997 || (pr.CompletionValue > 0 && pr.CurrentValue >= pr.CompletionValue)) { log += " status=" + pr.OperationStatus + " " + pr.CurrentValue + "/" + pr.CompletionValue; break; }
+        Thread.Sleep(200);
+      }
+      log += " break=" + BreakMirrorVirtualDisk(h);
+      for (int i = 0; i < 50; i++) { PROGRESS pr; if (GetVirtualDiskOperationProgress(h, ov, out pr) != 0 || pr.OperationStatus != 997) { log += " final=" + pr.OperationStatus; break; } Thread.Sleep(200); }
+      return log;
+    } finally { Marshal.FreeHGlobal(prm); Marshal.FreeHGlobal(path); Marshal.FreeHGlobal(ov); }
+  }
+  // CreateVirtualDisk with explicit choices, for trying VHD Set creation several ways.
+  public static uint CreateWith(string path, uint device, bool msVendor, uint block, uint sector, uint physical) {
+    var t = new STORAGE_TYPE { DeviceId = device, VendorId = msVendor ? MS : Guid.Empty };
+    var p = new CREATE_V2 { Version = 2, MaximumSize = 1073741824, BlockSizeInBytes = block, SectorSizeInBytes = sector, PhysicalSectorSizeInBytes = physical };
+    IntPtr h; uint r = CreateVirtualDisk(ref t, path, 0, IntPtr.Zero, 0, 0, ref p, IntPtr.Zero, out h);
+    if (r == 0) CloseHandle(h);
+    return r;
   }
 }
 '@
@@ -96,75 +111,87 @@ function Row([string]$step, $code, [string]$detail = '') {
 }
 function Attempt([string]$step, [scriptblock]$body) { try { & $body } catch { Row $step 'exception' $_.Exception.Message } }
 
-Write-Host ("Windows: " + (Get-CimInstance Win32_OperatingSystem).Caption + " " + [Environment]::OSVersion.Version)
-Write-Host ("Hyper-V feature: " + ((Get-WindowsFeature -Name Hyper-V -ErrorAction SilentlyContinue).InstallState))
+$os = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+Write-Host ("Part $Part on " + $os.ProductName + " build " + $os.CurrentBuild)
 
 $vhdx = Join-Path $root 'probe.vhdx'
-$set = Join-Path $root 'probe.vhds'
 $mirror = Join-Path $root 'probe-mirror.vhdx'
 $gb = [uint64]1073741824
 
-Attempt 'create VHDX (CreateVirtualDisk v2)' { Row 'create VHDX (CreateVirtualDisk v2)' ([Probe]::Create($vhdx, 3, $gb)) }
-Attempt 'create VHD Set (CreateVirtualDisk v2, device 4)' { Row 'create VHD Set (CreateVirtualDisk v2, device 4)' ([Probe]::Create($set, 4, $gb)) ((Get-ChildItem $root | ForEach-Object { $_.Name }) -join ',') }
-
-foreach ($mode in @('v2', 'v1-all')) {
-  $h = [IntPtr]::Zero
-  $r = if ($mode -eq 'v2') { [Probe]::Open($vhdx, 3, 0, [ref]$h) } else { [Probe]::OpenAll($vhdx, 3, 0, [ref]$h) }
-  Row "open VHDX ($mode)" $r
-  if ($r -ne 0) { continue }
-  try {
-    $c = 0; $id = [Probe]::Info($h, 2, [ref]$c); Row "get identifier ($mode)" $c $id
-    $c = 0; $vid = [Probe]::Info($h, 14, [ref]$c); Row "get virtual disk id ($mode)" $c $vid
-    $s = New-Object Probe+SET_INFO; $s.Version = 2; $s.Id = [Guid]::NewGuid(); Row "set identifier ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s)) $s.Id
-    $c = 0; Row "identifier after set ($mode)" $c ([Probe]::Info($h, 2, [ref]$c))
-    $s = New-Object Probe+SET_INFO; $s.Version = 5; $s.Id = [Guid]::NewGuid(); Row "set virtual disk id ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s)) $s.Id
-    $c = 0; Row "virtual disk id after set ($mode)" $c ([Probe]::Info($h, 14, [ref]$c))
-
-    $item = [Guid]::NewGuid(); $bytes = [Text.Encoding]::Unicode.GetBytes('probe value')
-    Row "metadata set ($mode)" ([Probe]::SetVirtualDiskMetadata($h, [ref]$item, [uint32]$bytes.Length, $bytes)) $item
-    $n = [uint32]64; $items = New-Object Guid[] 64; Row "metadata enumerate ($mode)" ([Probe]::EnumerateVirtualDiskMetadata($h, [ref]$n, $items)) ("count=" + $n)
-    $size = [uint32]4096; $buf = New-Object byte[] 4096; $g = [Probe]::GetVirtualDiskMetadata($h, [ref]$item, [ref]$size, $buf)
-    Row "metadata get ($mode)" $g ($(if ($g -eq 0) { [Text.Encoding]::Unicode.GetString($buf, 0, $size) } else { '' }))
-    Row "metadata delete ($mode)" ([Probe]::DeleteVirtualDiskMetadata($h, [ref]$item))
-
-    $s = New-Object Probe+SET_INFO; $s.Version = 6; $s.Enabled = 1; Row "change tracking on ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s))
-    $c = 0; $state = [Probe]::Info($h, 15, [ref]$c); Row "change tracking state ($mode)" $c $state
-    if ($state -match 'id=(\S+)') {
-      $ranges = New-Object Probe+RANGE[] 16; $count = [uint32]16; $done = [uint64]0
-      Row "query changes ($mode)" ([Probe]::QueryChangesVirtualDisk($h, $Matches[1], 0, $gb, 0, $ranges, [ref]$count, [ref]$done)) ("ranges=$count processed=$done")
-    }
-    $s = New-Object Probe+SET_INFO; $s.Version = 6; $s.Enabled = 0; Row "change tracking off ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s))
-  } finally { [void][Probe]::CloseHandle($h) }
+function DiskPart([string[]]$lines) {
+  $f = Join-Path $root ('dp-' + [Guid]::NewGuid().ToString('N') + '.txt')
+  [IO.File]::WriteAllLines($f, $lines, [Text.Encoding]::Unicode)
+  $out = & diskpart.exe /s $f 2>&1 | Out-String
+  Remove-Item -LiteralPath $f -Force
+  return $out
 }
 
-# Mirroring needs the disk attached; attach it without a drive letter first.
-Attempt 'mirror' {
-  Mount-DiskImage -ImagePath $vhdx -NoDriveLetter | Out-Null
-  Row 'attach for mirror' 0
-  $h = [IntPtr]::Zero; $r = [Probe]::Open($vhdx, 3, 0, [ref]$h); Row 'open attached VHDX (v2)' $r
-  if ($r -eq 0) { try { Row 'mirror and break' 'see detail' ([Probe]::Mirror($h, $mirror)) } finally { [void][Probe]::CloseHandle($h) } }
-  Dismount-DiskImage -ImagePath $vhdx | Out-Null
-  Row 'mirror file exists' ([int](-not (Test-Path $mirror))) $(if (Test-Path $mirror) { (Get-Item $mirror).Length } else { '' })
-}
-
-if (Test-Path $set) {
-  foreach ($flags in @(0, 16)) {
-    $h = [IntPtr]::Zero; $r = [Probe]::Open($set, 4, [uint32]$flags, [ref]$h); Row "open VHD Set (v2, flags $flags)" $r
+if ($Part -eq 'api') {
+  Attempt 'create VHDX' { Row 'create VHDX' ([Probe]::Create($vhdx, 3, $gb)) }
+  foreach ($mode in @('v2', 'v1-all')) {
+    $h = [IntPtr]::Zero
+    $r = if ($mode -eq 'v2') { [Probe]::Open($vhdx, 3, 0, [ref]$h) } else { [Probe]::OpenAll($vhdx, 3, 0, [ref]$h) }
+    Row "open VHDX ($mode)" $r
     if ($r -ne 0) { continue }
     try {
-      $snap = [Guid]::NewGuid(); $t = New-Object Probe+SNAP_TAKE; $t.Version = 1; $t.SnapshotId = $snap
-      $tr = [Probe]::TakeSnapshotVhdSet($h, [ref]$t, 0); Row "take checkpoint (flags $flags)" $tr $snap
-      if ($tr -eq 0) {
-        $a = New-Object Probe+SNAP_APPLY; $a.Version = 1; $a.SnapshotId = $snap; $a.LeafSnapshotId = [Guid]::NewGuid()
-        Row "apply checkpoint (flags $flags)" ([Probe]::ApplySnapshotVhdSet($h, [ref]$a, 0)) $a.LeafSnapshotId
-        $d = New-Object Probe+SNAP_DELETE; $d.Version = 1; $d.SnapshotId = $snap
-        Row "delete checkpoint (flags $flags)" ([Probe]::DeleteSnapshotVhdSet($h, [ref]$d, 0))
-      }
+      $c = 0; Row "get identifier ($mode)" 0 ([Probe]::Info($h, 2, [ref]$c))
+      $s = New-Object Probe+SET_INFO; $s.Version = 2; $s.Id = [Guid]::NewGuid(); Row "set identifier ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s)) $s.Id
+      $s = New-Object Probe+SET_INFO; $s.Version = 5; $s.Id = [Guid]::NewGuid(); Row "set virtual disk id ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s)) $s.Id
+      $item = [Guid]::NewGuid(); $bytes = [Text.Encoding]::Unicode.GetBytes('probe value')
+      Row "metadata set ($mode)" ([Probe]::SetVirtualDiskMetadata($h, [ref]$item, [uint32]$bytes.Length, $bytes)) $item
+      $n = [uint32]64; $items = New-Object Guid[] 64; Row "metadata enumerate ($mode)" ([Probe]::EnumerateVirtualDiskMetadata($h, [ref]$n, $items)) ("count=" + $n)
+      Row "metadata delete ($mode)" ([Probe]::DeleteVirtualDiskMetadata($h, [ref]$item))
+      $s = New-Object Probe+SET_INFO; $s.Version = 6; $s.Enabled = 1; Row "change tracking on ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s))
+      $c = 0; Row "change tracking state ($mode)" 0 ([Probe]::Info($h, 15, [ref]$c))
+      $s = New-Object Probe+SET_INFO; $s.Version = 6; $s.Enabled = 0; Row "change tracking off ($mode)" ([Probe]::SetVirtualDiskInformation($h, [ref]$s))
     } finally { [void][Probe]::CloseHandle($h) }
   }
-  Attempt 'attach VHD Set' { Mount-DiskImage -ImagePath $set -NoDriveLetter | Out-Null; Row 'attach VHD Set' 0 ((Get-DiskImage -ImagePath $set).Attached); Dismount-DiskImage -ImagePath $set | Out-Null }
-  Write-Host ('Files: ' + ((Get-ChildItem $root | ForEach-Object { $_.Name + '=' + $_.Length }) -join ', '))
+  Write-Host 'api part finished'
 }
 
-$md = @('| Step | Code | Meaning | Detail |', '| --- | --- | --- | --- |') + ($results | ForEach-Object { "| $($_.Step) | $($_.Code) | $($_.Meaning) | $($_.Detail) |" })
+if ($Part -eq 'mirror') {
+  Attempt 'create VHDX' { Row 'create VHDX' ([Probe]::Create($vhdx, 3, $gb)) }
+  foreach ($attached in @($false, $true)) {
+    if ($attached) { Write-Host (DiskPart @("select vdisk file=`"$vhdx`"", 'attach vdisk')) }
+    Remove-Item -LiteralPath $mirror -Force -ErrorAction SilentlyContinue
+    $h = [IntPtr]::Zero; $r = [Probe]::Open($vhdx, 3, 0, [ref]$h); Row "open VHDX (attached=$attached)" $r
+    if ($r -eq 0) { try { Row "mirror and break (attached=$attached)" 'log' ([Probe]::Mirror($h, $mirror)) } finally { [void][Probe]::CloseHandle($h) } }
+    Row "mirror file exists (attached=$attached)" ([int](-not (Test-Path $mirror))) $(if (Test-Path $mirror) { (Get-Item $mirror).Length } else { '' })
+    if ($attached) { Write-Host (DiskPart @("select vdisk file=`"$vhdx`"", 'detach vdisk')) }
+  }
+  Write-Host 'mirror part finished'
+}
+
+if ($Part -eq 'vhdset') {
+  $i = 0
+  foreach ($v in @(@(4, $true, 0, 0, 0), @(4, $true, 33554432, 512, 4096), @(4, $false, 0, 0, 0), @(0, $false, 0, 0, 0), @(3, $true, 0, 0, 0))) {
+    $i++; $p = Join-Path $root ("set-$i.vhds")
+    Attempt "create .vhds variant $i" { Row ("create .vhds variant $i (device " + $v[0] + ', ms vendor ' + $v[1] + ', block ' + $v[2] + ', sector ' + $v[3] + '/' + $v[4] + ')') ([Probe]::CreateWith($p, [uint32]$v[0], [bool]$v[1], [uint32]$v[2], [uint32]$v[3], [uint32]$v[4])) ((Get-ChildItem $root -Filter "set-$i*" | ForEach-Object { $_.Name + '=' + $_.Length }) -join ',') }
+  }
+  $newVhd = Get-Command New-VHD -ErrorAction SilentlyContinue
+  Row 'Hyper-V New-VHD available' ([int](-not $newVhd)) $(if ($newVhd) { $newVhd.Source } else { '' })
+  $set = Join-Path $root 'hv.vhds'
+  if ($newVhd) { Attempt 'New-VHD .vhds' { New-VHD -Path $set -SizeBytes 1GB -Dynamic | Out-Null; Row 'New-VHD .vhds' 0 ((Get-ChildItem $root -Filter 'hv*' | ForEach-Object { $_.Name + '=' + $_.Length }) -join ',') } }
+  $made = Get-ChildItem $root -Filter '*.vhds' | Where-Object { $_.Length -gt 0 } | Select-Object -First 1
+  if ($made) {
+    foreach ($flags in @(0, 16)) {
+      $h = [IntPtr]::Zero; $r = [Probe]::Open($made.FullName, 4, [uint32]$flags, [ref]$h); Row "open $($made.Name) (flags $flags)" $r
+      if ($r -ne 0) { continue }
+      try {
+        $snap = [Guid]::NewGuid(); $t = New-Object Probe+SNAP_TAKE; $t.Version = 1; $t.SnapshotId = $snap
+        $tr = [Probe]::TakeSnapshotVhdSet($h, [ref]$t, 0); Row "take checkpoint (flags $flags)" $tr $snap
+        if ($tr -eq 0) {
+          $a = New-Object Probe+SNAP_APPLY; $a.Version = 1; $a.SnapshotId = $snap; $a.LeafSnapshotId = [Guid]::NewGuid()
+          Row "apply checkpoint (flags $flags)" ([Probe]::ApplySnapshotVhdSet($h, [ref]$a, 0)) $a.LeafSnapshotId
+          $d = New-Object Probe+SNAP_DELETE; $d.Version = 1; $d.SnapshotId = $snap
+          Row "delete checkpoint (flags $flags)" ([Probe]::DeleteSnapshotVhdSet($h, [ref]$d, 0))
+        }
+      } finally { [void][Probe]::CloseHandle($h) }
+    }
+    Write-Host ('Files: ' + ((Get-ChildItem $root | ForEach-Object { $_.Name + '=' + $_.Length }) -join ', '))
+  }
+  Write-Host 'vhdset part finished'
+}
+
+$md = @("### Part $Part", '', '| Step | Code | Meaning | Detail |', '| --- | --- | --- | --- |') + ($results | ForEach-Object { "| $($_.Step) | $($_.Code) | $($_.Meaning) | $($_.Detail) |" })
 if ($env:GITHUB_STEP_SUMMARY) { $md -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append }

@@ -15,6 +15,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Probe the virtual disk API
+      - name: Identity, metadata and change tracking
+        if: always()
         shell: powershell
-        run: ./vdisk-api-probe.ps1
+        run: ./vdisk-api-probe.ps1 -Part api
+      - name: Mirroring
+        if: always()
+        shell: powershell
+        run: ./vdisk-api-probe.ps1 -Part mirror
+      - name: VHD Sets and checkpoints
+        if: always()
+        shell: powershell
+        run: ./vdisk-api-probe.ps1 -Part vhdset
