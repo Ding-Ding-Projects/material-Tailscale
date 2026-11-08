@@ -1,22 +1,28 @@
-// Runs the built app through every destination at several display scales,
-// language modes and themes, plus the minimum window size, and reports any
-// visible text that is cut off. Usage: npm run build && xvfb-run -a node scripts/clip-matrix.mjs
+// Runs the built app through every surface the sweep visits (overlays, menus and settings
+// sections included) at 100, 125, 150 and 200 percent and at the minimum window size, in both
+// themes and every language mode, and reports any visible text that is cut off.
+// Usage: npm run build && xvfb-run -a node scripts/clip-matrix.mjs
+// MT_CAPTURE_DESTS, MT_CLIP_THEMES, MT_CLIP_SCALES and MT_CLIP_LANGS narrow a run; MT_CAPTURE_PROFILE
+// gives it its own profile folder so two runs can go side by side.
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import electron from 'electron';
+import { APP_ROUTES } from './lib/sweep-routes.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const base = process.env.MT_CLIP_DIR || path.join(root, 'out', 'clipping');
 const scales = (process.env.MT_CLIP_SCALES || '1,1.25,1.5,2').split(',');
 const langs = (process.env.MT_CLIP_LANGS || 'en,yue,both').split(',');
 const sizes = [['1440', '940'], ['960', '640']];
+const dests = process.env.MT_CAPTURE_DESTS || APP_ROUTES.join(',');
+const themes = process.env.MT_CLIP_THEMES || 'dark,light';
 const report = [];
 for (const [w, hgt] of sizes) for (const z of scales) for (const lang of langs) {
   if (w === '960' && z !== '1') continue; // minimum window at 100% only
   const dir = path.join(base, `${w}x${hgt}-${Math.round(z * 100)}-${lang}`);
-  const r = spawnSync(electron, [root, '--disable-gpu', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { stdio: 'ignore', env: { ...process.env, MT_CAPTURE_DIR: dir, MT_CAPTURE_W: w, MT_CAPTURE_H: hgt, MT_CAPTURE_ZOOM: z, MT_CAPTURE_LANG: lang, MT_CAPTURE_CLIP: '1', MT_CAPTURE_THEMES: process.env.MT_CLIP_THEMES || 'dark', MT_CAPTURE_PALETTE: '0' } });
+  const r = spawnSync(electron, [root, '--disable-gpu', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { stdio: 'ignore', env: { ...process.env, MT_CAPTURE_DIR: dir, MT_CAPTURE_W: w, MT_CAPTURE_H: hgt, MT_CAPTURE_ZOOM: z, MT_CAPTURE_LANG: lang, MT_CAPTURE_CLIP: '1', MT_CAPTURE_THEMES: themes, MT_CAPTURE_DESTS: dests, MT_CAPTURE_PALETTE: '0' } });
   let found = [];
   try { found = JSON.parse(fs.readFileSync(path.join(dir, 'clipping.json'), 'utf8')); } catch { found = [{ error: `capture exited with ${r.status}` }]; }
   const count = found.reduce((n, x) => n + (x.found?.length || 1), 0);

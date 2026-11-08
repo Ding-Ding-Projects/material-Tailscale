@@ -83,6 +83,15 @@ Material Tailscale: Electron app, website, docs, release pipeline, extensions, a
 - Both companions were built into unsigned portable .exe files on Linux (134 MB and 110 MB) and photographed from the same files; the release builds them on Windows and checks NotSigned.
 - The release adds a `vdisk-proof` job that runs every disk operation on a clean Windows runner and appends the results to the notes.
 
+## Release sweep pass (2026-11-07, afternoon)
+
+- Main's last two Release runs (1.0.13 and 1.0.14) failed in "Package Squirrel.Windows installer": Squirrel's GitHub sync tried to open a historic delta package that another step still held. The branch ships one full and one delta package per release; nothing reached main until this pass.
+- A targeted sweep of every surface added today (Tools, regex builder and debugger, the six Ollama sections, the three virtual disk sections, Features, Docs, Changelog and their website pages; 4 sizes, 2 themes, 3 language modes; 744 checks) found 443 findings in 21 distinct problems: skipped heading levels on the new pages, buttons that claimed `aria-checked` without a radio role, feature cards with a list-item role their element could not carry, labelled boxes with no role, a tab-strip arrow covering a tab on a phone, and a row of chat buttons running off a phone screen. All fixed at the source; the re-run of the same 744 checks reports zero.
+- The capture-mode clipping probe now treats a sideways-scrolling strip and screen-reader-only text the way the sweep's probe does; before, both were reported as clipped.
+- Clipping matrix (`scripts/clip-matrix.mjs`, now on every sweep route in both themes by default): 1440 by 940 at 100, 125, 150 and 200 percent and 960 by 640 at 100 percent, in English, Cantonese and both, light and dark, 70 routes each. No visible text is clipped. The first six configurations ran before the probe learned to skip screen-reader-only text and flagged only that text (121 and 261 entries, all in `.sr-only` live regions); every configuration after the change reports zero.
+- `MT_CAPTURE_PROFILE` lets screenshot, clipping and recording runs use their own profile folder, so runs can go side by side without the single-instance lock closing one of them.
+- The instruction-mirror check keeps its lock beside the private source; `.instructions-lock` is removed from the repository, and the mirror in AGENTS.md and README.md now names the portable companions and the regex builder's full feature target.
+
 ## Not verified
 
 - Running against a real Tailscale daemon and a real tailnet admin API token.

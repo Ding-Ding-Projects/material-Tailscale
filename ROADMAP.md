@@ -59,7 +59,7 @@
 - [x] Install and update proof on a clean Windows runner after every release (previous release installed, updated with Update.exe, uninstalled)
 - [x] Postman collection of every admin API operation
 - [x] Wiki generator from docs (publishing blocked from the build machine, see HANDOFF)
-- [ ] Clipping matrix at 125/150/200% scale and every language mode
+- [x] Clipping matrix at 125/150/200% scale and every language mode: 100, 125, 150 and 200 percent plus the 960 by 640 minimum window, both themes, all three language modes, every surface the sweep visits; nothing clipped.
 - [x] Portable build companion (carries its commit's source) and offline website companion, both single unsigned .exe files in every release
 - [x] Wording lock in build.bat and a pre-push hook, with no rules or hash in the repository
 - [ ] Discussions enabled with a rolling progress thread (the build machine cannot change repository settings; progress is on issue #1)

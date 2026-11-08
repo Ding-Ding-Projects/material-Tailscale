@@ -112,7 +112,7 @@ Generated from `src/shared/feature-inventory.mjs` by `npm run gen:completeness`;
 | Design reference and parity | finished | finished | n/a | `scripts/design-boards.mjs`, `scripts/design-parity.mjs`, [article](features/appearance/design-reference.md) |  |
 | Real screenshots and a recording | finished | finished | n/a | `src/main/main.js`, `scripts/record.mjs` |  |
 | Every-surface sweep | finished | finished | n/a | `scripts/sweep.mjs`, `src/main/sweep.js`, [article](features/appearance/every-surface-sweep.md) |  |
-| Clipping matrix | partly built | n/a | n/a | `scripts/clip-matrix.mjs` | The 125, 150 and 200 percent scales in every language mode are not run yet. |
+| Clipping matrix | finished | n/a | n/a | `scripts/clip-matrix.mjs` |  |
 | Version on the front screen | finished | finished | n/a | `src/renderer/ui/shell.js`, `site/site.js` |  |
 | A picture for shared links | n/a | finished | n/a | `social-preview.png` |  |
 
